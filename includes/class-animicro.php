@@ -33,7 +33,7 @@ class Animicro {
 		return [
 			'active_modules'    => [],
 			'available_modules' => [ 'fade', 'slide-up', 'slide-down', 'scale', 'blur', 'stagger', 'parallax', 'split' ],
-			'active_builder'    => 'none',
+			'active_builders'   => [ 'none' ],
 			'module_settings'   => [
 				'fade' => [
 					'duration' => 0.6,
@@ -47,7 +47,14 @@ class Animicro {
 
 	public static function get_settings(): array {
 		$settings = get_option( 'animicro_settings', [] );
-		return wp_parse_args( $settings, self::get_default_settings() );
+		$merged   = wp_parse_args( $settings, self::get_default_settings() );
+
+		// Migrate legacy active_builder (string) to active_builders (array).
+		if ( isset( $settings['active_builder'] ) && ! isset( $settings['active_builders'] ) ) {
+			$merged['active_builders'] = [ $settings['active_builder'] ];
+		}
+
+		return $merged;
 	}
 
 	private function load_dependencies(): void {

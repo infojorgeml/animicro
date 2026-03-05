@@ -89,8 +89,8 @@ class Animicro_Frontend {
 			return;
 		}
 
-		$active_builder = $settings['active_builder'] ?? 'none';
-		$css            = Animicro_Compatibility::get_editor_css( $settings['active_modules'], $active_builder );
+		$active_builders = $settings['active_builders'] ?? [ 'none' ];
+		$css             = Animicro_Compatibility::get_editor_css( $settings['active_modules'], $active_builders );
 
 		if ( ! empty( $css ) ) {
 			echo "<style id=\"animicro-dynamic-css\">\n" . $css . "</style>\n";

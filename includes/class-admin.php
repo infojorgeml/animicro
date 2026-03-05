@@ -174,9 +174,9 @@ class Animicro_Admin {
 			);
 		}
 
-		$clean['active_builder'] = isset( $raw['active_builder'] )
-			? sanitize_text_field( $raw['active_builder'] )
-			: $defaults['active_builder'];
+		$clean['active_builders'] = isset( $raw['active_builders'] ) && is_array( $raw['active_builders'] )
+			? array_values( array_map( 'sanitize_text_field', $raw['active_builders'] ) )
+			: $defaults['active_builders'] ?? [ 'none' ];
 
 		$raw_module_settings     = isset( $raw['module_settings'] ) && is_array( $raw['module_settings'] )
 			? $raw['module_settings']

@@ -9,7 +9,7 @@ import LicensePage from './components/LicensePage';
 
 export default function App() {
   const { version, page, isPremium } = window.animicroData;
-  const { settings, updateSettings, updateModuleSettings, toggleModule, save, isDirty, isSaving, saveMessage } = useSettings();
+  const { settings, updateModuleSettings, toggleModule, toggleBuilder, save, isDirty, isSaving, saveMessage } = useSettings();
   const [activeTab, setActiveTab] = useState<TabId>('modules');
 
   const isLicensePage = page === 'license';
@@ -71,7 +71,7 @@ export default function App() {
             )}
             {activeTab === 'cheatsheet' && <CheatSheet />}
             {activeTab === 'integrations' && (
-              <Integrations settings={settings} onUpdate={updateSettings} />
+              <Integrations settings={settings} toggleBuilder={toggleBuilder} />
             )}
           </div>
         </>

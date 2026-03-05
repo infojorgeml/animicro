@@ -6,6 +6,7 @@ interface UseSettingsReturn {
   updateSettings: (partial: Partial<AnimicroSettings>) => void;
   updateModuleSettings: (moduleId: string, partial: Partial<ModuleConfig>) => void;
   toggleModule: (moduleId: string) => void;
+  toggleBuilder: (builderId: string) => void;
   save: () => Promise<boolean>;
   isDirty: boolean;
   isSaving: boolean;
@@ -51,6 +52,17 @@ export function useSettings(): UseSettingsReturn {
     setSaveMessage('');
   }, []);
 
+  const toggleBuilder = useCallback((builderId: string) => {
+    setSettings(prev => {
+      const active = prev.active_builders.includes(builderId)
+        ? prev.active_builders.filter(b => b !== builderId)
+        : [...prev.active_builders, builderId];
+      return { ...prev, active_builders: active };
+    });
+    setIsDirty(true);
+    setSaveMessage('');
+  }, []);
+
   const save = useCallback(async (): Promise<boolean> => {
     setIsSaving(true);
     setSaveMessage('');
@@ -65,7 +77,7 @@ export function useSettings(): UseSettingsReturn {
         },
         body: JSON.stringify({
           active_modules:  settings.active_modules,
-          active_builder:  settings.active_builder,
+          active_builders: settings.active_builders,
           module_settings: settings.module_settings,
         }),
       });
@@ -88,5 +100,5 @@ export function useSettings(): UseSettingsReturn {
     }
   }, [settings]);
 
-  return { settings, updateSettings, updateModuleSettings, toggleModule, save, isDirty, isSaving, saveMessage };
+  return { settings, updateSettings, updateModuleSettings, toggleModule, toggleBuilder, save, isDirty, isSaving, saveMessage };
 }

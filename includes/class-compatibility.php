@@ -27,32 +27,42 @@ class Animicro_Compatibility {
 	/**
 	 * Returns the body selector that targets only the real frontend.
 	 *
-	 * When a builder is selected, we use body:not(.editor-class) so elements
-	 * stay visible inside the editor but hide on the live page.
+	 * When builders are selected, we chain body:not(.editor-class) for each
+	 * so elements stay visible inside those editors but hide on the live page.
 	 *
 	 * When "none" is selected, we chain :not() for ALL known editors + wp-admin.
 	 */
-	private static function get_frontend_selector( string $active_builder ): string {
-		if ( 'none' !== $active_builder && isset( self::BUILDER_EDITOR_CLASSES[ $active_builder ] ) ) {
-			return 'body:not(.' . self::BUILDER_EDITOR_CLASSES[ $active_builder ] . ')';
+	private static function get_frontend_selector( array $active_builders ): string {
+		$active_builders = array_filter( $active_builders, 'is_string' );
+
+		if ( empty( $active_builders ) || in_array( 'none', $active_builders, true ) ) {
+			$nots = ':not(.wp-admin)';
+			foreach ( self::BUILDER_EDITOR_CLASSES as $class ) {
+				$nots .= ':not(.' . $class . ')';
+			}
+			return 'body' . $nots;
 		}
-		$nots = ':not(.wp-admin)';
-		foreach ( self::BUILDER_EDITOR_CLASSES as $class ) {
-			$nots .= ':not(.' . $class . ')';
+
+		$nots = '';
+		foreach ( $active_builders as $id ) {
+			if ( isset( self::BUILDER_EDITOR_CLASSES[ $id ] ) ) {
+				$nots .= ':not(.' . self::BUILDER_EDITOR_CLASSES[ $id ] . ')';
+			}
 		}
-		return 'body' . $nots;
+
+		return $nots ? 'body' . $nots : 'body:not(.wp-admin)';
 	}
 
 	/**
 	 * Generate inline CSS rules for active modules.
 	 * Injected in <head> for instant load (no flicker).
 	 */
-	public static function get_editor_css( array $active_modules, string $active_builder = 'none' ): string {
+	public static function get_editor_css( array $active_modules, array $active_builders = [] ): string {
 		if ( empty( $active_modules ) ) {
 			return '';
 		}
 
-		$prefix = self::get_frontend_selector( sanitize_text_field( $active_builder ) );
+		$prefix = self::get_frontend_selector( $active_builders );
 		$rules  = [];
 
 		foreach ( $active_modules as $module ) {

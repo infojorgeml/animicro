@@ -8,7 +8,7 @@ export interface ModuleConfig {
 export interface AnimicroSettings {
   active_modules: string[];
   available_modules: string[];
-  active_builder: string;
+  active_builders: string[];
   module_settings: Record<string, ModuleConfig>;
 }
 
