@@ -1,76 +1,76 @@
 # Animicro
 
-Micro-animaciones utility-first para WordPress basadas en [Motion One](https://motion.dev/). Clases CSS simples, rendimiento extremo.
+Utility-first micro-animations for WordPress powered by [Motion One](https://motion.dev/). Simple CSS classes, extreme performance.
 
-## Descripción
+## Description
 
-Animicro permite añadir animaciones de alto nivel (estilo Awwwards) con impacto mínimo en el rendimiento. Activa módulos en el panel, aplica clases como `.am-fade` o `.am-slide-up` en tu Page Builder y listo.
+Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade` or `.am-slide-up` in your Page Builder, and you're done.
 
-**Filosofía**: Utility-first. Sin interfaces complejas, sin líneas de tiempo. Solo clases y atributos `data-*`.
+**Philosophy**: Utility-first. No complex interfaces, no timelines. Just classes and `data-*` attributes.
 
-## Requisitos
+## Requirements
 
 - WordPress 6.0+
 - PHP 7.4+
 
-## Instalación
+## Installation
 
-1. Descarga o clona el plugin en `wp-content/plugins/Animicro/`
-2. Ejecuta `npm install` y `npm run build` en la raíz del plugin
-3. Activa el plugin desde el escritorio de WordPress
-4. Ve a **Animicro** en el menú lateral para configurar módulos
+1. Download or clone the plugin to `wp-content/plugins/Animicro/`
+2. Run `npm install` and `npm run build` in the plugin root
+3. Activate the plugin from the WordPress dashboard
+4. Go to **Animicro** in the sidebar menu to configure modules
 
-## Módulos disponibles
+## Available modules
 
-| Módulo | Clase | Descripción | Plan |
+| Module | Class | Description | Plan |
 |--------|-------|-------------|------|
-| Fade | `.am-fade` | Aparición suave con opacidad | Free |
-| Slide Up | `.am-slide-up` | Desliza hacia arriba al aparecer | Free |
-| Slide Down | `.am-slide-down` | Desliza hacia abajo al aparecer | Free |
-| Scale | `.am-scale` | Escala desde pequeño al tamaño real | Free |
-| Blur | `.am-blur` | Desenfoque que se aclara al aparecer | Pro |
-| Stagger | `.am-stagger` | Anima hijos del contenedor en secuencia | Pro |
-| Parallax | `.am-parallax` | Movimiento parallax vinculado al scroll | Pro |
-| Split Text | `.am-split` | Divide y anima texto por letras/palabras | Pro |
+| Fade | `.am-fade` | Smooth appearance with opacity | Free |
+| Slide Up | `.am-slide-up` | Slides up when appearing | Free |
+| Slide Down | `.am-slide-down` | Slides down when appearing | Free |
+| Scale | `.am-scale` | Scales from small to full size | Free |
+| Blur | `.am-blur` | Blur that clears as it appears | Pro |
+| Stagger | `.am-stagger` | Animates container children in sequence | Pro |
+| Parallax | `.am-parallax` | Scroll-linked parallax movement | Pro |
+| Split Text | `.am-split` | Splits and animates text by letters/words | Pro |
 
-## Uso básico
+## Basic usage
 
 ```html
-<!-- Fade simple -->
-<div class="am-fade">Contenido que aparece suavemente</div>
+<!-- Simple fade -->
+<div class="am-fade">Content that appears smoothly</div>
 
-<!-- Con atributos personalizados -->
+<!-- With custom attributes -->
 <div class="am-fade" data-duration="1" data-delay="0.3" data-easing="ease-in-out">
-  Contenido con duración y delay personalizados
+  Content with custom duration and delay
 </div>
 ```
 
-## Atributos data-*
+## Data attributes
 
-| Atributo | Tipo | Default | Descripción |
-|----------|------|---------|-------------|
-| `data-duration` | float (s) | 0.6 | Duración de la animación |
-| `data-delay` | float (s) | 0 | Retraso antes de iniciar |
-| `data-easing` | string | ease-out | Curva de aceleración |
-| `data-margin` | string | -50px 0px | Margen de activación (inView) |
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `data-duration` | float (s) | 0.6 | Animation duration |
+| `data-delay` | float (s) | 0 | Delay before starting |
+| `data-easing` | string | ease-out | Easing curve |
+| `data-margin` | string | -50px 0px | Activation margin (inView) |
 
-## Compatibilidad
+## Compatibility
 
-Funciona con Elementor, Bricks, Breakdance, Oxygen y Gutenberg. El CSS se adapta automáticamente para no ocultar elementos dentro de los editores.
+Works with Elementor, Bricks, Breakdance, Oxygen and Gutenberg. Dynamic inline CSS adapts per builder so elements stay visible inside editors and animations only run on the live frontend.
 
-## Licencia Pro
+## Pro License
 
-Los módulos Blur, Stagger, Parallax y Split Text requieren una licencia Pro. Actívala en **Animicro → Licencia**.
+Blur, Stagger, Parallax and Split Text modules require a Pro license. Activate it under **Animicro → License**.
 
-## Desarrollo
+## Development
 
 ```bash
 npm install
-npm run build          # Compila admin + frontend
+npm run build          # Build admin + frontend
 npm run dev:admin      # Watch mode admin
 npm run dev:frontend   # Watch mode frontend
 ```
 
-## Licencia
+## License
 
 GPL-2.0-or-later
