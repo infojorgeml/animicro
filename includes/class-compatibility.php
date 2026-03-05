@@ -14,21 +14,28 @@ class Animicro_Compatibility {
 	];
 
 	private const MODULE_INITIAL_CSS = [
-		'fade'       => 'opacity:0;',
-		'slide-up'   => 'opacity:0;transform:translateY(20px);',
-		'slide-down' => 'opacity:0;transform:translateY(-20px);',
-		'scale'      => 'opacity:0;transform:scale(0.95);',
-		'blur'       => 'opacity:0;filter:blur(4px);',
+		'fade'       => 'opacity:0;will-change:opacity,transform;',
+		'slide-up'   => 'opacity:0;transform:translateY(20px);will-change:opacity,transform;',
+		'slide-down' => 'opacity:0;transform:translateY(-20px);will-change:opacity,transform;',
+		'scale'      => 'opacity:0;transform:scale(0.95);will-change:opacity,transform;',
+		'blur'       => 'opacity:0;filter:blur(4px);will-change:opacity,transform,filter;',
 		'stagger'    => '',
 		'parallax'   => '',
-		'split'      => 'opacity:0;',
+		'split'      => 'opacity:0;will-change:opacity,transform;',
 	];
 
 	/**
-	 * Builds a universal body:not() selector prefix that excludes
-	 * ALL known builder editors and wp-admin at once.
+	 * Returns the body selector that targets only the real frontend.
+	 *
+	 * When a builder is selected, we use body:not(.editor-class) so elements
+	 * stay visible inside the editor but hide on the live page.
+	 *
+	 * When "none" is selected, we chain :not() for ALL known editors + wp-admin.
 	 */
-	private static function get_universal_prefix(): string {
+	private static function get_frontend_selector( string $active_builder ): string {
+		if ( 'none' !== $active_builder && isset( self::BUILDER_EDITOR_CLASSES[ $active_builder ] ) ) {
+			return 'body:not(.' . self::BUILDER_EDITOR_CLASSES[ $active_builder ] . ')';
+		}
 		$nots = ':not(.wp-admin)';
 		foreach ( self::BUILDER_EDITOR_CLASSES as $class ) {
 			$nots .= ':not(.' . $class . ')';
@@ -37,15 +44,15 @@ class Animicro_Compatibility {
 	}
 
 	/**
-	 * Generate dynamic CSS rules for active modules.
-	 * Uses the universal :not() chain — no builder selection needed.
+	 * Generate inline CSS rules for active modules.
+	 * Injected in <head> for instant load (no flicker).
 	 */
-	public static function get_editor_css( array $active_modules ): string {
+	public static function get_editor_css( array $active_modules, string $active_builder = 'none' ): string {
 		if ( empty( $active_modules ) ) {
 			return '';
 		}
 
-		$prefix = self::get_universal_prefix();
+		$prefix = self::get_frontend_selector( sanitize_text_field( $active_builder ) );
 		$rules  = [];
 
 		foreach ( $active_modules as $module ) {
@@ -60,6 +67,10 @@ class Animicro_Compatibility {
 			$rules[] = "{$prefix} {$class}{{$props}}";
 		}
 
+		if ( in_array( 'split', $active_modules, true ) ) {
+			$rules[] = "{$prefix} .am-split.is-ready{opacity:1;}";
+		}
+
 		if ( empty( $rules ) ) {
 			return '';
 		}
@@ -69,7 +80,7 @@ class Animicro_Compatibility {
 
 	public static function get_available_builders(): array {
 		return [
-			'none'       => __( 'Ninguno / Otro', 'animicro' ),
+			'none'       => __( 'None / Other', 'animicro' ),
 			'elementor'  => 'Elementor',
 			'bricks'     => 'Bricks Builder',
 			'breakdance' => 'Breakdance',

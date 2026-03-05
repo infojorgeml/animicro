@@ -7,7 +7,7 @@ class Animicro_Frontend {
 
 	public function __construct() {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_assets' ] );
-		add_action( 'wp_head', [ $this, 'print_dynamic_css' ], 99 );
+		add_action( 'wp_head', [ $this, 'print_dynamic_css' ], 5 );
 	}
 
 	public function enqueue_assets(): void {
@@ -53,7 +53,6 @@ class Animicro_Frontend {
 		$module_settings = $settings['module_settings'] ?? [];
 		$is_premium      = Animicro_License_Manager::is_premium();
 
-		// Strip pro modules from the active list when there is no valid license.
 		$active_modules = array_values(
 			array_filter(
 				$settings['active_modules'],
@@ -79,13 +78,19 @@ class Animicro_Frontend {
 	}
 
 	public function print_dynamic_css(): void {
+		// Bricks editor iframe loads with ?bricks=run — skip hiding CSS there.
+		if ( isset( $_GET['bricks'] ) && 'run' === $_GET['bricks'] ) {
+			return;
+		}
+
 		$settings = Animicro::get_settings();
 
 		if ( empty( $settings['active_modules'] ) ) {
 			return;
 		}
 
-		$css = Animicro_Compatibility::get_editor_css( $settings['active_modules'] );
+		$active_builder = $settings['active_builder'] ?? 'none';
+		$css            = Animicro_Compatibility::get_editor_css( $settings['active_modules'], $active_builder );
 
 		if ( ! empty( $css ) ) {
 			echo "<style id=\"animicro-dynamic-css\">\n" . $css . "</style>\n";
