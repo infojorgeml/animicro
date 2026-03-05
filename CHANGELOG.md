@@ -5,6 +5,20 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5] - 2026-02-26
+
+### Added
+
+- **Live preview** for Fade module settings: animated square on the right that reflects duration, easing, and delay in real time
+- **Replay** button to manually trigger the preview animation
+
+### Changed
+
+- **Builder selection** is now multiselect: you can enable multiple builders (e.g. Bricks + Elementor) at once
+- Fade settings field order: Delay moved to second position (after Duration)
+- Preview panel background: light gray instead of dark
+- Preview no longer loops automatically; use Replay to see the animation again
+
 ## [0.2.0] - 2026-02-26
 
 ### Added
@@ -48,5 +62,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Vite 6 for admin (React + TypeScript + Tailwind) and frontend (Vanilla JS) build
 - REST API: `animicro/v1/settings`, `animicro/v1/license/status`, `animicro/v1/license/save`
 
+[0.2.5]: https://github.com/infojorgeml/animicro/compare/v0.2.0...v0.2.5
 [0.2.0]: https://github.com/infojorgeml/animicro/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/infojorgeml/animicro/releases/tag/v0.1.1

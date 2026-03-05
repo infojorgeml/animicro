@@ -4,7 +4,7 @@ Utility-first micro-animations for WordPress powered by [Motion One](https://mot
 
 ## Description
 
-Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade` or `.am-slide-up` in your Page Builder, and you're done.
+Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade` or `.am-slide-up` in your Page Builder, and you're done. Fade settings include a live preview so you can tune duration, easing, and delay without leaving the admin.
 
 **Philosophy**: Utility-first. No complex interfaces, no timelines. Just classes and `data-*` attributes.
 
@@ -56,7 +56,7 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 
 ## Compatibility
 
-Works with Elementor, Bricks, Breakdance, Oxygen and Gutenberg. Dynamic inline CSS adapts per builder so elements stay visible inside editors and animations only run on the live frontend.
+Works with Elementor, Bricks, Breakdance, Oxygen and Gutenberg. Dynamic inline CSS adapts per builder so elements stay visible inside editors and animations only run on the live frontend. You can select multiple builders if you use more than one.
 
 ## Pro License
 
