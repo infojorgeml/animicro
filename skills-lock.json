@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "skills": {
+    "wordpress-performance-best-practices": {
+      "source": "bartekmis/wordpress-performance-best-practises",
+      "sourceType": "github",
+      "computedHash": "379ace31b7d0f55112e3c6c9bb95d3e04cf683796bb294cc94e3be7b40bab791"
+    },
+    "wordpress-pro": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "computedHash": "64017aea810dfd5324988ece94380ec097947f0e6e9314f9e2b5e3a86847e3bd"
+    },
+    "wp-plugin-development": {
+      "source": "automattic/agent-skills",
+      "sourceType": "github",
+      "computedHash": "3c13a9d2e6e346c9f933918fdf4d191cdba9f2cfe24f87cbcd763d090bbd8014"
+    }
+  }
+}
