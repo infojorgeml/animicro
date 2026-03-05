@@ -36,9 +36,9 @@ export default function Dashboard({ settings, isPremium, onToggleModule, onUpdat
   return (
     <div>
       <div className="mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">Módulos de animación</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Animation modules</h2>
         <p className="text-sm text-gray-500">
-          Activa los módulos que necesites. Solo se carga el JS de los módulos activos.
+          Enable the modules you need. Only the JS of active modules is loaded.
         </p>
       </div>
 
@@ -84,12 +84,12 @@ export default function Dashboard({ settings, isPremium, onToggleModule, onUpdat
                   </p>
                   {isLocked && (
                     <p className="mt-1.5 text-xs text-amber-600">
-                      Requiere licencia Pro.{' '}
+                      Requires Pro license.{' '}
                       <a
                         href="?page=animicro-license"
                         className="underline hover:text-amber-700"
                       >
-                        Activar licencia
+                        Activate license
                       </a>
                     </p>
                   )}
@@ -110,7 +110,7 @@ export default function Dashboard({ settings, isPremium, onToggleModule, onUpdat
                       {isActive && (
                         <button
                           onClick={() => setSettingsFor(mod.id)}
-                          title={`Ajustes de ${mod.name}`}
+                          title={`Settings for ${mod.name}`}
                           className="rounded-md p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">

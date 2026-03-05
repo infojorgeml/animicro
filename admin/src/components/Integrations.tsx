@@ -11,10 +11,10 @@ export default function Integrations({ settings, onUpdate }: IntegrationsProps) 
   return (
     <div>
       <div className="mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">Compatibilidad con Builders</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Builder Compatibility</h2>
         <p className="text-sm text-gray-500">
-          Selecciona tu page builder principal. Animicro genera CSS que evita conflictos
-          con el modo editor, asegurando que las animaciones solo se ejecuten en el frontend.
+          Select your main page builder. Animicro generates CSS that avoids conflicts
+          with editor mode, ensuring animations only run on the frontend.
         </p>
       </div>
 

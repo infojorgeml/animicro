@@ -200,21 +200,21 @@ class Animicro_License_Manager {
 
 	public function get_error_message( string $reason ): string {
 		$messages = [
-			'ok'                 => __( 'Licencia válida', 'animicro' ),
-			'no_license'         => __( 'No se ha introducido ninguna clave de licencia', 'animicro' ),
-			'not_found'          => __( 'Clave de licencia no encontrada', 'animicro' ),
-			'expired'            => __( 'La licencia ha caducado', 'animicro' ),
-			'disabled'           => __( 'La licencia ha sido desactivada', 'animicro' ),
-			'domain_mismatch'    => __( 'El dominio no coincide con el dominio registrado', 'animicro' ),
-			'product_mismatch'   => __( 'La licencia no es válida para este producto', 'animicro' ),
-			'missing_params'     => __( 'Faltan parámetros requeridos', 'animicro' ),
-			'connection_error'   => __( 'No se pudo conectar con el servidor de licencias', 'animicro' ),
-			'server_error'       => __( 'Error en el servidor de licencias', 'animicro' ),
-			'invalid_response'   => __( 'Respuesta inválida del servidor de licencias', 'animicro' ),
-			'function_not_found' => __( 'Servicio de validación no disponible', 'animicro' ),
+			'ok'                 => __( 'License valid', 'animicro' ),
+			'no_license'         => __( 'No license key has been entered', 'animicro' ),
+			'not_found'          => __( 'License key not found', 'animicro' ),
+			'expired'            => __( 'License has expired', 'animicro' ),
+			'disabled'           => __( 'License has been deactivated', 'animicro' ),
+			'domain_mismatch'    => __( 'Domain does not match the registered domain', 'animicro' ),
+			'product_mismatch'   => __( 'License is not valid for this product', 'animicro' ),
+			'missing_params'     => __( 'Missing required parameters', 'animicro' ),
+			'connection_error'   => __( 'Could not connect to the license server', 'animicro' ),
+			'server_error'       => __( 'License server error', 'animicro' ),
+			'invalid_response'   => __( 'Invalid response from the license server', 'animicro' ),
+			'function_not_found' => __( 'Validation service unavailable', 'animicro' ),
 		];
 
-		return $messages[ $reason ] ?? __( 'Error desconocido', 'animicro' );
+		return $messages[ $reason ] ?? __( 'Unknown error', 'animicro' );
 	}
 
 	public static function validate_license_periodically(): void {

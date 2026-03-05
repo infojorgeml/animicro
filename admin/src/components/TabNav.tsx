@@ -6,9 +6,9 @@ interface Tab {
 }
 
 const TABS: Tab[] = [
-  { id: 'modules',      label: 'Módulos' },
+  { id: 'modules',      label: 'Modules' },
   { id: 'cheatsheet',   label: 'Cheat Sheet' },
-  { id: 'integrations', label: 'Integraciones' },
+  { id: 'integrations', label: 'Integrations' },
 ];
 
 interface TabNavProps {

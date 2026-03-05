@@ -30,8 +30,8 @@ class Animicro_Admin {
 
 		$this->license_page_hook = add_submenu_page(
 			'animicro',
-			__( 'Licencia Pro', 'animicro' ),
-			__( 'Licencia', 'animicro' ),
+			__( 'Pro License', 'animicro' ),
+			__( 'License', 'animicro' ),
 			'manage_options',
 			'animicro-license',
 			[ $this, 'render_page' ]

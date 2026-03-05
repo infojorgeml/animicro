@@ -1,17 +1,17 @@
 import { useState } from 'react';
 
 const ERROR_MESSAGES: Record<string, string> = {
-  ok:                 'Licencia válida',
-  no_license:         'No se ha introducido ninguna clave de licencia',
-  not_found:          'Clave de licencia no encontrada. Verifica que la clave sea correcta.',
-  expired:            'La licencia ha caducado. Por favor, renuévala.',
-  disabled:           'La licencia ha sido desactivada. Contacta con soporte.',
-  domain_mismatch:    'El dominio no coincide con el dominio registrado para esta licencia.',
-  product_mismatch:   'Esta licencia no es válida para Animicro.',
-  connection_error:   'No se pudo conectar con el servidor de licencias. Verifica tu conexión.',
-  server_error:       'Error en el servidor de licencias. Inténtalo de nuevo más tarde.',
-  invalid_response:   'Respuesta inválida del servidor. Inténtalo de nuevo.',
-  function_not_found: 'Servicio de validación no disponible temporalmente.',
+  ok:                 'License valid',
+  no_license:         'No license key has been entered',
+  not_found:          'License key not found. Please verify the key is correct.',
+  expired:            'License has expired. Please renew it.',
+  disabled:           'License has been deactivated. Contact support.',
+  domain_mismatch:    'Domain does not match the domain registered for this license.',
+  product_mismatch:   'This license is not valid for Animicro.',
+  connection_error:   'Could not connect to the license server. Check your connection.',
+  server_error:       'License server error. Please try again later.',
+  invalid_response:   'Invalid response from server. Please try again.',
+  function_not_found: 'Validation service temporarily unavailable.',
 };
 
 interface SaveResult {
@@ -59,7 +59,7 @@ export default function LicensePage() {
       setResult({
         success: false,
         is_premium: false,
-        message: 'Error al conectar con el servidor.',
+        message: 'Could not connect to the server.',
         data: { valid: false, reason: 'connection_error', plan: null },
       });
     } finally {
@@ -89,7 +89,7 @@ export default function LicensePage() {
       setResult({
         success: false,
         is_premium: false,
-        message: 'Error al conectar con el servidor.',
+        message: 'Could not connect to the server.',
         data: { valid: false, reason: 'connection_error', plan: null },
       });
     } finally {
@@ -103,9 +103,9 @@ export default function LicensePage() {
   return (
     <div className="max-w-xl">
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-900">Licencia Pro</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Pro License</h2>
         <p className="text-sm text-gray-500 mt-1">
-          Activa tu licencia para desbloquear los módulos Pro: Blur, Stagger, Parallax y Split Text.
+          Activate your license to unlock Pro modules: Blur, Stagger, Parallax and Split Text.
         </p>
       </div>
 
@@ -121,7 +121,7 @@ export default function LicensePage() {
           `} />
           <div>
             <p className="text-sm font-medium text-gray-900">
-              {currentlyPremium ? 'Licencia activa' : 'Sin licencia activa'}
+              {currentlyPremium ? 'License active' : 'No active license'}
             </p>
             <p className="text-xs text-gray-500 mt-0.5">
               Plan:{' '}
@@ -129,10 +129,10 @@ export default function LicensePage() {
                 {currentlyPremium ? plan?.toUpperCase() ?? 'Pro' : 'Free'}
               </span>
               {result?.data?.registered_domain && (
-                <> · Dominio: <span className="font-mono">{result.data.registered_domain}</span></>
+                <> · Domain: <span className="font-mono">{result.data.registered_domain}</span></>
               )}
               {result?.data?.expires_at && (
-                <> · Expira: {new Date(result.data.expires_at).toLocaleDateString('es-ES')}</>
+                <> · Expires: {new Date(result.data.expires_at).toLocaleDateString()}</>
               )}
             </p>
           </div>
@@ -142,7 +142,7 @@ export default function LicensePage() {
       {/* License key input */}
       <div className="space-y-3">
         <label className="block text-sm font-medium text-gray-700">
-          Clave de licencia
+          License key
         </label>
         <input
           type="text"
@@ -165,7 +165,7 @@ export default function LicensePage() {
                 : 'bg-gray-300 cursor-not-allowed'}
             `}
           >
-            {isSaving ? 'Verificando...' : 'Activar licencia'}
+            {isSaving ? 'Verifying...' : 'Activate license'}
           </button>
 
           {(currentlyPremium || !!initialKey) && (
@@ -175,7 +175,7 @@ export default function LicensePage() {
               className="rounded-lg px-4 py-2 text-sm font-medium text-red-600 border border-red-200
                          hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isRemoving ? 'Eliminando...' : 'Eliminar licencia'}
+              {isRemoving ? 'Removing...' : 'Remove license'}
             </button>
           )}
         </div>
@@ -190,14 +190,14 @@ export default function LicensePage() {
             : 'border-red-200 bg-red-50 text-red-800'}
         `}>
           <p className="font-medium">
-            {result.is_premium ? '¡Licencia activada correctamente!' : 'Error al activar la licencia'}
+            {result.is_premium ? 'License activated successfully!' : 'Error activating license'}
           </p>
           <p className="mt-0.5 text-xs opacity-80">
             {ERROR_MESSAGES[result.data?.reason] ?? result.message}
           </p>
           {result.is_premium && (
             <p className="mt-2 text-xs">
-              Recarga la página del panel para ver los módulos Pro desbloqueados.
+              Reload the panel page to see Pro modules unlocked.
             </p>
           )}
         </div>
@@ -205,7 +205,7 @@ export default function LicensePage() {
 
       {/* Info */}
       <div className="mt-8 rounded-lg border border-gray-200 bg-gray-50 p-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-2">Módulos Pro incluidos</h3>
+        <h3 className="text-sm font-medium text-gray-700 mb-2">Pro modules included</h3>
         <ul className="space-y-1">
           {[
             { name: 'Blur', css: '.am-blur' },

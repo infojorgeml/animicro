@@ -7,14 +7,14 @@ export interface ModuleInfo {
 }
 
 export const MODULE_INFO: ModuleInfo[] = [
-  { id: 'fade',       name: 'Fade',       description: 'Aparición suave con opacidad',              cssClass: '.am-fade',     isPro: false },
-  { id: 'slide-up',   name: 'Slide Up',   description: 'Desliza hacia arriba al aparecer',          cssClass: '.am-slide-up', isPro: false },
-  { id: 'slide-down', name: 'Slide Down', description: 'Desliza hacia abajo al aparecer',           cssClass: '.am-slide-down', isPro: false },
-  { id: 'scale',      name: 'Scale',      description: 'Escala desde pequeño al tamaño real',       cssClass: '.am-scale',    isPro: false },
-  { id: 'blur',       name: 'Blur',       description: 'Desenfoque que se aclara al aparecer',      cssClass: '.am-blur',     isPro: true },
-  { id: 'stagger',    name: 'Stagger',    description: 'Anima hijos del contenedor en secuencia',   cssClass: '.am-stagger',  isPro: true },
-  { id: 'parallax',   name: 'Parallax',   description: 'Movimiento parallax vinculado al scroll',   cssClass: '.am-parallax', isPro: true },
-  { id: 'split',      name: 'Split Text', description: 'Divide y anima texto por letras/palabras',  cssClass: '.am-split',    isPro: true },
+  { id: 'fade',       name: 'Fade',       description: 'Smooth appearance with opacity',              cssClass: '.am-fade',     isPro: false },
+  { id: 'slide-up',   name: 'Slide Up',   description: 'Slides up when appearing',                   cssClass: '.am-slide-up', isPro: false },
+  { id: 'slide-down', name: 'Slide Down', description: 'Slides down when appearing',                  cssClass: '.am-slide-down', isPro: false },
+  { id: 'scale',      name: 'Scale',      description: 'Scales from small to full size',               cssClass: '.am-scale',    isPro: false },
+  { id: 'blur',       name: 'Blur',       description: 'Blur that clears as it appears',               cssClass: '.am-blur',     isPro: true },
+  { id: 'stagger',    name: 'Stagger',    description: 'Animates container children in sequence',      cssClass: '.am-stagger',  isPro: true },
+  { id: 'parallax',   name: 'Parallax',   description: 'Scroll-linked parallax movement',               cssClass: '.am-parallax', isPro: true },
+  { id: 'split',      name: 'Split Text', description: 'Splits and animates text by letters/words',    cssClass: '.am-split',    isPro: true },
 ];
 
 export interface DataAttribute {
@@ -25,10 +25,10 @@ export interface DataAttribute {
 }
 
 export const DATA_ATTRIBUTES: DataAttribute[] = [
-  { attribute: 'data-duration',  type: 'float (s)',     defaultValue: '0.6',       usedBy: 'Todos' },
-  { attribute: 'data-delay',     type: 'float (s)',     defaultValue: '0',         usedBy: 'Todos' },
-  { attribute: 'data-easing',    type: 'string',        defaultValue: 'ease-out',  usedBy: 'Todos' },
-  { attribute: 'data-margin',    type: 'string',        defaultValue: '-50px 0px', usedBy: 'Todos' },
+  { attribute: 'data-duration',  type: 'float (s)',     defaultValue: '0.6',       usedBy: 'All' },
+  { attribute: 'data-delay',     type: 'float (s)',     defaultValue: '0',         usedBy: 'All' },
+  { attribute: 'data-easing',    type: 'string',        defaultValue: 'ease-out',  usedBy: 'All' },
+  { attribute: 'data-margin',    type: 'string',        defaultValue: '-50px 0px', usedBy: 'All' },
   { attribute: 'data-distance',  type: 'float (px)',    defaultValue: '30',        usedBy: 'slide-up, slide-down' },
   { attribute: 'data-scale',     type: 'float',         defaultValue: '0.95',      usedBy: 'scale' },
   { attribute: 'data-blur',      type: 'float (px)',    defaultValue: '4',         usedBy: 'blur' },
@@ -44,10 +44,10 @@ export interface EasingOption {
 }
 
 export const EASING_OPTIONS: EasingOption[] = [
-  { value: 'ease-out',                       label: 'Ease Out',        description: 'Rápido al inicio, frena al final — Recomendado' },
-  { value: 'ease-in-out',                    label: 'Ease In Out',     description: 'Arranque y freno suaves' },
-  { value: 'linear',                         label: 'Linear',          description: 'Constante, ideal para parallax' },
-  { value: 'cubic-bezier(0.25, 0.4, 0.25, 1)', label: 'Premium (Apple-like)', description: 'Curva suave tipo Apple' },
+  { value: 'ease-out',                       label: 'Ease Out',        description: 'Fast at start, slows at end — Recommended' },
+  { value: 'ease-in-out',                    label: 'Ease In Out',     description: 'Smooth start and stop' },
+  { value: 'linear',                         label: 'Linear',          description: 'Constant, ideal for parallax' },
+  { value: 'cubic-bezier(0.25, 0.4, 0.25, 1)', label: 'Premium (Apple-like)', description: 'Smooth Apple-style curve' },
 ];
 
 export interface MarginOption {
@@ -57,7 +57,7 @@ export interface MarginOption {
 }
 
 export const MARGIN_OPTIONS: MarginOption[] = [
-  { value: '0px 0px',   label: 'Pronto', description: 'Se anima al tocar el borde de la pantalla' },
-  { value: '-50px 0px', label: 'Normal', description: 'Espera a entrar un poco en pantalla' },
-  { value: '-10% 0px',  label: 'Tarde',  description: 'Espera a estar bien dentro de la pantalla' },
+  { value: '0px 0px',   label: 'Early',  description: 'Animates when touching the viewport edge' },
+  { value: '-50px 0px', label: 'Normal', description: 'Waits slightly before entering viewport' },
+  { value: '-10% 0px',  label: 'Late',   description: 'Waits until well inside the viewport' },
 ];

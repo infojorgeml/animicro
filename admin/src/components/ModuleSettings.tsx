@@ -21,7 +21,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
           </svg>
-          Módulos
+          Modules
         </button>
         <span className="text-gray-300">/</span>
         <div className="flex items-center gap-2">
@@ -32,14 +32,14 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
 
       <div className="space-y-8 max-w-lg">
 
-        {/* Duración */}
+        {/* Duration */}
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
-            Duración
+            Duration
             <span className="font-mono text-blue-600">{config.duration}s</span>
           </label>
           <p className="text-xs text-gray-400 mb-2">
-            Define si la animación se siente rápida y eléctrica, o suave y cinematográfica.
+            Defines whether the animation feels fast and snappy, or smooth and cinematic.
           </p>
           <input
             type="range"
@@ -51,18 +51,18 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             className="w-full accent-blue-600"
           />
           <div className="flex justify-between text-xs text-gray-400 mt-1">
-            <span>0.1s — Eléctrico</span>
-            <span>2.0s — Cinematográfico</span>
+            <span>0.1s — Snappy</span>
+            <span>2.0s — Cinematic</span>
           </div>
         </div>
 
         {/* Easing */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Curva de aceleración
+            Easing curve
           </label>
           <p className="text-xs text-gray-400 mb-2">
-            Controla cómo acelera y desacelera la animación a lo largo del tiempo.
+            Controls how the animation accelerates and decelerates over time.
           </p>
           <select
             value={config.easing}
@@ -88,7 +88,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             <span className="font-mono text-blue-600">{config.delay}s</span>
           </label>
           <p className="text-xs text-gray-400 mb-2">
-            Tiempo de espera antes de que comience la animación.
+            Wait time before the animation starts.
           </p>
           <input
             type="range"
@@ -100,18 +100,18 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             className="w-full accent-blue-600"
           />
           <div className="flex justify-between text-xs text-gray-400 mt-1">
-            <span>0s — Inmediato</span>
+            <span>0s — Immediate</span>
             <span>2.0s</span>
           </div>
         </div>
 
-        {/* Margen de activación */}
+        {/* Activation margin */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Margen de activación
+            Activation margin
           </label>
           <p className="text-xs text-gray-400 mb-2">
-            Define qué tan adentro de la pantalla debe entrar el elemento antes de animarse.
+            How far into the viewport the element must enter before animating.
           </p>
           <div className="grid grid-cols-3 gap-2">
             {MARGIN_OPTIONS.map(opt => (
@@ -131,9 +131,9 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             ))}
           </div>
           <p className="mt-2 text-xs text-gray-400 font-mono">
-            Valor: <code>{config.margin}</code>
+            Value: <code>{config.margin}</code>
             {' · '}
-            <span className="not-italic">Se puede sobrescribir con </span>
+            <span className="not-italic">Can be overridden with </span>
             <code>data-margin</code>
           </p>
         </div>

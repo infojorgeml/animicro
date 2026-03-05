@@ -16,7 +16,7 @@ function CopyButton({ text }: { text: string }) {
       className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600
                  hover:bg-gray-200 transition-colors"
     >
-      {copied ? 'Copiado!' : 'Copiar'}
+      {copied ? 'Copied!' : 'Copy'}
     </button>
   );
 }
@@ -25,17 +25,17 @@ export default function CheatSheet() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-1">Clases CSS</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-1">CSS Classes</h2>
         <p className="text-sm text-gray-500 mb-4">
-          Añade estas clases a cualquier elemento en tu builder.
+          Add these classes to any element in your builder.
         </p>
         <div className="overflow-x-auto rounded-lg border border-gray-200">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-2.5 text-left font-medium text-gray-700">Módulo</th>
-                <th className="px-4 py-2.5 text-left font-medium text-gray-700">Clase</th>
-                <th className="px-4 py-2.5 text-left font-medium text-gray-700">Descripción</th>
+                <th className="px-4 py-2.5 text-left font-medium text-gray-700">Module</th>
+                <th className="px-4 py-2.5 text-left font-medium text-gray-700">Class</th>
+                <th className="px-4 py-2.5 text-left font-medium text-gray-700">Description</th>
                 <th className="px-4 py-2.5 w-16"></th>
               </tr>
             </thead>
@@ -60,18 +60,18 @@ export default function CheatSheet() {
       </div>
 
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-1">Atributos Data</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-1">Data Attributes</h2>
         <p className="text-sm text-gray-500 mb-4">
-          Sobrescribe los valores globales por elemento.
+          Override global values per element.
         </p>
         <div className="overflow-x-auto rounded-lg border border-gray-200">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-2.5 text-left font-medium text-gray-700">Atributo</th>
-                <th className="px-4 py-2.5 text-left font-medium text-gray-700">Tipo</th>
+                <th className="px-4 py-2.5 text-left font-medium text-gray-700">Attribute</th>
+                <th className="px-4 py-2.5 text-left font-medium text-gray-700">Type</th>
                 <th className="px-4 py-2.5 text-left font-medium text-gray-700">Default</th>
-                <th className="px-4 py-2.5 text-left font-medium text-gray-700">Usado por</th>
+                <th className="px-4 py-2.5 text-left font-medium text-gray-700">Used by</th>
                 <th className="px-4 py-2.5 w-16"></th>
               </tr>
             </thead>
@@ -97,26 +97,26 @@ export default function CheatSheet() {
       </div>
 
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-1">Ejemplos</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-1">Examples</h2>
         <p className="text-sm text-gray-500 mb-4">
-          Copia y pega directamente en tu builder.
+          Copy and paste directly into your builder.
         </p>
         <div className="space-y-3">
           <ExampleBlock
-            title="Fade básico"
-            code={'<div class="am-fade">Contenido</div>'}
+            title="Basic fade"
+            code={'<div class="am-fade">Content</div>'}
           />
           <ExampleBlock
-            title="Slide con delay personalizado"
-            code={'<div class="am-slide-up" data-delay="0.3" data-duration="0.8">Contenido</div>'}
+            title="Slide with custom delay"
+            code={'<div class="am-slide-up" data-delay="0.3" data-duration="0.8">Content</div>'}
           />
           <ExampleBlock
-            title="Stagger en contenedor"
-            code={'<div class="am-stagger" data-stagger="0.1">\n  <div>Hijo 1</div>\n  <div>Hijo 2</div>\n  <div>Hijo 3</div>\n</div>'}
+            title="Stagger container"
+            code={'<div class="am-stagger" data-stagger="0.1">\n  <div>Child 1</div>\n  <div>Child 2</div>\n  <div>Child 3</div>\n</div>'}
           />
           <ExampleBlock
-            title="Split text por palabras"
-            code={'<h2 class="am-split" data-split="words">Tu texto aquí</h2>'}
+            title="Split text by words"
+            code={'<h2 class="am-split" data-split="words">Your text here</h2>'}
           />
         </div>
       </div>

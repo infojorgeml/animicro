@@ -32,7 +32,7 @@ export default function App() {
         {!isLicensePage && (
           <div className="flex items-center gap-3">
             {saveMessage && (
-              <span className={`text-sm ${saveMessage.startsWith('✓') ? 'text-green-600' : 'text-red-600'}`}>
+              <span className={`text-sm ${saveMessage === 'Saved' ? 'text-green-600' : 'text-red-600'}`}>
                 {saveMessage}
               </span>
             )}
@@ -46,7 +46,7 @@ export default function App() {
                   : 'bg-gray-300 cursor-not-allowed'}
               `}
             >
-              {isSaving ? 'Guardando...' : 'Guardar cambios'}
+              {isSaving ? 'Saving...' : 'Save changes'}
             </button>
           </div>
         )}

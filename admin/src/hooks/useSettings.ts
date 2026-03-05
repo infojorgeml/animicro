@@ -76,11 +76,11 @@ export function useSettings(): UseSettingsReturn {
       setSettings(prev => ({ ...prev, ...saved }));
       initial.current = { ...initial.current, ...saved };
       setIsDirty(false);
-      setSaveMessage('Guardado');
+      setSaveMessage('Saved');
       setTimeout(() => setSaveMessage(''), 2500);
       return true;
     } catch {
-      setSaveMessage('Error al guardar');
+      setSaveMessage('Error saving');
       setTimeout(() => setSaveMessage(''), 3000);
       return false;
     } finally {

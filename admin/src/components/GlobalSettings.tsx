@@ -10,16 +10,16 @@ export default function GlobalSettings({ settings, onUpdate }: GlobalSettingsPro
   return (
     <div>
       <div className="mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">Ajustes globales</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Global settings</h2>
         <p className="text-sm text-gray-500">
-          Valores por defecto para todas las animaciones. Se pueden sobrescribir por elemento con atributos data-*.
+          Default values for all animations. Can be overridden per element with data-* attributes.
         </p>
       </div>
 
       <div className="space-y-6 max-w-lg">
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-2">
-            Duración
+            Duration
             <span className="font-mono text-blue-600">{settings.global_duration}s</span>
           </label>
           <input
