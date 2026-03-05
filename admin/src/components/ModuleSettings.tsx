@@ -1,5 +1,6 @@
 import { EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
+import AnimationPreview from './AnimationPreview';
 
 interface ModuleSettingsProps {
   moduleId: string;
@@ -30,6 +31,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
       </div>
 
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-8 items-start">
+
       <div className="space-y-8 max-w-lg">
 
         {/* Duration */}
@@ -56,6 +59,30 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         </div>
 
+        {/* Delay */}
+        <div>
+          <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+            Delay
+            <span className="font-mono text-blue-600">{config.delay}s</span>
+          </label>
+          <p className="text-xs text-gray-400 mb-2">
+            Wait time before the animation starts.
+          </p>
+          <input
+            type="range"
+            min="0"
+            max="2"
+            step="0.1"
+            value={config.delay}
+            onChange={e => onUpdate({ delay: parseFloat(e.target.value) })}
+            className="w-full accent-blue-600"
+          />
+          <div className="flex justify-between text-xs text-gray-400 mt-1">
+            <span>0s — Immediate</span>
+            <span>2.0s</span>
+          </div>
+        </div>
+
         {/* Easing */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -79,30 +106,6 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
               {EASING_OPTIONS.find(o => o.value === config.easing)?.description}
             </p>
           )}
-        </div>
-
-        {/* Delay */}
-        <div>
-          <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
-            Delay
-            <span className="font-mono text-blue-600">{config.delay}s</span>
-          </label>
-          <p className="text-xs text-gray-400 mb-2">
-            Wait time before the animation starts.
-          </p>
-          <input
-            type="range"
-            min="0"
-            max="2"
-            step="0.1"
-            value={config.delay}
-            onChange={e => onUpdate({ delay: parseFloat(e.target.value) })}
-            className="w-full accent-blue-600"
-          />
-          <div className="flex justify-between text-xs text-gray-400 mt-1">
-            <span>0s — Immediate</span>
-            <span>2.0s</span>
-          </div>
         </div>
 
         {/* Activation margin */}
@@ -137,6 +140,12 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             <code>data-margin</code>
           </p>
         </div>
+
+      </div>
+
+      <div className="hidden lg:block sticky top-8">
+        <AnimationPreview moduleId={moduleId} config={config} />
+      </div>
 
       </div>
     </div>
