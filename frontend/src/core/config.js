@@ -17,7 +17,7 @@ export function getElementConfig(el, moduleId = '') {
     duration:  d.amDuration  !== undefined ? parseFloat(d.amDuration)  : (mod.duration  ?? 0.6),
     delay:     d.amDelay     !== undefined ? parseFloat(d.amDelay)     : (mod.delay     ?? 0),
     easing:    d.amEasing    || mod.easing  || 'ease-out',
-    distance:  d.amDistance  !== undefined ? parseFloat(d.amDistance)  : 30,
+    distance:  d.amDistance  !== undefined ? parseFloat(d.amDistance)  : (mod.distance  ?? 30),
     margin:    d.amMargin    || mod.margin  || '-50px 0px',
   };
 }

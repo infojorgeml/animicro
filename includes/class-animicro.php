@@ -34,14 +34,21 @@ class Animicro {
 			'active_modules'    => [],
 			'available_modules' => [ 'fade', 'slide-up', 'slide-down', 'scale', 'blur', 'stagger', 'parallax', 'split' ],
 			'active_builders'   => [ 'none' ],
-			'module_settings'   => [
-				'fade' => [
-					'duration' => 0.6,
-					'easing'   => 'ease-out',
-					'delay'    => 0.0,
-					'margin'   => '-50px 0px',
-				],
+		'module_settings'   => [
+			'fade' => [
+				'duration' => 0.6,
+				'easing'   => 'ease-out',
+				'delay'    => 0.0,
+				'margin'   => '-50px 0px',
 			],
+			'slide-up' => [
+				'duration' => 0.6,
+				'easing'   => 'ease-out',
+				'delay'    => 0.0,
+				'margin'   => '-50px 0px',
+				'distance' => 30,
+			],
+		],
 		];
 	}
 

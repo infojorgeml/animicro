@@ -4,7 +4,7 @@ Utility-first micro-animations for WordPress powered by [Motion One](https://mot
 
 ## Description
 
-Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade` or `.am-slide-up` in your Page Builder, and you're done. Fade settings include a live preview so you can tune duration, easing, and delay without leaving the admin.
+Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade` or `.am-slide-up` in your Page Builder, and you're done. Fade and Slide Up each have their own settings with a live preview so you can tune duration, easing, delay, and (for slide) distance without leaving the admin.
 
 **Philosophy**: Utility-first. No complex interfaces, no timelines. Just classes and `data-am-*` attributes.
 
@@ -53,6 +53,7 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 | `data-am-delay` | float (s) | 0 | Delay before starting |
 | `data-am-easing` | string | ease-out | Easing curve |
 | `data-am-margin` | string | -50px 0px | Activation margin (inView) |
+| `data-am-distance` | number (px) | 30 | Slide distance (slide-up, slide-down only) |
 
 ## Compatibility
 

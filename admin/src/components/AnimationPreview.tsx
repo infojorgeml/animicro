@@ -18,18 +18,25 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
     controlsRef.current?.cancel();
 
+    const isSlide = moduleId.startsWith('slide');
+    const dist = config.distance ?? 30;
+
     el.style.opacity = '0';
+    if (isSlide) el.style.transform = `translateY(${dist}px)`;
 
     requestAnimationFrame(() => {
+      const keyframes: Record<string, any> = { opacity: [0, 1] };
+      if (isSlide) keyframes.y = [dist, 0];
+
       controlsRef.current = animate(
         el,
-        { opacity: [0, 1] },
+        keyframes,
         { duration: config.duration, delay: config.delay, easing: config.easing as any },
       );
 
       controlsRef.current.finished.catch(() => {});
     });
-  }, [config.duration, config.delay, config.easing]);
+  }, [config.duration, config.delay, config.easing, config.distance, moduleId]);
 
   useEffect(() => {
     play();
@@ -71,6 +78,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
       <div className="w-full text-center space-y-1">
         <p className="text-[10px] text-gray-400 font-mono">
           {config.duration}s · {config.easing} · {config.delay}s delay
+          {moduleId.startsWith('slide') && config.distance != null && ` · ${config.distance}px`}
         </p>
       </div>
 

@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 
@@ -8,6 +8,13 @@ interface ModuleSettingsProps {
   onUpdate: (partial: Partial<ModuleConfig>) => void;
   onBack: () => void;
 }
+
+const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
+  fade: DEFAULT_FADE_CONFIG,
+  'slide-up': DEFAULT_SLIDE_UP_CONFIG,
+};
+
+const hasDistance = (id: string) => id === 'slide-up' || id === 'slide-down';
 
 export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: ModuleSettingsProps) {
   const mod = MODULE_INFO.find(m => m.id === moduleId);
@@ -83,6 +90,32 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         </div>
 
+        {/* Distance (slide modules only) */}
+        {hasDistance(moduleId) && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Distance
+              <span className="font-mono text-blue-600">{config.distance ?? 30}px</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              How far the element travels before reaching its final position.
+            </p>
+            <input
+              type="range"
+              min="10"
+              max="100"
+              step="5"
+              value={config.distance ?? 30}
+              onChange={e => onUpdate({ distance: parseInt(e.target.value, 10) })}
+              className="w-full accent-blue-600"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>10px — Subtle</span>
+              <span>100px — Dramatic</span>
+            </div>
+          </div>
+        )}
+
         {/* Easing */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -133,12 +166,6 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
               </button>
             ))}
           </div>
-          <p className="mt-2 text-xs text-gray-400 font-mono">
-            Value: <code>{config.margin}</code>
-            {' · '}
-            <span className="not-italic">Can be overridden with </span>
-            <code>data-am-margin</code>
-          </p>
         </div>
 
       </div>
@@ -147,7 +174,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         <AnimationPreview
           moduleId={moduleId}
           config={config}
-          onReset={moduleId === 'fade' ? () => onUpdate(DEFAULT_FADE_CONFIG) : undefined}
+          onReset={DEFAULTS[moduleId] ? () => onUpdate(DEFAULTS[moduleId]) : undefined}
         />
       </div>
 

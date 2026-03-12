@@ -214,12 +214,18 @@ class Animicro_Admin {
 		foreach ( $default_module_settings as $module_id => $module_defaults ) {
 			$raw_mod = $raw_module_settings[ $module_id ] ?? [];
 
-			$clean_module_settings[ $module_id ] = [
+			$entry = [
 				'duration' => isset( $raw_mod['duration'] ) ? (float) $raw_mod['duration'] : $module_defaults['duration'],
 				'easing'   => isset( $raw_mod['easing'] )   ? sanitize_text_field( $raw_mod['easing'] ) : $module_defaults['easing'],
 				'delay'    => isset( $raw_mod['delay'] )     ? (float) $raw_mod['delay'] : $module_defaults['delay'],
 				'margin'   => isset( $raw_mod['margin'] )    ? sanitize_text_field( $raw_mod['margin'] ) : $module_defaults['margin'],
 			];
+
+			if ( isset( $module_defaults['distance'] ) ) {
+				$entry['distance'] = isset( $raw_mod['distance'] ) ? (float) $raw_mod['distance'] : $module_defaults['distance'];
+			}
+
+			$clean_module_settings[ $module_id ] = $entry;
 		}
 
 		foreach ( $raw_module_settings as $module_id => $raw_mod ) {

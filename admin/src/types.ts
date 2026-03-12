@@ -3,6 +3,7 @@ export interface ModuleConfig {
   easing: string;
   delay: number;
   margin: string;
+  distance?: number;
 }
 
 export interface AnimicroSettings {

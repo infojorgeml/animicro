@@ -5,6 +5,23 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.8] - 2026-02-26
+
+### Added
+
+- **Slide Up module** brought to same quality as Fade:
+  - Per-module settings (duration, easing, delay, margin, distance) with dedicated settings page
+  - **Distance** slider (10–100px) in admin for slide-up and slide-down
+  - Live preview in admin shows opacity + translateY for slide modules
+  - Reset to default button for Slide Up settings
+- `ModuleConfig` and PHP defaults now support optional `distance` for slide modules
+- Frontend `slide.js` rewritten: per-element config via `getElementConfig`, `margin`-based inView (no `amount`)
+
+### Changed
+
+- Initial CSS for `.am-slide-up` and `.am-slide-down` aligned to 30px distance (was 20px)
+- `getElementConfig` uses module default `distance` from settings when not overridden by `data-am-distance`
+
 ## [0.2.7] - 2026-02-26
 
 ### Changed
