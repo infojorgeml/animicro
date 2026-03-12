@@ -4,7 +4,7 @@ Utility-first micro-animations for WordPress powered by [Motion One](https://mot
 
 ## Description
 
-Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade`, `.am-slide-up`, or `.am-slide-right` in your Page Builder, and you're done. Fade and all slide modules (up, down, right, left) have their own settings with a live preview so you can tune duration, easing, delay, and distance without leaving the admin.
+Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade`, `.am-scale`, or `.am-slide-up` in your Page Builder, and you're done. Fade, Scale, all slide modules, and Blur each have their own settings with a live preview so you can tune duration, easing, delay, and (where applicable) scale factor, blur amount, or distance without leaving the admin.
 
 **Philosophy**: Utility-first. No complex interfaces, no timelines. Just classes and `data-am-*` attributes.
 
@@ -25,17 +25,19 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 | Module | Class | Description | Plan |
 |--------|-------|-------------|------|
 | Fade | `.am-fade` | Smooth appearance with opacity | Free |
+| Scale | `.am-scale` | Scales from small to full size | Free |
 | Slide Up | `.am-slide-up` | Slides up when appearing | Free |
 | Slide Down | `.am-slide-down` | Slides down when appearing | Free |
 | Slide Right | `.am-slide-right` | Slides in from the left | Pro |
 | Slide Left | `.am-slide-left` | Slides in from the right | Pro |
-| Scale | `.am-scale` | Scales from small to full size | Free |
 | Blur | `.am-blur` | Blur that clears as it appears | Pro |
 | Stagger | `.am-stagger` | Animates container children in sequence | Pro |
 | Parallax | `.am-parallax` | Scroll-linked parallax movement | Pro |
 | Split Text | `.am-split` | Splits and animates text by letters/words | Pro |
 
 ## Basic usage
+
+Use only one animation class per element. Do not combine `.am-fade` with `.am-slide-up` (or other entry animations) on the same element — it can cause flicker.
 
 ```html
 <!-- Simple fade -->
@@ -56,6 +58,8 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 | `data-am-easing` | string | ease-out | Easing curve |
 | `data-am-margin` | string | -50px 0px | Activation margin (inView) |
 | `data-am-distance` | number (px) | 30 | Slide distance (slide-up, slide-down, slide-right, slide-left) |
+| `data-am-scale` | float | 0.95 | Starting scale (scale module) |
+| `data-am-blur` | number (px) | 4 | Initial blur amount (blur module) |
 
 ## Compatibility
 

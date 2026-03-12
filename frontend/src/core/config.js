@@ -18,6 +18,8 @@ export function getElementConfig(el, moduleId = '') {
     delay:     d.amDelay     !== undefined ? parseFloat(d.amDelay)     : (mod.delay     ?? 0),
     easing:    d.amEasing    || mod.easing  || 'ease-out',
     distance:  d.amDistance  !== undefined ? parseFloat(d.amDistance)  : (mod.distance  ?? 30),
+    scale:     d.amScale    !== undefined ? parseFloat(d.amScale)    : (mod.scale    ?? 0.95),
+    blur:      d.amBlur     !== undefined ? parseFloat(d.amBlur)     : (mod.blur     ?? 4),
     margin:    d.amMargin    || mod.margin  || '-50px 0px',
   };
 }

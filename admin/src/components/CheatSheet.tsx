@@ -24,6 +24,10 @@ function CopyButton({ text }: { text: string }) {
 export default function CheatSheet() {
   return (
     <div className="space-y-8">
+      <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <strong>Important:</strong> Use only one animation class per element. Do not combine <code className="rounded bg-amber-100 px-1">.am-fade</code> with <code className="rounded bg-amber-100 px-1">.am-slide-up</code> (or other entry animations) on the same element — it can cause flicker.
+      </div>
+
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-1">CSS Classes</h2>
         <p className="text-sm text-gray-500 mb-4">

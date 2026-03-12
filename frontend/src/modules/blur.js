@@ -2,16 +2,18 @@ import { animate, inView } from 'motion';
 import { getElementConfig } from '../core/config.js';
 
 export function init() {
-  inView('.am-blur', (el) => {
-    const cfg = getElementConfig(el);
-    const amount = el.dataset.amBlur !== undefined ? parseFloat(el.dataset.amBlur) : 4;
+  const els = document.querySelectorAll('.am-blur');
+  if (!els.length) return;
 
-    animate(
-      el,
-      { opacity: [0, 1], filter: [`blur(${amount}px)`, 'blur(0px)'] },
-      { duration: cfg.duration, delay: cfg.delay, easing: cfg.easing }
-    );
+  els.forEach((el) => {
+    const cfg = getElementConfig(el, 'blur');
 
-    el.classList.add('am-animated');
-  }, { amount: 0.2 });
+    inView(el, () => {
+      animate(
+        el,
+        { opacity: [0, 1], filter: [`blur(${cfg.blur}px)`, 'blur(0px)'] },
+        { duration: cfg.duration, delay: cfg.delay, easing: cfg.easing }
+      );
+    }, { margin: cfg.margin });
+  });
 }

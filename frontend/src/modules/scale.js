@@ -2,16 +2,18 @@ import { animate, inView } from 'motion';
 import { getElementConfig } from '../core/config.js';
 
 export function init() {
-  inView('.am-scale', (el) => {
-    const cfg = getElementConfig(el);
-    const from = el.dataset.amScale !== undefined ? parseFloat(el.dataset.amScale) : 0.95;
+  const els = document.querySelectorAll('.am-scale');
+  if (!els.length) return;
 
-    animate(
-      el,
-      { opacity: [0, 1], scale: [from, 1] },
-      { duration: cfg.duration, delay: cfg.delay, easing: cfg.easing }
-    );
+  els.forEach((el) => {
+    const cfg = getElementConfig(el, 'scale');
 
-    el.classList.add('am-animated');
-  }, { amount: 0.2 });
+    inView(el, () => {
+      animate(
+        el,
+        { opacity: [0, 1], scale: [cfg.scale, 1] },
+        { duration: cfg.duration, delay: cfg.delay, easing: cfg.easing }
+      );
+    }, { margin: cfg.margin });
+  });
 }

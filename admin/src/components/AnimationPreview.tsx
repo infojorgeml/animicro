@@ -21,19 +21,35 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
     const isSlide = moduleId.startsWith('slide');
     const isHorizontal = moduleId === 'slide-left' || moduleId === 'slide-right';
     const isNegative = moduleId === 'slide-down' || moduleId === 'slide-right';
-    const dist = config.distance ?? 30;
-    const from = isNegative ? -dist : dist;
+    const isScale = moduleId === 'scale';
+    const isBlur = moduleId === 'blur';
 
     el.style.opacity = '0';
+    el.style.transform = 'none';
+    el.style.filter = 'none';
+
     if (isSlide) {
+      const dist = config.distance ?? 30;
+      const from = isNegative ? -dist : dist;
       el.style.transform = isHorizontal ? `translateX(${from}px)` : `translateY(${from}px)`;
+    } else if (isScale) {
+      el.style.transform = `scale(${config.scale ?? 0.95})`;
+    } else if (isBlur) {
+      el.style.filter = `blur(${config.blur ?? 4}px)`;
     }
 
     requestAnimationFrame(() => {
       const keyframes: Record<string, any> = { opacity: [0, 1] };
+
       if (isSlide) {
+        const dist = config.distance ?? 30;
+        const from = isNegative ? -dist : dist;
         const axis = isHorizontal ? 'x' : 'y';
         keyframes[axis] = [from, 0];
+      } else if (isScale) {
+        keyframes.scale = [config.scale ?? 0.95, 1];
+      } else if (isBlur) {
+        keyframes.filter = [`blur(${config.blur ?? 4}px)`, 'blur(0px)'];
       }
 
       controlsRef.current = animate(
@@ -44,7 +60,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
       controlsRef.current.finished.catch(() => {});
     });
-  }, [config.duration, config.delay, config.easing, config.distance, moduleId]);
+  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, moduleId]);
 
   useEffect(() => {
     play();
@@ -87,6 +103,8 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
         <p className="text-[10px] text-gray-400 font-mono">
           {config.duration}s · {config.easing} · {config.delay}s delay
           {moduleId.startsWith('slide') && config.distance != null && ` · ${config.distance}px`}
+          {moduleId === 'scale' && config.scale != null && ` · scale ${config.scale}`}
+          {moduleId === 'blur' && config.blur != null && ` · blur ${config.blur}px`}
         </p>
       </div>
 

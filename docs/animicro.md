@@ -5,6 +5,7 @@ Utility-first micro-animations for WordPress powered by [Motion One](https://mot
 ## Overview
 
 - **Philosophy**: Utility-first. No timelines or complex UIs. Users enable modules in the admin panel and apply CSS classes (`.am-fade`, `.am-slide-up`, etc.) and `data-am-*` attributes in their Page Builder.
+- **One animation per element**: Do not combine entry animations (e.g. `.am-fade` + `.am-slide-up`) on the same element — multiple modules would run conflicting animations and cause flicker.
 - **Goal**: High-end animations (Awwwards-style) with minimal performance impact, compatible with popular builders.
 - **Prefixes**: PHP functions/handles/globals use `animicro_`. CSS classes use `.am-`. Data attributes use `data-am-*`.
 

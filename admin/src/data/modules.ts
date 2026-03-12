@@ -39,6 +39,22 @@ export const DEFAULT_SLIDE_LEFT_CONFIG: ModuleConfig = {
   distance: 30,
 };
 
+export const DEFAULT_SCALE_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  scale: 0.95,
+};
+
+export const DEFAULT_BLUR_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  blur: 4,
+};
+
 export interface ModuleInfo {
   id: string;
   name: string;
@@ -48,16 +64,16 @@ export interface ModuleInfo {
 }
 
 export const MODULE_INFO: ModuleInfo[] = [
-  { id: 'fade',       name: 'Fade',       description: 'Smooth appearance with opacity',              cssClass: '.am-fade',     isPro: false },
-  { id: 'slide-up',   name: 'Slide Up',   description: 'Slides up when appearing',                   cssClass: '.am-slide-up', isPro: false },
-  { id: 'slide-down',  name: 'Slide Down',  description: 'Slides down when appearing',                  cssClass: '.am-slide-down',  isPro: false },
+  { id: 'fade',        name: 'Fade',        description: 'Smooth appearance with opacity',             cssClass: '.am-fade',        isPro: false },
+  { id: 'scale',       name: 'Scale',       description: 'Scales from small to full size',             cssClass: '.am-scale',       isPro: false },
+  { id: 'slide-up',    name: 'Slide Up',    description: 'Slides up when appearing',                   cssClass: '.am-slide-up',    isPro: false },
+  { id: 'slide-down',  name: 'Slide Down',  description: 'Slides down when appearing',                 cssClass: '.am-slide-down',  isPro: false },
   { id: 'slide-right', name: 'Slide Right', description: 'Slides in from the left',                    cssClass: '.am-slide-right', isPro: true },
   { id: 'slide-left',  name: 'Slide Left',  description: 'Slides in from the right',                   cssClass: '.am-slide-left',  isPro: true },
-  { id: 'scale',       name: 'Scale',       description: 'Scales from small to full size',             cssClass: '.am-scale',       isPro: false },
-  { id: 'blur',       name: 'Blur',       description: 'Blur that clears as it appears',               cssClass: '.am-blur',     isPro: true },
-  { id: 'stagger',    name: 'Stagger',    description: 'Animates container children in sequence',      cssClass: '.am-stagger',  isPro: true },
-  { id: 'parallax',   name: 'Parallax',   description: 'Scroll-linked parallax movement',               cssClass: '.am-parallax', isPro: true },
-  { id: 'split',      name: 'Split Text', description: 'Splits and animates text by letters/words',    cssClass: '.am-split',    isPro: true },
+  { id: 'blur',        name: 'Blur',        description: 'Blur that clears as it appears',             cssClass: '.am-blur',        isPro: true },
+  { id: 'stagger',     name: 'Stagger',     description: 'Animates container children in sequence',    cssClass: '.am-stagger',     isPro: true },
+  { id: 'parallax',    name: 'Parallax',    description: 'Scroll-linked parallax movement',            cssClass: '.am-parallax',    isPro: true },
+  { id: 'split',       name: 'Split Text',  description: 'Splits and animates text by letters/words',  cssClass: '.am-split',       isPro: true },
 ];
 
 export interface DataAttribute {

@@ -32,7 +32,7 @@ class Animicro {
 	public static function get_default_settings(): array {
 		return [
 			'active_modules'    => [],
-			'available_modules' => [ 'fade', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'scale', 'blur', 'stagger', 'parallax', 'split' ],
+			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'blur', 'stagger', 'parallax', 'split' ],
 			'active_builders'   => [ 'none' ],
 		'module_settings'   => [
 			'fade' => [
@@ -40,6 +40,13 @@ class Animicro {
 				'easing'   => 'ease-out',
 				'delay'    => 0.0,
 				'margin'   => '-50px 0px',
+			],
+			'scale' => [
+				'duration' => 0.6,
+				'easing'   => 'ease-out',
+				'delay'    => 0.0,
+				'margin'   => '-50px 0px',
+				'scale'    => 0.95,
 			],
 			'slide-up' => [
 				'duration' => 0.6,
@@ -68,6 +75,13 @@ class Animicro {
 				'delay'    => 0.0,
 				'margin'   => '-50px 0px',
 				'distance' => 30,
+			],
+			'blur' => [
+				'duration' => 0.6,
+				'easing'   => 'ease-out',
+				'delay'    => 0.0,
+				'margin'   => '-50px 0px',
+				'blur'     => 4,
 			],
 		],
 		];

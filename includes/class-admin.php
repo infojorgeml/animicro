@@ -224,6 +224,12 @@ class Animicro_Admin {
 			if ( isset( $module_defaults['distance'] ) ) {
 				$entry['distance'] = isset( $raw_mod['distance'] ) ? (float) $raw_mod['distance'] : $module_defaults['distance'];
 			}
+			if ( isset( $module_defaults['scale'] ) ) {
+				$entry['scale'] = isset( $raw_mod['scale'] ) ? (float) $raw_mod['scale'] : $module_defaults['scale'];
+			}
+			if ( isset( $module_defaults['blur'] ) ) {
+				$entry['blur'] = isset( $raw_mod['blur'] ) ? (float) $raw_mod['blur'] : $module_defaults['blur'];
+			}
 
 			$clean_module_settings[ $module_id ] = $entry;
 		}

@@ -4,6 +4,8 @@ export interface ModuleConfig {
   delay: number;
   margin: string;
   distance?: number;
+  scale?: number;
+  blur?: number;
 }
 
 export interface AnimicroSettings {

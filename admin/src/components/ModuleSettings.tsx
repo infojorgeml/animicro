@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 
@@ -11,10 +11,12 @@ interface ModuleSettingsProps {
 
 const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   fade: DEFAULT_FADE_CONFIG,
+  scale: DEFAULT_SCALE_CONFIG,
   'slide-up': DEFAULT_SLIDE_UP_CONFIG,
   'slide-down': DEFAULT_SLIDE_DOWN_CONFIG,
   'slide-right': DEFAULT_SLIDE_RIGHT_CONFIG,
   'slide-left': DEFAULT_SLIDE_LEFT_CONFIG,
+  blur: DEFAULT_BLUR_CONFIG,
 };
 
 const hasDistance = (id: string) => id.startsWith('slide-');
@@ -92,6 +94,58 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             <span>2.0s</span>
           </div>
         </div>
+
+        {/* Scale factor (scale module only) */}
+        {moduleId === 'scale' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Scale factor
+              <span className="font-mono text-blue-600">{config.scale ?? 0.95}</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Starting scale of the element before it grows to full size.
+            </p>
+            <input
+              type="range"
+              min="0.5"
+              max="1"
+              step="0.05"
+              value={config.scale ?? 0.95}
+              onChange={e => onUpdate({ scale: parseFloat(e.target.value) })}
+              className="w-full accent-blue-600"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0.5 — Half size</span>
+              <span>1.0 — No scale</span>
+            </div>
+          </div>
+        )}
+
+        {/* Blur amount (blur module only) */}
+        {moduleId === 'blur' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Blur amount
+              <span className="font-mono text-blue-600">{config.blur ?? 4}px</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Initial blur intensity before it clears to sharp.
+            </p>
+            <input
+              type="range"
+              min="1"
+              max="20"
+              step="1"
+              value={config.blur ?? 4}
+              onChange={e => onUpdate({ blur: parseInt(e.target.value, 10) })}
+              className="w-full accent-blue-600"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>1px — Subtle</span>
+              <span>20px — Heavy</span>
+            </div>
+          </div>
+        )}
 
         {/* Distance (slide modules only) */}
         {hasDistance(moduleId) && (
