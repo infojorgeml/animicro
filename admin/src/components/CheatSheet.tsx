@@ -96,44 +96,6 @@ export default function CheatSheet() {
         </div>
       </div>
 
-      <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-1">Examples</h2>
-        <p className="text-sm text-gray-500 mb-4">
-          Copy and paste directly into your builder.
-        </p>
-        <div className="space-y-3">
-          <ExampleBlock
-            title="Basic fade"
-            code={'<div class="am-fade">Content</div>'}
-          />
-          <ExampleBlock
-            title="Slide with custom delay"
-            code={'<div class="am-slide-up" data-delay="0.3" data-duration="0.8">Content</div>'}
-          />
-          <ExampleBlock
-            title="Stagger container"
-            code={'<div class="am-stagger" data-stagger="0.1">\n  <div>Child 1</div>\n  <div>Child 2</div>\n  <div>Child 3</div>\n</div>'}
-          />
-          <ExampleBlock
-            title="Split text by words"
-            code={'<h2 class="am-split" data-split="words">Your text here</h2>'}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ExampleBlock({ title, code }: { title: string; code: string }) {
-  return (
-    <div className="rounded-lg border border-gray-200 bg-gray-50 overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2 bg-white border-b border-gray-200">
-        <span className="text-sm font-medium text-gray-700">{title}</span>
-        <CopyButton text={code} />
-      </div>
-      <pre className="px-4 py-3 text-sm text-gray-800 overflow-x-auto">
-        <code>{code}</code>
-      </pre>
     </div>
   );
 }

@@ -58,7 +58,7 @@ export default function App() {
         </div>
       ) : (
         <>
-          <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
+          <TabNav activeTab={activeTab} onTabChange={setActiveTab} isPremium={isPremium} />
 
           <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             {activeTab === 'modules' && (
@@ -69,7 +69,7 @@ export default function App() {
                 onUpdateModuleSettings={updateModuleSettings}
               />
             )}
-            {activeTab === 'cheatsheet' && <CheatSheet />}
+            {activeTab === 'cheatsheet' && isPremium && <CheatSheet />}
             {activeTab === 'integrations' && (
               <Integrations settings={settings} toggleBuilder={toggleBuilder} />
             )}
