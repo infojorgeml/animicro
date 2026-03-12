@@ -60,7 +60,7 @@ Works with Elementor, Bricks, Breakdance, Oxygen and Gutenberg. Dynamic inline C
 
 ## Pro License
 
-Blur, Stagger, Parallax and Split Text modules require a Pro license. Activate it under **Animicro → License**.
+Blur, Stagger, Parallax and Split Text modules require a Pro license. The Cheat Sheet (classes and data attributes reference) is also Pro-only. Activate your license under **Animicro → License** or visit [animicro.com](https://animicro.com).
 
 ## Development
 

@@ -5,6 +5,19 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.6] - 2026-02-26
+
+### Added
+
+- **Reset to default** button in Fade preview panel to restore duration, easing, delay, and margin
+- Plugin row links: **Settings** (to admin) and **Upgrade to Pro** (bold green, animicro.com)
+
+### Changed
+
+- **Cheat Sheet** is Pro-only: tab shows "Pro" badge and is locked without license; content visible only for Pro users
+- Examples section removed from Cheat Sheet (CSS Classes and Data Attributes tables only)
+- Plugin URI and Author URI set to https://animicro.com
+
 ## [0.2.5] - 2026-02-26
 
 ### Added
@@ -62,6 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Vite 6 for admin (React + TypeScript + Tailwind) and frontend (Vanilla JS) build
 - REST API: `animicro/v1/settings`, `animicro/v1/license/status`, `animicro/v1/license/save`
 
+[0.2.6]: https://github.com/infojorgeml/animicro/compare/v0.2.5...v0.2.6
 [0.2.5]: https://github.com/infojorgeml/animicro/compare/v0.2.0...v0.2.5
 [0.2.0]: https://github.com/infojorgeml/animicro/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/infojorgeml/animicro/releases/tag/v0.1.1
