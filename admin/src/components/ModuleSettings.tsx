@@ -137,7 +137,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             Value: <code>{config.margin}</code>
             {' · '}
             <span className="not-italic">Can be overridden with </span>
-            <code>data-margin</code>
+            <code>data-am-margin</code>
           </p>
         </div>
 

@@ -28,9 +28,9 @@ function splitIntoSpans(el, mode) {
 export function init() {
   inView('.am-split', (el) => {
     const cfg = getElementConfig(el);
-    const mode = el.dataset.split || 'chars';
-    const staggerDelay = el.dataset.stagger !== undefined
-      ? parseFloat(el.dataset.stagger)
+    const mode = el.dataset.amSplit || 'chars';
+    const staggerDelay = el.dataset.amStagger !== undefined
+      ? parseFloat(el.dataset.amStagger)
       : 0.05;
 
     const spans = splitIntoSpans(el, mode);

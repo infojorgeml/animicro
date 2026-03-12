@@ -35,16 +35,16 @@ export interface DataAttribute {
 }
 
 export const DATA_ATTRIBUTES: DataAttribute[] = [
-  { attribute: 'data-duration',  type: 'float (s)',     defaultValue: '0.6',       usedBy: 'All' },
-  { attribute: 'data-delay',     type: 'float (s)',     defaultValue: '0',         usedBy: 'All' },
-  { attribute: 'data-easing',    type: 'string',        defaultValue: 'ease-out',  usedBy: 'All' },
-  { attribute: 'data-margin',    type: 'string',        defaultValue: '-50px 0px', usedBy: 'All' },
-  { attribute: 'data-distance',  type: 'float (px)',    defaultValue: '30',        usedBy: 'slide-up, slide-down' },
-  { attribute: 'data-scale',     type: 'float',         defaultValue: '0.95',      usedBy: 'scale' },
-  { attribute: 'data-blur',      type: 'float (px)',    defaultValue: '4',         usedBy: 'blur' },
-  { attribute: 'data-stagger',   type: 'float (s)',     defaultValue: '0.1',       usedBy: 'stagger, split' },
-  { attribute: 'data-speed',     type: 'float',         defaultValue: '0.5',       usedBy: 'parallax' },
-  { attribute: 'data-split',     type: 'chars | words', defaultValue: 'chars',     usedBy: 'split' },
+  { attribute: 'data-am-duration',  type: 'float (s)',     defaultValue: '0.6',       usedBy: 'All' },
+  { attribute: 'data-am-delay',     type: 'float (s)',     defaultValue: '0',         usedBy: 'All' },
+  { attribute: 'data-am-easing',    type: 'string',        defaultValue: 'ease-out',  usedBy: 'All' },
+  { attribute: 'data-am-margin',    type: 'string',        defaultValue: '-50px 0px', usedBy: 'All' },
+  { attribute: 'data-am-distance',  type: 'float (px)',    defaultValue: '30',        usedBy: 'slide-up, slide-down' },
+  { attribute: 'data-am-scale',     type: 'float',         defaultValue: '0.95',      usedBy: 'scale' },
+  { attribute: 'data-am-blur',      type: 'float (px)',    defaultValue: '4',         usedBy: 'blur' },
+  { attribute: 'data-am-stagger',   type: 'float (s)',     defaultValue: '0.1',       usedBy: 'stagger, split' },
+  { attribute: 'data-am-speed',     type: 'float',         defaultValue: '0.5',       usedBy: 'parallax' },
+  { attribute: 'data-am-split',     type: 'chars | words', defaultValue: 'chars',     usedBy: 'split' },
 ];
 
 export interface EasingOption {

@@ -4,7 +4,7 @@ import { getElementConfig } from '../core/config.js';
 export function init() {
   inView('.am-blur', (el) => {
     const cfg = getElementConfig(el);
-    const amount = el.dataset.blur !== undefined ? parseFloat(el.dataset.blur) : 4;
+    const amount = el.dataset.amBlur !== undefined ? parseFloat(el.dataset.amBlur) : 4;
 
     animate(
       el,

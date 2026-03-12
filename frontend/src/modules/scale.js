@@ -4,7 +4,7 @@ import { getElementConfig } from '../core/config.js';
 export function init() {
   inView('.am-scale', (el) => {
     const cfg = getElementConfig(el);
-    const from = el.dataset.scale !== undefined ? parseFloat(el.dataset.scale) : 0.95;
+    const from = el.dataset.amScale !== undefined ? parseFloat(el.dataset.amScale) : 0.95;
 
     animate(
       el,

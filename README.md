@@ -6,7 +6,7 @@ Utility-first micro-animations for WordPress powered by [Motion One](https://mot
 
 Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade` or `.am-slide-up` in your Page Builder, and you're done. Fade settings include a live preview so you can tune duration, easing, and delay without leaving the admin.
 
-**Philosophy**: Utility-first. No complex interfaces, no timelines. Just classes and `data-*` attributes.
+**Philosophy**: Utility-first. No complex interfaces, no timelines. Just classes and `data-am-*` attributes.
 
 ## Requirements
 
@@ -40,7 +40,7 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 <div class="am-fade">Content that appears smoothly</div>
 
 <!-- With custom attributes -->
-<div class="am-fade" data-duration="1" data-delay="0.3" data-easing="ease-in-out">
+<div class="am-fade" data-am-duration="1" data-am-delay="0.3" data-am-easing="ease-in-out">
   Content with custom duration and delay
 </div>
 ```
@@ -49,10 +49,10 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 
 | Attribute | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `data-duration` | float (s) | 0.6 | Animation duration |
-| `data-delay` | float (s) | 0 | Delay before starting |
-| `data-easing` | string | ease-out | Easing curve |
-| `data-margin` | string | -50px 0px | Activation margin (inView) |
+| `data-am-duration` | float (s) | 0.6 | Animation duration |
+| `data-am-delay` | float (s) | 0 | Delay before starting |
+| `data-am-easing` | string | ease-out | Easing curve |
+| `data-am-margin` | string | -50px 0px | Activation margin (inView) |
 
 ## Compatibility
 

@@ -4,8 +4,8 @@ import { getElementConfig } from '../core/config.js';
 export function init() {
   inView('.am-stagger', (container) => {
     const cfg = getElementConfig(container);
-    const staggerDelay = container.dataset.stagger !== undefined
-      ? parseFloat(container.dataset.stagger)
+    const staggerDelay = container.dataset.amStagger !== undefined
+      ? parseFloat(container.dataset.amStagger)
       : 0.1;
 
     const children = container.children;
