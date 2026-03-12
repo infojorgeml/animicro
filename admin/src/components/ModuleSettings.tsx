@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 
@@ -12,9 +12,12 @@ interface ModuleSettingsProps {
 const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   fade: DEFAULT_FADE_CONFIG,
   'slide-up': DEFAULT_SLIDE_UP_CONFIG,
+  'slide-down': DEFAULT_SLIDE_DOWN_CONFIG,
+  'slide-right': DEFAULT_SLIDE_RIGHT_CONFIG,
+  'slide-left': DEFAULT_SLIDE_LEFT_CONFIG,
 };
 
-const hasDistance = (id: string) => id === 'slide-up' || id === 'slide-down';
+const hasDistance = (id: string) => id.startsWith('slide-');
 
 export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: ModuleSettingsProps) {
   const mod = MODULE_INFO.find(m => m.id === moduleId);

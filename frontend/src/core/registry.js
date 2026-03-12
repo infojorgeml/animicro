@@ -6,8 +6,10 @@
 const MODULES = {
   'fade':       () => import('../modules/fade.js'),
   'slide-up':   () => import('../modules/slide.js'),
-  'slide-down': () => import('../modules/slide.js'),
-  'scale':      () => import('../modules/scale.js'),
+  'slide-down':  () => import('../modules/slide.js'),
+  'slide-right': () => import('../modules/slide.js'),
+  'slide-left':  () => import('../modules/slide.js'),
+  'scale':       () => import('../modules/scale.js'),
   'blur':       () => import('../modules/blur.js'),
   'stagger':    () => import('../modules/stagger.js'),
   'parallax':   () => import('../modules/parallax.js'),

@@ -5,6 +5,21 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.9] - 2026-02-26
+
+### Added
+
+- **Slide Down** full support: per-module settings, distance slider, live preview, reset to default (same as Slide Up)
+- **Slide Right** (`.am-slide-right`) and **Slide Left** (`.am-slide-left`) as Pro modules: X-axis slide-in animations, settings page, live preview, initial CSS
+- Frontend `slide.js` extended for X-axis: slide-right animates `x: [-distance, 0]`, slide-left `x: [distance, 0]`
+- Registry entries and PHP defaults for `slide-right` and `slide-left`
+
+### Changed
+
+- License: Slide Right and Slide Left require Pro; Slide Down remains free
+- `data-am-distance` applies to all four slide modules (slide-up, slide-down, slide-right, slide-left)
+- AnimationPreview supports X-axis for slide-right/slide-left
+
 ## [0.2.8] - 2026-02-26
 
 ### Added

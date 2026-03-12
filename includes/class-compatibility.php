@@ -16,8 +16,10 @@ class Animicro_Compatibility {
 	private const MODULE_INITIAL_CSS = [
 		'fade'       => 'opacity:0;will-change:opacity,transform;',
 		'slide-up'   => 'opacity:0;transform:translateY(30px);will-change:opacity,transform;',
-		'slide-down' => 'opacity:0;transform:translateY(-30px);will-change:opacity,transform;',
-		'scale'      => 'opacity:0;transform:scale(0.95);will-change:opacity,transform;',
+		'slide-down'  => 'opacity:0;transform:translateY(-30px);will-change:opacity,transform;',
+		'slide-right' => 'opacity:0;transform:translateX(-30px);will-change:opacity,transform;',
+		'slide-left'  => 'opacity:0;transform:translateX(30px);will-change:opacity,transform;',
+		'scale'       => 'opacity:0;transform:scale(0.95);will-change:opacity,transform;',
 		'blur'       => 'opacity:0;filter:blur(4px);will-change:opacity,transform,filter;',
 		'stagger'    => '',
 		'parallax'   => '',

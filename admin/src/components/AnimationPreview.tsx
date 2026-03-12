@@ -19,14 +19,22 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
     controlsRef.current?.cancel();
 
     const isSlide = moduleId.startsWith('slide');
+    const isHorizontal = moduleId === 'slide-left' || moduleId === 'slide-right';
+    const isNegative = moduleId === 'slide-down' || moduleId === 'slide-right';
     const dist = config.distance ?? 30;
+    const from = isNegative ? -dist : dist;
 
     el.style.opacity = '0';
-    if (isSlide) el.style.transform = `translateY(${dist}px)`;
+    if (isSlide) {
+      el.style.transform = isHorizontal ? `translateX(${from}px)` : `translateY(${from}px)`;
+    }
 
     requestAnimationFrame(() => {
       const keyframes: Record<string, any> = { opacity: [0, 1] };
-      if (isSlide) keyframes.y = [dist, 0];
+      if (isSlide) {
+        const axis = isHorizontal ? 'x' : 'y';
+        keyframes[axis] = [from, 0];
+      }
 
       controlsRef.current = animate(
         el,

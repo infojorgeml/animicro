@@ -4,7 +4,7 @@ Utility-first micro-animations for WordPress powered by [Motion One](https://mot
 
 ## Description
 
-Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade` or `.am-slide-up` in your Page Builder, and you're done. Fade and Slide Up each have their own settings with a live preview so you can tune duration, easing, delay, and (for slide) distance without leaving the admin.
+Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade`, `.am-slide-up`, or `.am-slide-right` in your Page Builder, and you're done. Fade and all slide modules (up, down, right, left) have their own settings with a live preview so you can tune duration, easing, delay, and distance without leaving the admin.
 
 **Philosophy**: Utility-first. No complex interfaces, no timelines. Just classes and `data-am-*` attributes.
 
@@ -27,6 +27,8 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 | Fade | `.am-fade` | Smooth appearance with opacity | Free |
 | Slide Up | `.am-slide-up` | Slides up when appearing | Free |
 | Slide Down | `.am-slide-down` | Slides down when appearing | Free |
+| Slide Right | `.am-slide-right` | Slides in from the left | Pro |
+| Slide Left | `.am-slide-left` | Slides in from the right | Pro |
 | Scale | `.am-scale` | Scales from small to full size | Free |
 | Blur | `.am-blur` | Blur that clears as it appears | Pro |
 | Stagger | `.am-stagger` | Animates container children in sequence | Pro |
@@ -53,7 +55,7 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 | `data-am-delay` | float (s) | 0 | Delay before starting |
 | `data-am-easing` | string | ease-out | Easing curve |
 | `data-am-margin` | string | -50px 0px | Activation margin (inView) |
-| `data-am-distance` | number (px) | 30 | Slide distance (slide-up, slide-down only) |
+| `data-am-distance` | number (px) | 30 | Slide distance (slide-up, slide-down, slide-right, slide-left) |
 
 ## Compatibility
 
@@ -61,7 +63,7 @@ Works with Elementor, Bricks, Breakdance, Oxygen and Gutenberg. Dynamic inline C
 
 ## Pro License
 
-Blur, Stagger, Parallax and Split Text modules require a Pro license. The Cheat Sheet (classes and data attributes reference) is also Pro-only. Activate your license under **Animicro → License** or visit [animicro.com](https://animicro.com).
+Blur, Stagger, Parallax, Split Text, Slide Right and Slide Left require a Pro license. The Cheat Sheet (classes and data attributes reference) is also Pro-only. Activate your license under **Animicro → License** or visit [animicro.com](https://animicro.com).
 
 ## Development
 
