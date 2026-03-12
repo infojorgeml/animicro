@@ -10,11 +10,38 @@ class Animicro_Admin {
 
 	public function __construct() {
 		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
+		add_filter( 'plugin_action_links_' . ANIMICRO_BASENAME, [ $this, 'plugin_action_links' ], 10, 2 );
 
 		if ( is_admin() ) {
 			add_action( 'admin_menu', [ $this, 'register_menu' ] );
 			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		}
+	}
+
+	/**
+	 * Add Settings and Upgrade links to the plugin row.
+	 */
+	public function plugin_action_links( array $links, string $plugin_file ): array {
+		if ( ANIMICRO_BASENAME !== $plugin_file ) {
+			return $links;
+		}
+
+		$settings_url = admin_url( 'admin.php?page=animicro' );
+		$upgrade_url  = 'https://animicro.com/';
+
+		$settings_link = sprintf(
+			'<a href="%s">%s</a>',
+			esc_url( $settings_url ),
+			esc_html__( 'Settings', 'animicro' )
+		);
+
+		$upgrade_link = sprintf(
+			'<a href="%s" target="_blank" rel="noopener noreferrer" style="font-weight: 700; color: #16a34a;">%s</a>',
+			esc_url( $upgrade_url ),
+			esc_html__( 'Upgrade to Pro', 'animicro' )
+		);
+
+		return array_merge( [ $settings_link, $upgrade_link ], $links );
 	}
 
 	public function register_menu(): void {

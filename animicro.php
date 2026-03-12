@@ -1,13 +1,13 @@
 <?php
 /**
  * Plugin Name:       Animicro
- * Plugin URI:        https://animicro.dev
+ * Plugin URI:        https://animicro.com
  * Description:       Utility-first micro-animations powered by Motion One for WordPress. Simple CSS classes, extreme performance.
- * Version:           0.2.5
+ * Version:           0.2.6
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Animicro
- * Author URI:        https://animicro.dev
+ * Author URI:        https://animicro.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       animicro
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ANIMICRO_VERSION', '0.2.5' );
+define( 'ANIMICRO_VERSION', '0.2.6' );
 define( 'ANIMICRO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ANIMICRO_URL', plugin_dir_url( __FILE__ ) );
 define( 'ANIMICRO_BASENAME', plugin_basename( __FILE__ ) );
