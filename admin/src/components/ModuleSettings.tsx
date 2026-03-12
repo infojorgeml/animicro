@@ -1,4 +1,4 @@
-import { EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 
@@ -144,7 +144,11 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
       </div>
 
       <div className="hidden lg:block sticky top-8">
-        <AnimationPreview moduleId={moduleId} config={config} />
+        <AnimationPreview
+          moduleId={moduleId}
+          config={config}
+          onReset={moduleId === 'fade' ? () => onUpdate(DEFAULT_FADE_CONFIG) : undefined}
+        />
       </div>
 
       </div>

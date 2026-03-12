@@ -1,3 +1,13 @@
+import type { ModuleConfig } from '../types';
+
+/** Default Fade module config (duration, easing, delay, margin). */
+export const DEFAULT_FADE_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+};
+
 export interface ModuleInfo {
   id: string;
   name: string;
