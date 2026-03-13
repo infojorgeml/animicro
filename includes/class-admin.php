@@ -236,6 +236,9 @@ class Animicro_Admin {
 			if ( isset( $module_defaults['typingSpeed'] ) ) {
 				$entry['typingSpeed'] = isset( $raw_mod['typingSpeed'] ) ? (float) $raw_mod['typingSpeed'] : $module_defaults['typingSpeed'];
 			}
+			if ( isset( $module_defaults['speed'] ) ) {
+				$entry['speed'] = isset( $raw_mod['speed'] ) ? (float) $raw_mod['speed'] : $module_defaults['speed'];
+			}
 
 			$clean_module_settings[ $module_id ] = $entry;
 		}

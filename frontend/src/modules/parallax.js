@@ -1,15 +1,18 @@
 import { animate, scroll } from 'motion';
+import { getElementConfig } from '../core/config.js';
 
 export function init() {
-  const elements = document.querySelectorAll('.am-parallax');
+  const els = document.querySelectorAll('.am-parallax');
 
-  elements.forEach((el) => {
-    const speed = el.dataset.amSpeed !== undefined ? parseFloat(el.dataset.amSpeed) : 0.5;
-    const distance = speed * 100;
+  els.forEach((el) => {
+    const cfg = getElementConfig(el, 'parallax');
+    const distance = cfg.speed * 100;
 
     scroll(
       animate(el, { y: [-distance, distance] }, { easing: 'linear' }),
       { target: el }
     );
+
+    el.classList.add('am-animated');
   });
 }

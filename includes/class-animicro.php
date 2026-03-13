@@ -113,6 +113,13 @@ class Animicro {
 				'staggerDelay' => 0.1,
 				'distance'     => 20,
 			],
+			'parallax' => [
+				'duration' => 0.6,
+				'easing'   => 'linear',
+				'delay'    => 0.0,
+				'margin'   => '-50px 0px',
+				'speed'    => 0.5,
+			],
 		],
 		];
 	}

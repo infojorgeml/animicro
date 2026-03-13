@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_PARALLAX_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 
@@ -21,6 +21,7 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   'text-reveal': DEFAULT_TEXT_REVEAL_CONFIG,
   typewriter: DEFAULT_TYPEWRITER_CONFIG,
   stagger: DEFAULT_STAGGER_CONFIG,
+  parallax: DEFAULT_PARALLAX_CONFIG,
 };
 
 const hasDistance = (id: string) => id.startsWith('slide-') || id === 'split' || id === 'stagger';
@@ -53,6 +54,32 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
 
       <div className="space-y-8 max-w-lg">
 
+        {/* Parallax speed (parallax only) */}
+        {moduleId === 'parallax' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Speed
+              <span className="font-mono text-blue-600">{config.speed ?? 0.5}</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Movement intensity. Higher values produce stronger parallax displacement as the user scrolls.
+            </p>
+            <input
+              type="range"
+              min="0.1"
+              max="1"
+              step="0.1"
+              value={config.speed ?? 0.5}
+              onChange={e => onUpdate({ speed: parseFloat(e.target.value) })}
+              className="w-full accent-blue-600"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0.1 — Subtle</span>
+              <span>1.0 — Dramatic</span>
+            </div>
+          </div>
+        )}
+
         {/* Typing speed (typewriter only) */}
         {moduleId === 'typewriter' && (
           <div>
@@ -79,8 +106,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Duration (hidden for typewriter) */}
-        {moduleId !== 'typewriter' && (
+        {/* Duration (hidden for typewriter and parallax) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Duration
@@ -105,7 +132,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
         )}
 
-        {/* Delay */}
+        {/* Delay (hidden for parallax) */}
+        {moduleId !== 'parallax' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Delay
@@ -128,6 +156,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             <span>2.0s</span>
           </div>
         </div>
+        )}
 
         {/* Scale factor (scale module only) */}
         {moduleId === 'scale' && (
@@ -241,8 +270,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Easing (hidden for typewriter) */}
-        {moduleId !== 'typewriter' && (
+        {/* Easing (hidden for typewriter and parallax) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Easing curve
@@ -268,7 +297,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
         )}
 
-        {/* Activation margin */}
+        {/* Activation margin (hidden for parallax) */}
+        {moduleId !== 'parallax' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Activation margin
@@ -294,6 +324,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             ))}
           </div>
         </div>
+        )}
 
       </div>
 

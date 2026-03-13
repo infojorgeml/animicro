@@ -8,6 +8,7 @@ export interface ModuleConfig {
   blur?: number;
   staggerDelay?: number;
   typingSpeed?: number;
+  speed?: number;
 }
 
 export interface AnimicroSettings {

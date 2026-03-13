@@ -4,7 +4,7 @@ Utility-first micro-animations for WordPress powered by [Motion One](https://mot
 
 ## Description
 
-Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade`, `.am-scale`, or `.am-slide-up` in your Page Builder, and you're done. Fade, Scale, all slide modules, Blur, Stagger, Split Text, Text Reveal, and Typewriter each have their own settings with a live preview so you can tune duration, easing, delay, and (where applicable) scale factor, blur amount, or distance without leaving the admin.
+Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade`, `.am-scale`, or `.am-slide-up` in your Page Builder, and you're done. Fade, Scale, all slide modules, Blur, Stagger, Parallax, Split Text, Text Reveal, and Typewriter each have their own settings with a live preview so you can tune duration, easing, delay, speed, and (where applicable) scale factor, blur amount, or distance without leaving the admin.
 
 **Philosophy**: Utility-first. No complex interfaces, no timelines. Just classes and `data-am-*` attributes.
 
@@ -63,6 +63,7 @@ Use only one animation class per element. Do not combine `.am-fade` with `.am-sl
 | `data-am-scale` | float | 0.95 | Starting scale (scale module) |
 | `data-am-blur` | number (px) | 4 | Initial blur amount (blur module) |
 | `data-am-stagger` | float (s) | 0.05 | Stagger delay between units (split, text-reveal, stagger) |
+| `data-am-speed` | float | 0.5 | Parallax movement intensity (parallax module) |
 | `data-am-typing-speed` | float (s) | 0.06 | Delay per character (typewriter module) |
 
 ## Compatibility

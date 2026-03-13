@@ -19,6 +19,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
   const isTextReveal = moduleId === 'text-reveal';
   const isTypewriter = moduleId === 'typewriter';
   const isStagger = moduleId === 'stagger';
+  const isParallax = moduleId === 'parallax';
 
   const play = useCallback(() => {
     const el = ref.current;
@@ -80,6 +81,24 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
             delay: stagger(config.staggerDelay ?? 0.1, { start: config.delay }),
             easing: config.easing as any,
           },
+        );
+        controlsRef.current.finished.catch(() => {});
+      });
+      return;
+    }
+
+    if (isParallax) {
+      const square = el.querySelector<HTMLDivElement>('[data-parallax-item]');
+      if (!square) return;
+
+      const distance = (config.speed ?? 0.5) * 60;
+      square.style.transform = `translateY(${-distance}px)`;
+
+      requestAnimationFrame(() => {
+        controlsRef.current = animate(
+          square,
+          { y: [-distance, distance, -distance] },
+          { duration: 3, easing: 'linear' },
         );
         controlsRef.current.finished.catch(() => {});
       });
@@ -176,7 +195,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
       controlsRef.current.finished.catch(() => {});
     });
-  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, moduleId, isSplit, isTextReveal, isTypewriter, isStagger]);
+  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, config.speed, moduleId, isSplit, isTextReveal, isTypewriter, isStagger, isParallax]);
 
   useEffect(() => {
     play();
@@ -205,6 +224,18 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
               }}
             />
           ))}
+        </div>
+      );
+    }
+
+    if (isParallax) {
+      return (
+        <div ref={ref} className="flex items-center justify-center h-full overflow-hidden">
+          <div
+            data-parallax-item=""
+            className="w-20 h-20 rounded-2xl"
+            style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)' }}
+          />
         </div>
       );
     }
@@ -316,7 +347,9 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
       <div className="w-full text-center space-y-1">
         <p className="text-[10px] text-gray-400 font-mono">
-          {isTypewriter
+          {isParallax
+            ? `speed ${config.speed ?? 0.5} · ${((config.speed ?? 0.5) * 100).toFixed(0)}px range`
+            : isTypewriter
             ? `${config.typingSpeed ?? 0.06}s/char · ${config.delay}s delay`
             : <>
                 {config.duration}s · {config.easing} · {config.delay}s delay

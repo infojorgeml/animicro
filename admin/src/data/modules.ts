@@ -89,6 +89,14 @@ export const DEFAULT_STAGGER_CONFIG: ModuleConfig = {
   distance: 20,
 };
 
+export const DEFAULT_PARALLAX_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'linear',
+  delay: 0,
+  margin: '-50px 0px',
+  speed: 0.5,
+};
+
 export type ModuleCategory = 'entry' | 'text' | 'group' | 'scroll';
 
 export interface ModuleInfo {
