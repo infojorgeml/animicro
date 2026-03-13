@@ -2,25 +2,27 @@ import { animate, stagger, inView } from 'motion';
 import { getElementConfig } from '../core/config.js';
 
 export function init() {
-  inView('.am-stagger', (container) => {
-    const cfg = getElementConfig(container);
-    const staggerDelay = container.dataset.amStagger !== undefined
-      ? parseFloat(container.dataset.amStagger)
-      : 0.1;
+  const els = document.querySelectorAll('.am-stagger');
 
-    const children = container.children;
-    if (!children.length) return;
+  els.forEach((container) => {
+    const cfg = getElementConfig(container, 'stagger');
+    const items = Array.from(container.children);
+    if (!items.length) return;
 
-    animate(
-      children,
-      { opacity: [0, 1], y: [cfg.distance, 0] },
-      {
-        duration: cfg.duration,
-        delay: stagger(staggerDelay),
-        easing: cfg.easing,
-      }
-    );
+    container.classList.add('is-ready');
+
+    inView(container, () => {
+      animate(
+        items,
+        { opacity: [0, 1], y: [cfg.distance, 0] },
+        {
+          duration: cfg.duration,
+          delay: stagger(cfg.staggerDelay, { start: cfg.delay }),
+          easing: cfg.easing,
+        }
+      );
+    }, { margin: cfg.margin });
 
     container.classList.add('am-animated');
-  }, { amount: 0.2 });
+  });
 }

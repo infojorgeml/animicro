@@ -21,7 +21,7 @@ class Animicro_Compatibility {
 		'slide-left'  => 'opacity:0;transform:translateX(30px);will-change:opacity,transform;',
 		'scale'       => 'opacity:0;transform:scale(0.95);will-change:opacity,transform;',
 		'blur'       => 'opacity:0;filter:blur(4px);will-change:opacity,transform,filter;',
-		'stagger'    => '',
+		'stagger'    => 'opacity:0;transform:translateY(20px);will-change:opacity,transform;',
 		'parallax'   => '',
 		'split-chars' => 'opacity:0;will-change:opacity,transform;',
 		'split-words' => 'opacity:0;will-change:opacity,transform;',
@@ -72,6 +72,15 @@ class Animicro_Compatibility {
 
 		foreach ( $active_modules as $module ) {
 			$module = sanitize_text_field( $module );
+
+			if ( 'stagger' === $module ) {
+				$stagger_css = self::MODULE_INITIAL_CSS['stagger'] ?? '';
+				if ( $stagger_css ) {
+					$rules[] = "{$prefix} .am-stagger>*{{$stagger_css}}";
+					$rules[] = "{$prefix} .am-stagger.is-ready>*{opacity:1;transform:none;}";
+				}
+				continue;
+			}
 
 			if ( 'typewriter' === $module ) {
 				$tw_css = self::MODULE_INITIAL_CSS['typewriter'] ?? '';

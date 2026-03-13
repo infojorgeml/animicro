@@ -80,6 +80,15 @@ export const DEFAULT_TYPEWRITER_CONFIG: ModuleConfig = {
   typingSpeed: 0.06,
 };
 
+export const DEFAULT_STAGGER_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  staggerDelay: 0.1,
+  distance: 20,
+};
+
 export type ModuleCategory = 'entry' | 'text' | 'group' | 'scroll';
 
 export interface ModuleInfo {
@@ -138,7 +147,7 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-delay',     type: 'float (s)',     defaultValue: '0',         usedBy: 'All' },
   { attribute: 'data-am-easing',    type: 'string',        defaultValue: 'ease-out',  usedBy: 'All' },
   { attribute: 'data-am-margin',    type: 'string',        defaultValue: '-50px 0px', usedBy: 'All' },
-  { attribute: 'data-am-distance',  type: 'float (px)',    defaultValue: '30',        usedBy: 'slide-up, slide-down, slide-right, slide-left, split' },
+  { attribute: 'data-am-distance',  type: 'float (px)',    defaultValue: '30',        usedBy: 'slide-up, slide-down, slide-right, slide-left, split, stagger' },
   { attribute: 'data-am-scale',     type: 'float',         defaultValue: '0.95',      usedBy: 'scale' },
   { attribute: 'data-am-blur',      type: 'float (px)',    defaultValue: '4',         usedBy: 'blur' },
   { attribute: 'data-am-stagger',   type: 'float (s)',     defaultValue: '0.05',      usedBy: 'stagger, split, text-reveal' },

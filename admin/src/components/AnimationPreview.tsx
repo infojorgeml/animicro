@@ -18,6 +18,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
   const isSplit = moduleId === 'split';
   const isTextReveal = moduleId === 'text-reveal';
   const isTypewriter = moduleId === 'typewriter';
+  const isStagger = moduleId === 'stagger';
 
   const play = useCallback(() => {
     const el = ref.current;
@@ -57,6 +58,31 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
       }
 
       twTimerRef.current = window.setTimeout(typeNext, startDelay);
+      return;
+    }
+
+    if (isStagger) {
+      const squares = el.querySelectorAll<HTMLDivElement>('[data-stagger-item]');
+      if (!squares.length) return;
+
+      const dist = config.distance ?? 20;
+      squares.forEach(s => {
+        s.style.opacity = '0';
+        s.style.transform = `translateY(${dist}px)`;
+      });
+
+      requestAnimationFrame(() => {
+        controlsRef.current = animate(
+          squares,
+          { opacity: [0, 1], y: [dist, 0] },
+          {
+            duration: config.duration,
+            delay: stagger(config.staggerDelay ?? 0.1, { start: config.delay }),
+            easing: config.easing as any,
+          },
+        );
+        controlsRef.current.finished.catch(() => {});
+      });
       return;
     }
 
@@ -150,7 +176,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
       controlsRef.current.finished.catch(() => {});
     });
-  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, moduleId, isSplit, isTextReveal, isTypewriter]);
+  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, moduleId, isSplit, isTextReveal, isTypewriter, isStagger]);
 
   useEffect(() => {
     play();
@@ -162,7 +188,27 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
   const splitChars = 'Animicro'.split('');
 
+  const STAGGER_ITEMS = 6;
+
   const renderPreviewContent = () => {
+    if (isStagger) {
+      return (
+        <div ref={ref} className="grid grid-cols-3 gap-3 p-4">
+          {Array.from({ length: STAGGER_ITEMS }).map((_, i) => (
+            <div
+              key={i}
+              data-stagger-item=""
+              className="w-12 h-12 rounded-lg"
+              style={{
+                background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                opacity: 0,
+              }}
+            />
+          ))}
+        </div>
+      );
+    }
+
     if (isTypewriter) {
       return (
         <div ref={ref} style={{ fontSize: '28px', fontWeight: 700, letterSpacing: '0.02em' }}>
@@ -279,6 +325,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
                 {moduleId === 'blur' && config.blur != null && ` · blur ${config.blur}px`}
                 {isSplit && ` · stagger ${config.staggerDelay ?? 0.05}s · ${config.distance ?? 15}px`}
                 {isTextReveal && ` · stagger ${config.staggerDelay ?? 0.12}s`}
+                {isStagger && ` · stagger ${config.staggerDelay ?? 0.1}s · ${config.distance ?? 20}px`}
               </>
           }
         </p>

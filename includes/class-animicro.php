@@ -105,6 +105,14 @@ class Animicro {
 				'margin'      => '-50px 0px',
 				'typingSpeed' => 0.06,
 			],
+			'stagger' => [
+				'duration'     => 0.6,
+				'easing'       => 'ease-out',
+				'delay'        => 0.0,
+				'margin'       => '-50px 0px',
+				'staggerDelay' => 0.1,
+				'distance'     => 20,
+			],
 		],
 		];
 	}

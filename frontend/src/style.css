@@ -8,23 +8,20 @@
 .am-fade,
 .am-slide-up,
 .am-slide-down,
+.am-slide-right,
+.am-slide-left,
 .am-scale,
 .am-blur,
-.am-split {
+.am-split-chars,
+.am-split-words,
+.am-text-reveal,
+.am-typewriter,
+.am-stagger > * {
   opacity: 1;
   visibility: visible;
 }
 
-/* 2. STAGGER: container children hidden until animated */
-.am-stagger > * {
-  opacity: 0;
-}
-
-.am-stagger.am-animated > * {
-  opacity: 1;
-}
-
-/* 3. SPLIT TEXT: overflow + word spans */
+/* 2. SPLIT TEXT: overflow + word spans */
 .am-split {
   overflow: hidden;
 }
