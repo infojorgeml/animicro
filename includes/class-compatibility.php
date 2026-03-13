@@ -25,6 +25,7 @@ class Animicro_Compatibility {
 		'parallax'   => '',
 		'split-chars' => 'opacity:0;will-change:opacity,transform;',
 		'split-words' => 'opacity:0;will-change:opacity,transform;',
+		'text-reveal' => 'opacity:0;will-change:opacity,transform;',
 	];
 
 	/**
@@ -70,6 +71,15 @@ class Animicro_Compatibility {
 
 		foreach ( $active_modules as $module ) {
 			$module = sanitize_text_field( $module );
+
+			if ( 'text-reveal' === $module ) {
+				$tr_css = self::MODULE_INITIAL_CSS['text-reveal'] ?? '';
+				if ( $tr_css ) {
+					$rules[] = "{$prefix} .am-text-reveal{{$tr_css}}";
+					$rules[] = "{$prefix} .am-text-reveal.is-ready{opacity:1;}";
+				}
+				continue;
+			}
 
 			if ( 'split' === $module ) {
 				$split_css = self::MODULE_INITIAL_CSS['split-chars'] ?? '';

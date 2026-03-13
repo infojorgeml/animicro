@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 
@@ -18,6 +18,7 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   'slide-left': DEFAULT_SLIDE_LEFT_CONFIG,
   blur: DEFAULT_BLUR_CONFIG,
   split: DEFAULT_SPLIT_CONFIG,
+  'text-reveal': DEFAULT_TEXT_REVEAL_CONFIG,
 };
 
 const hasDistance = (id: string) => id.startsWith('slide-') || id === 'split';
@@ -150,28 +151,30 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Stagger delay (split module only) */}
-        {moduleId === 'split' && (
+        {/* Stagger delay (split and text-reveal) */}
+        {(moduleId === 'split' || moduleId === 'text-reveal') && (
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
               Stagger delay
-              <span className="font-mono text-blue-600">{config.staggerDelay ?? 0.05}s</span>
+              <span className="font-mono text-blue-600">{config.staggerDelay ?? (moduleId === 'text-reveal' ? 0.12 : 0.05)}s</span>
             </label>
             <p className="text-xs text-gray-400 mb-2">
-              Time between each letter or word starting its animation.
+              {moduleId === 'text-reveal'
+                ? 'Time between each line starting its reveal.'
+                : 'Time between each letter or word starting its animation.'}
             </p>
             <input
               type="range"
-              min="0.01"
-              max="0.2"
+              min={moduleId === 'text-reveal' ? '0.05' : '0.01'}
+              max={moduleId === 'text-reveal' ? '0.3' : '0.2'}
               step="0.01"
-              value={config.staggerDelay ?? 0.05}
+              value={config.staggerDelay ?? (moduleId === 'text-reveal' ? 0.12 : 0.05)}
               onChange={e => onUpdate({ staggerDelay: parseFloat(e.target.value) })}
               className="w-full accent-blue-600"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
-              <span>0.01s — Fast cascade</span>
-              <span>0.2s — Slow reveal</span>
+              <span>{moduleId === 'text-reveal' ? '0.05s — Quick' : '0.01s — Fast cascade'}</span>
+              <span>{moduleId === 'text-reveal' ? '0.3s — Dramatic' : '0.2s — Slow reveal'}</span>
             </div>
           </div>
         )}

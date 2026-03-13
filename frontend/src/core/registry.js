@@ -14,6 +14,7 @@ const MODULES = {
   'stagger':     () => import('../modules/stagger.js'),
   'parallax':    () => import('../modules/parallax.js'),
   'split':       () => import('../modules/split-text.js'),
+  'text-reveal': () => import('../modules/text-reveal.js'),
 };
 
 export async function loadModules(activeModules) {

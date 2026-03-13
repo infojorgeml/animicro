@@ -34,6 +34,7 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 | Stagger | `.am-stagger` | Animates container children in sequence | Pro |
 | Parallax | `.am-parallax` | Scroll-linked parallax movement | Pro |
 | Split Text | `.am-split-chars` / `.am-split-words` | Splits and animates text by characters or words | Pro |
+| Text Reveal | `.am-text-reveal` | Reveals text line by line with a sliding mask | Pro |
 
 ## Basic usage
 

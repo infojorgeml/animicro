@@ -64,6 +64,14 @@ export const DEFAULT_SPLIT_CONFIG: ModuleConfig = {
   distance: 15,
 };
 
+export const DEFAULT_TEXT_REVEAL_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  staggerDelay: 0.12,
+};
+
 export type ModuleCategory = 'entry' | 'text' | 'group' | 'scroll';
 
 export interface ModuleInfo {
@@ -95,7 +103,7 @@ export const MODULE_INFO: ModuleInfo[] = [
 
   // Text
   { id: 'split',        name: 'Split Text',   description: 'Splits and animates text by letters/words', cssClass: '.am-split-chars .am-split-words', isPro: true, category: 'text' },
-  { id: 'text-reveal',  name: 'Text Reveal',  description: 'Reveals text with a sliding mask',          cssClass: '.am-text-reveal',  isPro: true, category: 'text', isPlaceholder: true },
+  { id: 'text-reveal',  name: 'Text Reveal',  description: 'Reveals text line by line with a sliding mask', cssClass: '.am-text-reveal',  isPro: true, category: 'text' },
   { id: 'highlight',    name: 'Highlight',    description: 'Animated highlight behind text',             cssClass: '.am-highlight',    isPro: true, category: 'text', isPlaceholder: true },
   { id: 'typewriter',   name: 'Typewriter',   description: 'Types text character by character',          cssClass: '.am-typewriter',   isPro: true, category: 'text', isPlaceholder: true },
 
@@ -125,7 +133,7 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-distance',  type: 'float (px)',    defaultValue: '30',        usedBy: 'slide-up, slide-down, slide-right, slide-left, split' },
   { attribute: 'data-am-scale',     type: 'float',         defaultValue: '0.95',      usedBy: 'scale' },
   { attribute: 'data-am-blur',      type: 'float (px)',    defaultValue: '4',         usedBy: 'blur' },
-  { attribute: 'data-am-stagger',   type: 'float (s)',     defaultValue: '0.05',      usedBy: 'stagger, split' },
+  { attribute: 'data-am-stagger',   type: 'float (s)',     defaultValue: '0.05',      usedBy: 'stagger, split, text-reveal' },
   { attribute: 'data-am-speed',     type: 'float',         defaultValue: '0.5',       usedBy: 'parallax' },
 ];
 

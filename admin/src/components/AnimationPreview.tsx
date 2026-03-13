@@ -8,16 +8,42 @@ interface AnimationPreviewProps {
   onReset?: () => void;
 }
 
+const REVEAL_LINES = ['Motion', 'Micro', 'Animations'];
+
 export default function AnimationPreview({ moduleId, config, onReset }: AnimationPreviewProps) {
   const ref = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<ReturnType<typeof animate>>();
   const isSplit = moduleId === 'split';
+  const isTextReveal = moduleId === 'text-reveal';
 
   const play = useCallback(() => {
     const el = ref.current;
     if (!el) return;
 
     controlsRef.current?.cancel();
+
+    if (isTextReveal) {
+      const inners = el.querySelectorAll<HTMLSpanElement>('[data-tr-inner]');
+      if (!inners.length) return;
+
+      inners.forEach(s => {
+        s.style.transform = 'translateY(100%)';
+      });
+
+      requestAnimationFrame(() => {
+        controlsRef.current = animate(
+          inners,
+          { y: ['100%', '0%'] },
+          {
+            duration: config.duration,
+            delay: stagger(config.staggerDelay ?? 0.12, { start: config.delay }),
+            easing: config.easing as any,
+          },
+        );
+        controlsRef.current.finished.catch(() => {});
+      });
+      return;
+    }
 
     if (isSplit) {
       const spans = el.querySelectorAll<HTMLSpanElement>('span');
@@ -86,7 +112,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
       controlsRef.current.finished.catch(() => {});
     });
-  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, moduleId, isSplit]);
+  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, moduleId, isSplit, isTextReveal]);
 
   useEffect(() => {
     play();
@@ -97,6 +123,63 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
   const splitChars = 'Animicro'.split('');
 
+  const renderPreviewContent = () => {
+    if (isTextReveal) {
+      return (
+        <div ref={ref} className="flex flex-col items-center gap-0" style={{ fontSize: '22px', fontWeight: 700, lineHeight: 1.3 }}>
+          {REVEAL_LINES.map((line, i) => (
+            <span key={i} style={{ display: 'block', overflow: 'hidden' }}>
+              <span
+                data-tr-inner=""
+                style={{
+                  display: 'block',
+                  transform: 'translateY(100%)',
+                  background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                {line}
+              </span>
+            </span>
+          ))}
+        </div>
+      );
+    }
+
+    if (isSplit) {
+      return (
+        <div ref={ref} className="flex" style={{ fontSize: '28px', fontWeight: 700, letterSpacing: '0.02em' }}>
+          {splitChars.map((ch, i) => (
+            <span
+              key={i}
+              style={{
+                display: 'inline-block',
+                opacity: 0,
+                background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              {ch}
+            </span>
+          ))}
+        </div>
+      );
+    }
+
+    return (
+      <div
+        ref={ref}
+        className="w-28 h-28 rounded-2xl"
+        style={{
+          background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+          opacity: 0,
+        }}
+      />
+    );
+  };
+
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="relative flex items-center justify-center w-full aspect-square rounded-2xl bg-gray-100 overflow-hidden">
@@ -106,33 +189,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
             backgroundSize: '20px 20px',
           }}
         />
-        {isSplit ? (
-          <div ref={ref} className="flex" style={{ fontSize: '28px', fontWeight: 700, letterSpacing: '0.02em' }}>
-            {splitChars.map((ch, i) => (
-              <span
-                key={i}
-                style={{
-                  display: 'inline-block',
-                  opacity: 0,
-                  background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >
-                {ch}
-              </span>
-            ))}
-          </div>
-        ) : (
-          <div
-            ref={ref}
-            className="w-28 h-28 rounded-2xl"
-            style={{
-              background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
-              opacity: 0,
-            }}
-          />
-        )}
+        {renderPreviewContent()}
       </div>
 
       <button
@@ -153,6 +210,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
           {moduleId === 'scale' && config.scale != null && ` · scale ${config.scale}`}
           {moduleId === 'blur' && config.blur != null && ` · blur ${config.blur}px`}
           {isSplit && ` · stagger ${config.staggerDelay ?? 0.05}s · ${config.distance ?? 15}px`}
+          {isTextReveal && ` · stagger ${config.staggerDelay ?? 0.12}s`}
         </p>
       </div>
 
