@@ -15,6 +15,7 @@ const MODULES = {
   'parallax':    () => import('../modules/parallax.js'),
   'split':       () => import('../modules/split-text.js'),
   'text-reveal': () => import('../modules/text-reveal.js'),
+  'typewriter':  () => import('../modules/typewriter.js'),
 };
 
 export async function loadModules(activeModules) {

@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 
@@ -19,6 +19,7 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   blur: DEFAULT_BLUR_CONFIG,
   split: DEFAULT_SPLIT_CONFIG,
   'text-reveal': DEFAULT_TEXT_REVEAL_CONFIG,
+  typewriter: DEFAULT_TYPEWRITER_CONFIG,
 };
 
 const hasDistance = (id: string) => id.startsWith('slide-') || id === 'split';
@@ -51,7 +52,34 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
 
       <div className="space-y-8 max-w-lg">
 
-        {/* Duration */}
+        {/* Typing speed (typewriter only) */}
+        {moduleId === 'typewriter' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Typing speed
+              <span className="font-mono text-blue-600">{config.typingSpeed ?? 0.06}s</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Delay between each character. Lower values type faster.
+            </p>
+            <input
+              type="range"
+              min="0.02"
+              max="0.15"
+              step="0.01"
+              value={config.typingSpeed ?? 0.06}
+              onChange={e => onUpdate({ typingSpeed: parseFloat(e.target.value) })}
+              className="w-full accent-blue-600"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0.02s — Very fast</span>
+              <span>0.15s — Slow, dramatic</span>
+            </div>
+          </div>
+        )}
+
+        {/* Duration (hidden for typewriter) */}
+        {moduleId !== 'typewriter' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Duration
@@ -74,6 +102,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             <span>2.0s — Cinematic</span>
           </div>
         </div>
+        )}
 
         {/* Delay */}
         <div>
@@ -207,7 +236,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Easing */}
+        {/* Easing (hidden for typewriter) */}
+        {moduleId !== 'typewriter' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Easing curve
@@ -231,6 +261,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             </p>
           )}
         </div>
+        )}
 
         {/* Activation margin */}
         <div>

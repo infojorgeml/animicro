@@ -233,6 +233,9 @@ class Animicro_Admin {
 			if ( isset( $module_defaults['staggerDelay'] ) ) {
 				$entry['staggerDelay'] = isset( $raw_mod['staggerDelay'] ) ? (float) $raw_mod['staggerDelay'] : $module_defaults['staggerDelay'];
 			}
+			if ( isset( $module_defaults['typingSpeed'] ) ) {
+				$entry['typingSpeed'] = isset( $raw_mod['typingSpeed'] ) ? (float) $raw_mod['typingSpeed'] : $module_defaults['typingSpeed'];
+			}
 
 			$clean_module_settings[ $module_id ] = $entry;
 		}

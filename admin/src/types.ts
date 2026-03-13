@@ -7,6 +7,7 @@ export interface ModuleConfig {
   scale?: number;
   blur?: number;
   staggerDelay?: number;
+  typingSpeed?: number;
 }
 
 export interface AnimicroSettings {

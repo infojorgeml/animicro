@@ -21,6 +21,7 @@ export function getElementConfig(el, moduleId = '') {
     scale:        d.amScale    !== undefined ? parseFloat(d.amScale)    : (mod.scale    ?? 0.95),
     blur:         d.amBlur     !== undefined ? parseFloat(d.amBlur)     : (mod.blur     ?? 4),
     staggerDelay: d.amStagger  !== undefined ? parseFloat(d.amStagger)  : (mod.staggerDelay ?? 0.05),
+    typingSpeed:  d.amTypingSpeed !== undefined ? parseFloat(d.amTypingSpeed) : (mod.typingSpeed ?? 0.06),
     margin:       d.amMargin    || mod.margin  || '-50px 0px',
   };
 }

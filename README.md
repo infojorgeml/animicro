@@ -4,7 +4,7 @@ Utility-first micro-animations for WordPress powered by [Motion One](https://mot
 
 ## Description
 
-Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade`, `.am-scale`, or `.am-slide-up` in your Page Builder, and you're done. Fade, Scale, all slide modules, and Blur each have their own settings with a live preview so you can tune duration, easing, delay, and (where applicable) scale factor, blur amount, or distance without leaving the admin.
+Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade`, `.am-scale`, or `.am-slide-up` in your Page Builder, and you're done. Fade, Scale, all slide modules, Blur, Split Text, Text Reveal, and Typewriter each have their own settings with a live preview so you can tune duration, easing, delay, and (where applicable) scale factor, blur amount, or distance without leaving the admin.
 
 **Philosophy**: Utility-first. No complex interfaces, no timelines. Just classes and `data-am-*` attributes.
 
@@ -35,6 +35,7 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 | Parallax | `.am-parallax` | Scroll-linked parallax movement | Pro |
 | Split Text | `.am-split-chars` / `.am-split-words` | Splits and animates text by characters or words | Pro |
 | Text Reveal | `.am-text-reveal` | Reveals text line by line with a sliding mask | Pro |
+| Typewriter | `.am-typewriter` | Types text character by character with blinking cursor | Pro |
 
 ## Basic usage
 
@@ -61,7 +62,8 @@ Use only one animation class per element. Do not combine `.am-fade` with `.am-sl
 | `data-am-distance` | number (px) | 30 | Slide distance (slide-up, slide-down, slide-right, slide-left) |
 | `data-am-scale` | float | 0.95 | Starting scale (scale module) |
 | `data-am-blur` | number (px) | 4 | Initial blur amount (blur module) |
-| `data-am-stagger` | float (s) | 0.05 | Stagger delay between units (split module) |
+| `data-am-stagger` | float (s) | 0.05 | Stagger delay between units (split, text-reveal) |
+| `data-am-typing-speed` | float (s) | 0.06 | Delay per character (typewriter module) |
 
 ## Compatibility
 
@@ -69,7 +71,7 @@ Works with Elementor, Bricks, Breakdance, Oxygen and Gutenberg. Dynamic inline C
 
 ## Pro License
 
-Blur, Stagger, Parallax, Split Text, Slide Right and Slide Left require a Pro license. The Cheat Sheet (classes and data attributes reference) is also Pro-only. Activate your license under **Animicro → License** or visit [animicro.com](https://animicro.com).
+Blur, Stagger, Parallax, Split Text, Text Reveal, Typewriter, Slide Right and Slide Left require a Pro license. The Cheat Sheet (classes and data attributes reference) is also Pro-only. Activate your license under **Animicro → License** or visit [animicro.com](https://animicro.com).
 
 ## Development
 

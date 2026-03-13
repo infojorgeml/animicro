@@ -26,6 +26,7 @@ class Animicro_Compatibility {
 		'split-chars' => 'opacity:0;will-change:opacity,transform;',
 		'split-words' => 'opacity:0;will-change:opacity,transform;',
 		'text-reveal' => 'opacity:0;will-change:opacity,transform;',
+		'typewriter'  => 'opacity:0;',
 	];
 
 	/**
@@ -71,6 +72,15 @@ class Animicro_Compatibility {
 
 		foreach ( $active_modules as $module ) {
 			$module = sanitize_text_field( $module );
+
+			if ( 'typewriter' === $module ) {
+				$tw_css = self::MODULE_INITIAL_CSS['typewriter'] ?? '';
+				if ( $tw_css ) {
+					$rules[] = "{$prefix} .am-typewriter{{$tw_css}}";
+					$rules[] = "{$prefix} .am-typewriter.is-ready{opacity:1;}";
+				}
+				continue;
+			}
 
 			if ( 'text-reveal' === $module ) {
 				$tr_css = self::MODULE_INITIAL_CSS['text-reveal'] ?? '';

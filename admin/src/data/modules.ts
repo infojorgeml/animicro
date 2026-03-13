@@ -72,6 +72,14 @@ export const DEFAULT_TEXT_REVEAL_CONFIG: ModuleConfig = {
   staggerDelay: 0.12,
 };
 
+export const DEFAULT_TYPEWRITER_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  typingSpeed: 0.06,
+};
+
 export type ModuleCategory = 'entry' | 'text' | 'group' | 'scroll';
 
 export interface ModuleInfo {
@@ -105,7 +113,7 @@ export const MODULE_INFO: ModuleInfo[] = [
   { id: 'split',        name: 'Split Text',   description: 'Splits and animates text by letters/words', cssClass: '.am-split-chars .am-split-words', isPro: true, category: 'text' },
   { id: 'text-reveal',  name: 'Text Reveal',  description: 'Reveals text line by line with a sliding mask', cssClass: '.am-text-reveal',  isPro: true, category: 'text' },
   { id: 'highlight',    name: 'Highlight',    description: 'Animated highlight behind text',             cssClass: '.am-highlight',    isPro: true, category: 'text', isPlaceholder: true },
-  { id: 'typewriter',   name: 'Typewriter',   description: 'Types text character by character',          cssClass: '.am-typewriter',   isPro: true, category: 'text', isPlaceholder: true },
+  { id: 'typewriter',   name: 'Typewriter',   description: 'Types text character by character with a blinking cursor', cssClass: '.am-typewriter', isPro: true, category: 'text' },
 
   // Groups & Layouts
   { id: 'stagger',      name: 'Stagger',      description: 'Animates container children in sequence',   cssClass: '.am-stagger',      isPro: true, category: 'group' },
@@ -135,6 +143,7 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-blur',      type: 'float (px)',    defaultValue: '4',         usedBy: 'blur' },
   { attribute: 'data-am-stagger',   type: 'float (s)',     defaultValue: '0.05',      usedBy: 'stagger, split, text-reveal' },
   { attribute: 'data-am-speed',     type: 'float',         defaultValue: '0.5',       usedBy: 'parallax' },
+  { attribute: 'data-am-typing-speed', type: 'float (s)',  defaultValue: '0.06',      usedBy: 'typewriter' },
 ];
 
 export interface EasingOption {

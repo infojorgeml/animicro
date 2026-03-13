@@ -9,18 +9,56 @@ interface AnimationPreviewProps {
 }
 
 const REVEAL_LINES = ['Motion', 'Micro', 'Animations'];
+const TYPEWRITER_TEXT = 'Animicro';
 
 export default function AnimationPreview({ moduleId, config, onReset }: AnimationPreviewProps) {
   const ref = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<ReturnType<typeof animate>>();
+  const twTimerRef = useRef<number>();
   const isSplit = moduleId === 'split';
   const isTextReveal = moduleId === 'text-reveal';
+  const isTypewriter = moduleId === 'typewriter';
 
   const play = useCallback(() => {
     const el = ref.current;
     if (!el) return;
 
     controlsRef.current?.cancel();
+
+    if (twTimerRef.current) {
+      clearTimeout(twTimerRef.current);
+      twTimerRef.current = undefined;
+    }
+
+    if (isTypewriter) {
+      const textNode = el.querySelector<HTMLSpanElement>('[data-tw-text]');
+      const cursor = el.querySelector<HTMLSpanElement>('[data-tw-cursor]');
+      if (!textNode || !cursor) return;
+
+      textNode.textContent = '';
+      cursor.style.opacity = '1';
+      cursor.style.transition = 'none';
+
+      let i = 0;
+      const speed = (config.typingSpeed ?? 0.06) * 1000;
+      const startDelay = config.delay * 1000;
+
+      function typeNext() {
+        if (i < TYPEWRITER_TEXT.length) {
+          textNode!.textContent += TYPEWRITER_TEXT[i];
+          i++;
+          twTimerRef.current = window.setTimeout(typeNext, speed);
+        } else {
+          twTimerRef.current = window.setTimeout(() => {
+            cursor!.style.transition = 'opacity 0.4s';
+            cursor!.style.opacity = '0';
+          }, 600);
+        }
+      }
+
+      twTimerRef.current = window.setTimeout(typeNext, startDelay);
+      return;
+    }
 
     if (isTextReveal) {
       const inners = el.querySelectorAll<HTMLSpanElement>('[data-tr-inner]');
@@ -112,18 +150,45 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
       controlsRef.current.finished.catch(() => {});
     });
-  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, moduleId, isSplit, isTextReveal]);
+  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, moduleId, isSplit, isTextReveal, isTypewriter]);
 
   useEffect(() => {
     play();
     return () => {
       controlsRef.current?.cancel();
+      if (twTimerRef.current) clearTimeout(twTimerRef.current);
     };
   }, [play]);
 
   const splitChars = 'Animicro'.split('');
 
   const renderPreviewContent = () => {
+    if (isTypewriter) {
+      return (
+        <div ref={ref} style={{ fontSize: '28px', fontWeight: 700, letterSpacing: '0.02em' }}>
+          <span
+            data-tw-text=""
+            style={{
+              background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          />
+          <span
+            data-tw-cursor=""
+            style={{
+              display: 'inline',
+              animation: 'am-tw-blink-preview 0.7s steps(2) infinite',
+              background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >|</span>
+          <style>{`@keyframes am-tw-blink-preview{0%,100%{opacity:1}50%{opacity:0}}`}</style>
+        </div>
+      );
+    }
+
     if (isTextReveal) {
       return (
         <div ref={ref} className="flex flex-col items-center gap-0" style={{ fontSize: '22px', fontWeight: 700, lineHeight: 1.3 }}>
@@ -205,12 +270,17 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
       <div className="w-full text-center space-y-1">
         <p className="text-[10px] text-gray-400 font-mono">
-          {config.duration}s · {config.easing} · {config.delay}s delay
-          {moduleId.startsWith('slide') && config.distance != null && ` · ${config.distance}px`}
-          {moduleId === 'scale' && config.scale != null && ` · scale ${config.scale}`}
-          {moduleId === 'blur' && config.blur != null && ` · blur ${config.blur}px`}
-          {isSplit && ` · stagger ${config.staggerDelay ?? 0.05}s · ${config.distance ?? 15}px`}
-          {isTextReveal && ` · stagger ${config.staggerDelay ?? 0.12}s`}
+          {isTypewriter
+            ? `${config.typingSpeed ?? 0.06}s/char · ${config.delay}s delay`
+            : <>
+                {config.duration}s · {config.easing} · {config.delay}s delay
+                {moduleId.startsWith('slide') && config.distance != null && ` · ${config.distance}px`}
+                {moduleId === 'scale' && config.scale != null && ` · scale ${config.scale}`}
+                {moduleId === 'blur' && config.blur != null && ` · blur ${config.blur}px`}
+                {isSplit && ` · stagger ${config.staggerDelay ?? 0.05}s · ${config.distance ?? 15}px`}
+                {isTextReveal && ` · stagger ${config.staggerDelay ?? 0.12}s`}
+              </>
+          }
         </p>
       </div>
 
@@ -218,11 +288,8 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
         <button
           type="button"
           onClick={onReset}
-          className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+          className="rounded-lg bg-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-blue-100 hover:text-blue-700"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-          </svg>
           Reset to default
         </button>
       )}
