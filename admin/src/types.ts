@@ -6,6 +6,7 @@ export interface ModuleConfig {
   distance?: number;
   scale?: number;
   blur?: number;
+  staggerDelay?: number;
 }
 
 export interface AnimicroSettings {

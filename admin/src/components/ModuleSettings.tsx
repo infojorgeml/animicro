@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 
@@ -17,9 +17,10 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   'slide-right': DEFAULT_SLIDE_RIGHT_CONFIG,
   'slide-left': DEFAULT_SLIDE_LEFT_CONFIG,
   blur: DEFAULT_BLUR_CONFIG,
+  split: DEFAULT_SPLIT_CONFIG,
 };
 
-const hasDistance = (id: string) => id.startsWith('slide-');
+const hasDistance = (id: string) => id.startsWith('slide-') || id === 'split';
 
 export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: ModuleSettingsProps) {
   const mod = MODULE_INFO.find(m => m.id === moduleId);
@@ -37,9 +38,11 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           Modules
         </button>
         <span className="text-gray-300">/</span>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="font-semibold text-gray-900">{mod?.name ?? moduleId}</span>
-          <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">{mod?.cssClass}</code>
+          {(mod?.cssClass ?? '').trim().split(/\s+/).filter(Boolean).map((cls, i) => (
+            <code key={i} className="rounded bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-600">{cls}</code>
+          ))}
         </div>
       </div>
 
@@ -147,28 +150,56 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Distance (slide modules only) */}
+        {/* Stagger delay (split module only) */}
+        {moduleId === 'split' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Stagger delay
+              <span className="font-mono text-blue-600">{config.staggerDelay ?? 0.05}s</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Time between each letter or word starting its animation.
+            </p>
+            <input
+              type="range"
+              min="0.01"
+              max="0.2"
+              step="0.01"
+              value={config.staggerDelay ?? 0.05}
+              onChange={e => onUpdate({ staggerDelay: parseFloat(e.target.value) })}
+              className="w-full accent-blue-600"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0.01s — Fast cascade</span>
+              <span>0.2s — Slow reveal</span>
+            </div>
+          </div>
+        )}
+
+        {/* Distance (slide and split modules) */}
         {hasDistance(moduleId) && (
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
               Distance
-              <span className="font-mono text-blue-600">{config.distance ?? 30}px</span>
+              <span className="font-mono text-blue-600">{config.distance ?? (moduleId === 'split' ? 15 : 30)}px</span>
             </label>
             <p className="text-xs text-gray-400 mb-2">
-              How far the element travels before reaching its final position.
+              {moduleId === 'split'
+                ? 'How far each letter/word slides up before reaching its final position.'
+                : 'How far the element travels before reaching its final position.'}
             </p>
             <input
               type="range"
-              min="10"
-              max="100"
+              min={moduleId === 'split' ? '5' : '10'}
+              max={moduleId === 'split' ? '50' : '100'}
               step="5"
-              value={config.distance ?? 30}
+              value={config.distance ?? (moduleId === 'split' ? 15 : 30)}
               onChange={e => onUpdate({ distance: parseInt(e.target.value, 10) })}
               className="w-full accent-blue-600"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
-              <span>10px — Subtle</span>
-              <span>100px — Dramatic</span>
+              <span>{moduleId === 'split' ? '5px — Subtle' : '10px — Subtle'}</span>
+              <span>{moduleId === 'split' ? '50px — Dramatic' : '100px — Dramatic'}</span>
             </div>
           </div>
         )}

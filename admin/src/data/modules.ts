@@ -55,25 +55,59 @@ export const DEFAULT_BLUR_CONFIG: ModuleConfig = {
   blur: 4,
 };
 
+export const DEFAULT_SPLIT_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  staggerDelay: 0.05,
+  distance: 15,
+};
+
+export type ModuleCategory = 'entry' | 'text' | 'group' | 'scroll';
+
 export interface ModuleInfo {
   id: string;
   name: string;
   description: string;
   cssClass: string;
   isPro: boolean;
+  category: ModuleCategory;
+  isPlaceholder?: boolean;
 }
 
+export const MODULE_CATEGORIES: { id: ModuleCategory; label: string; description: string }[] = [
+  { id: 'entry',  label: 'Entry Animations',   description: 'Triggered once when the element enters the viewport' },
+  { id: 'text',   label: 'Text',               description: 'Typography-specific animations' },
+  { id: 'group',  label: 'Groups & Layouts',   description: 'Animate containers and their children' },
+  { id: 'scroll', label: 'Scroll & Continuous', description: 'Scroll-linked animations' },
+];
+
 export const MODULE_INFO: ModuleInfo[] = [
-  { id: 'fade',        name: 'Fade',        description: 'Smooth appearance with opacity',             cssClass: '.am-fade',        isPro: false },
-  { id: 'scale',       name: 'Scale',       description: 'Scales from small to full size',             cssClass: '.am-scale',       isPro: false },
-  { id: 'slide-up',    name: 'Slide Up',    description: 'Slides up when appearing',                   cssClass: '.am-slide-up',    isPro: false },
-  { id: 'slide-down',  name: 'Slide Down',  description: 'Slides down when appearing',                 cssClass: '.am-slide-down',  isPro: false },
-  { id: 'slide-right', name: 'Slide Right', description: 'Slides in from the left',                    cssClass: '.am-slide-right', isPro: true },
-  { id: 'slide-left',  name: 'Slide Left',  description: 'Slides in from the right',                   cssClass: '.am-slide-left',  isPro: true },
-  { id: 'blur',        name: 'Blur',        description: 'Blur that clears as it appears',             cssClass: '.am-blur',        isPro: true },
-  { id: 'stagger',     name: 'Stagger',     description: 'Animates container children in sequence',    cssClass: '.am-stagger',     isPro: true },
-  { id: 'parallax',    name: 'Parallax',    description: 'Scroll-linked parallax movement',            cssClass: '.am-parallax',    isPro: true },
-  { id: 'split',       name: 'Split Text',  description: 'Splits and animates text by letters/words',  cssClass: '.am-split',       isPro: true },
+  // Entry Animations
+  { id: 'fade',        name: 'Fade',        description: 'Smooth appearance with opacity',            cssClass: '.am-fade',        isPro: false, category: 'entry' },
+  { id: 'scale',       name: 'Scale',       description: 'Scales from small to full size',            cssClass: '.am-scale',       isPro: false, category: 'entry' },
+  { id: 'slide-up',    name: 'Slide Up',    description: 'Slides up when appearing',                  cssClass: '.am-slide-up',    isPro: false, category: 'entry' },
+  { id: 'slide-down',  name: 'Slide Down',  description: 'Slides down when appearing',                cssClass: '.am-slide-down',  isPro: false, category: 'entry' },
+  { id: 'slide-right', name: 'Slide Right', description: 'Slides in from the left',                   cssClass: '.am-slide-right', isPro: true,  category: 'entry' },
+  { id: 'slide-left',  name: 'Slide Left',  description: 'Slides in from the right',                  cssClass: '.am-slide-left',  isPro: true,  category: 'entry' },
+  { id: 'blur',        name: 'Blur',        description: 'Blur that clears as it appears',            cssClass: '.am-blur',        isPro: true,  category: 'entry' },
+
+  // Text
+  { id: 'split',        name: 'Split Text',   description: 'Splits and animates text by letters/words', cssClass: '.am-split-chars .am-split-words', isPro: true, category: 'text' },
+  { id: 'text-reveal',  name: 'Text Reveal',  description: 'Reveals text with a sliding mask',          cssClass: '.am-text-reveal',  isPro: true, category: 'text', isPlaceholder: true },
+  { id: 'highlight',    name: 'Highlight',    description: 'Animated highlight behind text',             cssClass: '.am-highlight',    isPro: true, category: 'text', isPlaceholder: true },
+  { id: 'typewriter',   name: 'Typewriter',   description: 'Types text character by character',          cssClass: '.am-typewriter',   isPro: true, category: 'text', isPlaceholder: true },
+
+  // Groups & Layouts
+  { id: 'stagger',      name: 'Stagger',      description: 'Animates container children in sequence',   cssClass: '.am-stagger',      isPro: true, category: 'group' },
+  { id: 'grid-reveal',  name: 'Grid Reveal',  description: 'Reveals grid items with staggered entries',  cssClass: '.am-grid-reveal',  isPro: true, category: 'group', isPlaceholder: true },
+  { id: 'list-reorder', name: 'List Reorder', description: 'Smooth reordering of list items',            cssClass: '.am-list-reorder', isPro: true, category: 'group', isPlaceholder: true },
+
+  // Scroll & Continuous
+  { id: 'parallax',        name: 'Parallax',        description: 'Scroll-linked parallax movement',       cssClass: '.am-parallax',        isPro: true, category: 'scroll' },
+  { id: 'scroll-progress', name: 'Scroll Progress', description: 'Scrubbing animation tied to scroll',    cssClass: '.am-scroll-progress', isPro: true, category: 'scroll', isPlaceholder: true },
+  { id: 'sticky-reveal',   name: 'Sticky Reveal',   description: 'Reveals content as it sticks on scroll', cssClass: '.am-sticky-reveal',   isPro: true, category: 'scroll', isPlaceholder: true },
 ];
 
 export interface DataAttribute {
@@ -88,12 +122,11 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-delay',     type: 'float (s)',     defaultValue: '0',         usedBy: 'All' },
   { attribute: 'data-am-easing',    type: 'string',        defaultValue: 'ease-out',  usedBy: 'All' },
   { attribute: 'data-am-margin',    type: 'string',        defaultValue: '-50px 0px', usedBy: 'All' },
-  { attribute: 'data-am-distance',  type: 'float (px)',    defaultValue: '30',        usedBy: 'slide-up, slide-down, slide-right, slide-left' },
+  { attribute: 'data-am-distance',  type: 'float (px)',    defaultValue: '30',        usedBy: 'slide-up, slide-down, slide-right, slide-left, split' },
   { attribute: 'data-am-scale',     type: 'float',         defaultValue: '0.95',      usedBy: 'scale' },
   { attribute: 'data-am-blur',      type: 'float (px)',    defaultValue: '4',         usedBy: 'blur' },
-  { attribute: 'data-am-stagger',   type: 'float (s)',     defaultValue: '0.1',       usedBy: 'stagger, split' },
+  { attribute: 'data-am-stagger',   type: 'float (s)',     defaultValue: '0.05',      usedBy: 'stagger, split' },
   { attribute: 'data-am-speed',     type: 'float',         defaultValue: '0.5',       usedBy: 'parallax' },
-  { attribute: 'data-am-split',     type: 'chars | words', defaultValue: 'chars',     usedBy: 'split' },
 ];
 
 export interface EasingOption {

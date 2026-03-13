@@ -33,7 +33,7 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 | Blur | `.am-blur` | Blur that clears as it appears | Pro |
 | Stagger | `.am-stagger` | Animates container children in sequence | Pro |
 | Parallax | `.am-parallax` | Scroll-linked parallax movement | Pro |
-| Split Text | `.am-split` | Splits and animates text by letters/words | Pro |
+| Split Text | `.am-split-chars` / `.am-split-words` | Splits and animates text by characters or words | Pro |
 
 ## Basic usage
 
@@ -60,6 +60,7 @@ Use only one animation class per element. Do not combine `.am-fade` with `.am-sl
 | `data-am-distance` | number (px) | 30 | Slide distance (slide-up, slide-down, slide-right, slide-left) |
 | `data-am-scale` | float | 0.95 | Starting scale (scale module) |
 | `data-am-blur` | number (px) | 4 | Initial blur amount (blur module) |
+| `data-am-stagger` | float (s) | 0.05 | Stagger delay between units (split module) |
 
 ## Compatibility
 

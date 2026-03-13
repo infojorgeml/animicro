@@ -1,5 +1,5 @@
 import { useRef, useEffect, useCallback } from 'react';
-import { animate } from 'motion';
+import { animate, stagger } from 'motion';
 import type { ModuleConfig } from '../types';
 
 interface AnimationPreviewProps {
@@ -11,12 +11,38 @@ interface AnimationPreviewProps {
 export default function AnimationPreview({ moduleId, config, onReset }: AnimationPreviewProps) {
   const ref = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<ReturnType<typeof animate>>();
+  const isSplit = moduleId === 'split';
 
   const play = useCallback(() => {
     const el = ref.current;
     if (!el) return;
 
     controlsRef.current?.cancel();
+
+    if (isSplit) {
+      const spans = el.querySelectorAll<HTMLSpanElement>('span');
+      if (!spans.length) return;
+
+      const dist = config.distance ?? 15;
+      spans.forEach(s => {
+        s.style.opacity = '0';
+        s.style.transform = `translateY(${dist}px)`;
+      });
+
+      requestAnimationFrame(() => {
+        controlsRef.current = animate(
+          spans,
+          { opacity: [0, 1], y: [dist, 0] },
+          {
+            duration: config.duration,
+            delay: stagger(config.staggerDelay ?? 0.05, { start: config.delay }),
+            easing: config.easing as any,
+          },
+        );
+        controlsRef.current.finished.catch(() => {});
+      });
+      return;
+    }
 
     const isSlide = moduleId.startsWith('slide');
     const isHorizontal = moduleId === 'slide-left' || moduleId === 'slide-right';
@@ -60,7 +86,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
       controlsRef.current.finished.catch(() => {});
     });
-  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, moduleId]);
+  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, moduleId, isSplit]);
 
   useEffect(() => {
     play();
@@ -68,6 +94,8 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
       controlsRef.current?.cancel();
     };
   }, [play]);
+
+  const splitChars = 'Animicro'.split('');
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -78,14 +106,33 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
             backgroundSize: '20px 20px',
           }}
         />
-        <div
-          ref={ref}
-          className="w-28 h-28 rounded-2xl"
-          style={{
-            background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
-            opacity: 0,
-          }}
-        />
+        {isSplit ? (
+          <div ref={ref} className="flex" style={{ fontSize: '28px', fontWeight: 700, letterSpacing: '0.02em' }}>
+            {splitChars.map((ch, i) => (
+              <span
+                key={i}
+                style={{
+                  display: 'inline-block',
+                  opacity: 0,
+                  background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                {ch}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <div
+            ref={ref}
+            className="w-28 h-28 rounded-2xl"
+            style={{
+              background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+              opacity: 0,
+            }}
+          />
+        )}
       </div>
 
       <button
@@ -105,6 +152,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
           {moduleId.startsWith('slide') && config.distance != null && ` · ${config.distance}px`}
           {moduleId === 'scale' && config.scale != null && ` · scale ${config.scale}`}
           {moduleId === 'blur' && config.blur != null && ` · blur ${config.blur}px`}
+          {isSplit && ` · stagger ${config.staggerDelay ?? 0.05}s · ${config.distance ?? 15}px`}
         </p>
       </div>
 

@@ -5,6 +5,16 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2026-02-26
+
+### Added
+
+- **Split Text module** (Pro): hybrid approach with two utility classes — `.am-split-chars` (by characters) and `.am-split-words` (by words). One admin module, per-module settings (stagger delay, distance), live preview, `data-am-stagger` support.
+
+### Changed
+
+- Split Text: removed `data-am-split`; mode is now determined by the CSS class used
+
 ## [0.3.0] - 2026-02-26
 
 ### Added
@@ -140,6 +150,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Vite 6 for admin (React + TypeScript + Tailwind) and frontend (Vanilla JS) build
 - REST API: `animicro/v1/settings`, `animicro/v1/license/status`, `animicro/v1/license/save`
 
+[0.3.1]: https://github.com/infojorgeml/animicro/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/infojorgeml/animicro/compare/v0.2.9...v0.3.0
 [0.2.7]: https://github.com/infojorgeml/animicro/compare/v0.2.6...v0.2.7
 [0.2.6]: https://github.com/infojorgeml/animicro/compare/v0.2.5...v0.2.6
 [0.2.5]: https://github.com/infojorgeml/animicro/compare/v0.2.0...v0.2.5

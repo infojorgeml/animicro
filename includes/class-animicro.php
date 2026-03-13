@@ -83,6 +83,14 @@ class Animicro {
 				'margin'   => '-50px 0px',
 				'blur'     => 4,
 			],
+			'split' => [
+				'duration'     => 0.6,
+				'easing'       => 'ease-out',
+				'delay'        => 0.0,
+				'margin'       => '-50px 0px',
+				'staggerDelay' => 0.05,
+				'distance'     => 15,
+			],
 		],
 		];
 	}

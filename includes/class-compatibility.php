@@ -23,7 +23,8 @@ class Animicro_Compatibility {
 		'blur'       => 'opacity:0;filter:blur(4px);will-change:opacity,transform,filter;',
 		'stagger'    => '',
 		'parallax'   => '',
-		'split'      => 'opacity:0;will-change:opacity,transform;',
+		'split-chars' => 'opacity:0;will-change:opacity,transform;',
+		'split-words' => 'opacity:0;will-change:opacity,transform;',
 	];
 
 	/**
@@ -69,7 +70,19 @@ class Animicro_Compatibility {
 
 		foreach ( $active_modules as $module ) {
 			$module = sanitize_text_field( $module );
-			$props  = self::MODULE_INITIAL_CSS[ $module ] ?? '';
+
+			if ( 'split' === $module ) {
+				$split_css = self::MODULE_INITIAL_CSS['split-chars'] ?? '';
+				if ( $split_css ) {
+					$rules[] = "{$prefix} .am-split-chars{{$split_css}}";
+					$rules[] = "{$prefix} .am-split-words{{$split_css}}";
+					$rules[] = "{$prefix} .am-split-chars.is-ready{opacity:1;}";
+					$rules[] = "{$prefix} .am-split-words.is-ready{opacity:1;}";
+				}
+				continue;
+			}
+
+			$props = self::MODULE_INITIAL_CSS[ $module ] ?? '';
 
 			if ( empty( $props ) ) {
 				continue;
@@ -77,10 +90,6 @@ class Animicro_Compatibility {
 
 			$class   = '.am-' . $module;
 			$rules[] = "{$prefix} {$class}{{$props}}";
-		}
-
-		if ( in_array( 'split', $active_modules, true ) ) {
-			$rules[] = "{$prefix} .am-split.is-ready{opacity:1;}";
 		}
 
 		if ( empty( $rules ) ) {

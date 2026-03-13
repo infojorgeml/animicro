@@ -22,30 +22,33 @@ function splitIntoSpans(el, mode) {
     el.appendChild(span);
   });
 
+  el.classList.add('is-ready');
+
   return el.querySelectorAll('span');
 }
 
 export function init() {
-  inView('.am-split', (el) => {
-    const cfg = getElementConfig(el);
-    const mode = el.dataset.amSplit || 'chars';
-    const staggerDelay = el.dataset.amStagger !== undefined
-      ? parseFloat(el.dataset.amStagger)
-      : 0.05;
+  const els = document.querySelectorAll('.am-split-chars, .am-split-words');
+
+  els.forEach((el) => {
+    const mode = el.classList.contains('am-split-words') ? 'words' : 'chars';
+    const cfg = getElementConfig(el, 'split');
 
     const spans = splitIntoSpans(el, mode);
     if (!spans.length) return;
 
-    animate(
-      spans,
-      { opacity: [0, 1], y: [cfg.distance * 0.5, 0] },
-      {
-        duration: cfg.duration,
-        delay: stagger(staggerDelay),
-        easing: cfg.easing,
-      }
-    );
+    inView(el, () => {
+      animate(
+        spans,
+        { opacity: [0, 1], y: [cfg.distance, 0] },
+        {
+          duration: cfg.duration,
+          delay: stagger(cfg.staggerDelay, { start: cfg.delay }),
+          easing: cfg.easing,
+        }
+      );
+    }, { margin: cfg.margin });
 
     el.classList.add('am-animated');
-  }, { amount: 0.2 });
+  });
 }

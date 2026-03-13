@@ -14,12 +14,13 @@ export function getElementConfig(el, moduleId = '') {
   const mod  = (globals.moduleSettings && moduleId) ? (globals.moduleSettings[moduleId] || {}) : {};
 
   return {
-    duration:  d.amDuration  !== undefined ? parseFloat(d.amDuration)  : (mod.duration  ?? 0.6),
-    delay:     d.amDelay     !== undefined ? parseFloat(d.amDelay)     : (mod.delay     ?? 0),
-    easing:    d.amEasing    || mod.easing  || 'ease-out',
-    distance:  d.amDistance  !== undefined ? parseFloat(d.amDistance)  : (mod.distance  ?? 30),
-    scale:     d.amScale    !== undefined ? parseFloat(d.amScale)    : (mod.scale    ?? 0.95),
-    blur:      d.amBlur     !== undefined ? parseFloat(d.amBlur)     : (mod.blur     ?? 4),
-    margin:    d.amMargin    || mod.margin  || '-50px 0px',
+    duration:     d.amDuration  !== undefined ? parseFloat(d.amDuration)  : (mod.duration  ?? 0.6),
+    delay:        d.amDelay     !== undefined ? parseFloat(d.amDelay)     : (mod.delay     ?? 0),
+    easing:       d.amEasing    || mod.easing  || 'ease-out',
+    distance:     d.amDistance  !== undefined ? parseFloat(d.amDistance)  : (mod.distance  ?? 30),
+    scale:        d.amScale    !== undefined ? parseFloat(d.amScale)    : (mod.scale    ?? 0.95),
+    blur:         d.amBlur     !== undefined ? parseFloat(d.amBlur)     : (mod.blur     ?? 4),
+    staggerDelay: d.amStagger  !== undefined ? parseFloat(d.amStagger)  : (mod.staggerDelay ?? 0.05),
+    margin:       d.amMargin    || mod.margin  || '-50px 0px',
   };
 }

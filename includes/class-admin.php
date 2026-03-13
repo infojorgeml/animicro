@@ -230,6 +230,9 @@ class Animicro_Admin {
 			if ( isset( $module_defaults['blur'] ) ) {
 				$entry['blur'] = isset( $raw_mod['blur'] ) ? (float) $raw_mod['blur'] : $module_defaults['blur'];
 			}
+			if ( isset( $module_defaults['staggerDelay'] ) ) {
+				$entry['staggerDelay'] = isset( $raw_mod['staggerDelay'] ) ? (float) $raw_mod['staggerDelay'] : $module_defaults['staggerDelay'];
+			}
 
 			$clean_module_settings[ $module_id ] = $entry;
 		}

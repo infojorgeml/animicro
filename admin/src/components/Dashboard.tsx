@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Toggle from './Toggle';
 import ModuleSettings from './ModuleSettings';
-import { MODULE_INFO } from '../data/modules';
+import { MODULE_INFO, MODULE_CATEGORIES } from '../data/modules';
 import type { AnimicroSettings, ModuleConfig } from '../types';
 
 const DEFAULT_MODULE_CONFIG: ModuleConfig = {
@@ -35,109 +35,131 @@ export default function Dashboard({ settings, isPremium, onToggleModule, onUpdat
 
   return (
     <div>
-      <div className="mb-4">
+      <div className="mb-6">
         <h2 className="text-lg font-semibold text-gray-900">Animation modules</h2>
         <p className="text-sm text-gray-500">
           Enable the modules you need. Only the JS of active modules is loaded.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {MODULE_INFO.map(mod => {
-          const isLocked  = mod.isPro && !isPremium;
-          const isActive  = !isLocked && settings.active_modules.includes(mod.id);
+      <div className="space-y-8">
+        {MODULE_CATEGORIES.map(cat => {
+          const modules = MODULE_INFO.filter(m => m.category === cat.id);
+          if (!modules.length) return null;
 
           return (
-            <div
-              key={mod.id}
-              className={`
-                rounded-lg border p-4 transition-colors
-                ${isLocked
-                  ? 'border-gray-200 bg-gray-50 opacity-60'
-                  : isActive
-                    ? 'border-blue-200 bg-blue-50/50'
-                    : 'border-gray-200 bg-white'}
-              `}
-            >
-              <div className="flex items-center justify-between">
-                <div className="min-w-0 mr-3">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`font-medium ${isLocked ? 'text-gray-400' : 'text-gray-900'}`}>
-                      {mod.name}
-                    </span>
-                    <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">
-                      {mod.cssClass}
-                    </code>
-                    {mod.isPro && (
-                      <span className={`
-                        rounded-full px-2 py-0.5 text-xs font-semibold
-                        ${isPremium
-                          ? 'bg-amber-100 text-amber-700'
-                          : 'bg-gray-200 text-gray-500'}
-                      `}>
-                        Pro
-                      </span>
-                    )}
-                  </div>
-                  <p className={`mt-1 text-sm ${isLocked ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {mod.description}
-                  </p>
-                  {isLocked && (
-                    <p className="mt-1.5 text-xs text-amber-600">
-                      Requires Pro license.{' '}
-                      <a
-                        href="?page=animicro-license"
-                        className="underline hover:text-amber-700"
-                      >
-                        Activate license
-                      </a>
-                    </p>
-                  )}
-                </div>
+            <div key={cat.id}>
+              <div className="mb-3">
+                <h2 className="text-sm font-semibold text-gray-700">{cat.label}</h2>
+                <p className="text-[14px] text-gray-400">{cat.description}</p>
+              </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  {isLocked ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-5 h-5 text-gray-300"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {modules.map(mod => {
+                  const isPlaceholder = !!mod.isPlaceholder;
+                  const isLocked = isPlaceholder || (mod.isPro && !isPremium);
+                  const isActive = !isLocked && settings.active_modules.includes(mod.id);
+
+                  return (
+                    <div
+                      key={mod.id}
+                      className={`
+                        rounded-lg border p-4 transition-colors
+                        ${isPlaceholder
+                          ? 'border-dashed border-gray-200 bg-gray-50/50 opacity-50'
+                          : isLocked
+                            ? 'border-gray-200 bg-gray-50 opacity-60'
+                            : isActive
+                              ? 'border-blue-200 bg-blue-50/50'
+                              : 'border-gray-200 bg-white'}
+                      `}
                     >
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <>
-                      {isActive && (
-                        <button
-                          onClick={() => setSettingsFor(mod.id)}
-                          title={`Settings for ${mod.name}`}
-                          className="rounded-md p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-                          </svg>
-                        </button>
-                      )}
-                      <Toggle
-                        checked={isActive}
-                        onChange={() => onToggleModule(mod.id)}
-                        label={`Toggle ${mod.name}`}
-                      />
-                    </>
-                  )}
-                </div>
+                      <div className="flex items-center justify-between">
+                        <div className="min-w-0 mr-3">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className={`font-medium text-[14px] ${isLocked ? 'text-gray-400' : 'text-gray-900'}`}>
+                              {mod.name}
+                            </span>
+                            {(mod.cssClass ?? '').trim().split(/\s+/).filter(Boolean).map((cls, i) => (
+                              <code key={i} className="rounded bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-600">{cls}</code>
+                            ))}
+                            {mod.isPro && (
+                              <span className={`
+                                rounded-full px-2 py-0.5 text-xs font-semibold
+                                ${isPremium && !isPlaceholder
+                                  ? 'bg-amber-100 text-amber-700'
+                                  : 'bg-gray-200 text-gray-500'}
+                              `}>
+                                Pro
+                              </span>
+                            )}
+                          </div>
+                          <p className={`mt-1 text-[13px] ${isLocked ? 'text-gray-400' : 'text-gray-500'}`}>
+                            {mod.description}
+                          </p>
+                          {isPlaceholder && (
+                            <p className="mt-1.5 text-xs text-gray-400">Coming soon</p>
+                          )}
+                          {!isPlaceholder && isLocked && (
+                            <p className="mt-1.5 text-xs text-amber-600">
+                              Requires Pro license.{' '}
+                              <a
+                                href="?page=animicro-license"
+                                className="underline hover:text-amber-700"
+                              >
+                                Activate license
+                              </a>
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          {isLocked ? (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="w-5 h-5 text-gray-300"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                            </svg>
+                          ) : (
+                            <>
+                              {isActive && (
+                                <button
+                                  onClick={() => setSettingsFor(mod.id)}
+                                  title={`Settings for ${mod.name}`}
+                                  className="rounded-md p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                                  </svg>
+                                </button>
+                              )}
+                              <Toggle
+                                checked={isActive}
+                                onChange={() => onToggleModule(mod.id)}
+                                label={`Toggle ${mod.name}`}
+                              />
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           );
         })}
       </div>
 
-      <div className="mt-6 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+      <div className="mt-6 flex items-center justify-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 shrink-0 text-amber-600" viewBox="0 0 20 20" fill="currentColor">
           <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
         </svg>
         <p>
-          <strong>Important:</strong> Use only one animation class per element. Do not combine <code className="rounded bg-amber-100 px-1">.am-fade</code> with <code className="rounded bg-amber-100 px-1">.am-slide-up</code> (or other entry animations) on the same element — it can cause flicker.
+          <strong>Important:</strong> Use only one animation class per element. Do not combine <code className="rounded bg-amber-100 px-1 text-[11px]">.am-fade</code> with <code className="rounded bg-amber-100 px-1 text-[11px]">.am-slide-up</code> (or other entry animations) on the same element — it can cause flicker.
         </p>
       </div>
     </div>
