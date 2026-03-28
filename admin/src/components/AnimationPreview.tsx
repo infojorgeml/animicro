@@ -20,6 +20,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
   const isTypewriter = moduleId === 'typewriter';
   const isStagger = moduleId === 'stagger';
   const isGridReveal = moduleId === 'grid-reveal';
+  const isHighlight = moduleId === 'highlight';
   const isParallax = moduleId === 'parallax';
 
   const play = useCallback(() => {
@@ -60,6 +61,28 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
       }
 
       twTimerRef.current = window.setTimeout(typeNext, startDelay);
+      return;
+    }
+
+    if (isHighlight) {
+      const inner = el.querySelector<HTMLSpanElement>('[data-hl-inner]');
+      if (!inner) return;
+
+      inner.style.setProperty('--am-hl-duration', '0s');
+      inner.classList.remove('am-highlight-active');
+      void inner.offsetWidth;
+
+      inner.style.setProperty('--am-hl-color', config.highlightColor ?? '#fde68a');
+      inner.style.setProperty('--am-hl-origin', config.highlightDirection ?? 'left');
+      inner.style.setProperty('--am-hl-duration', config.duration + 's');
+      inner.style.setProperty('--am-hl-easing', config.easing ?? 'ease-out');
+      inner.style.setProperty('--am-hl-delay', config.delay + 's');
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          inner.classList.add('am-highlight-active');
+        });
+      });
       return;
     }
 
@@ -249,7 +272,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
       controlsRef.current.finished.catch(() => {});
     });
-  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, config.speed, config.origin, moduleId, isSplit, isTextReveal, isTypewriter, isStagger, isGridReveal, isParallax]);
+  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, config.speed, config.origin, config.highlightColor, config.highlightDirection, moduleId, isSplit, isTextReveal, isTypewriter, isHighlight, isStagger, isGridReveal, isParallax]);
 
   useEffect(() => {
     play();
@@ -264,6 +287,41 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
   const STAGGER_ITEMS = 6;
 
   const renderPreviewContent = () => {
+    if (isHighlight) {
+      return (
+        <div ref={ref} style={{ fontSize: '28px', fontWeight: 700, letterSpacing: '0.02em' }}>
+          <span
+            data-hl-inner=""
+            className="am-highlight-inner"
+            style={{
+              '--am-hl-color': config.highlightColor ?? '#fde68a',
+              '--am-hl-origin': config.highlightDirection ?? 'left',
+              '--am-hl-duration': config.duration + 's',
+              '--am-hl-easing': config.easing ?? 'ease-out',
+              '--am-hl-delay': config.delay + 's',
+            } as React.CSSProperties}
+          >
+            Animicro
+          </span>
+          <style>{`
+            .am-highlight-inner { position: relative; display: inline; isolation: isolate; }
+            .am-highlight-inner::after {
+              content: '';
+              position: absolute;
+              left: 0; bottom: 0;
+              width: 100%; height: 40%;
+              background: var(--am-hl-color, #fde68a);
+              transform: scaleX(0);
+              transform-origin: var(--am-hl-origin, left);
+              transition: transform var(--am-hl-duration, 0.8s) var(--am-hl-easing, ease-out) var(--am-hl-delay, 0s);
+              z-index: -1;
+            }
+            .am-highlight-inner.am-highlight-active::after { transform: scaleX(1); }
+          `}</style>
+        </div>
+      );
+    }
+
     if (isStagger) {
       return (
         <div ref={ref} className="grid grid-cols-3 gap-3 p-4">
@@ -432,6 +490,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
                 {isTextReveal && ` · stagger ${config.staggerDelay ?? 0.12}s`}
                 {isStagger && ` · stagger ${config.staggerDelay ?? 0.1}s · ${config.distance ?? 20}px`}
                 {isGridReveal && ` · ${config.origin ?? 'center'} · stagger ${config.staggerDelay ?? 0.08}s · ${config.distance ?? 20}px`}
+                {isHighlight && ` · ${config.highlightDirection ?? 'left'} · ${config.highlightColor ?? '#fde68a'}`}
               </>
           }
         </p>

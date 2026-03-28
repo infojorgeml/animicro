@@ -16,13 +16,37 @@
 .am-split-words,
 .am-text-reveal,
 .am-typewriter,
+.am-highlight,
 .am-stagger > *,
 .am-grid-reveal > * {
   opacity: 1;
   visibility: visible;
 }
 
-/* 2. SPLIT TEXT: overflow + word spans */
+/* 2. HIGHLIGHT: marker effect via ::after pseudo-element */
+.am-highlight-inner {
+  position: relative;
+  display: inline;
+  isolation: isolate;
+}
+.am-highlight-inner::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 40%;
+  background: var(--am-hl-color, #fde68a);
+  transform: scaleX(0);
+  transform-origin: var(--am-hl-origin, left);
+  transition: transform var(--am-hl-duration, 0.8s) var(--am-hl-easing, ease-out) var(--am-hl-delay, 0s);
+  z-index: -1;
+}
+.am-highlight-inner.am-highlight-active::after {
+  transform: scaleX(1);
+}
+
+/* 3. SPLIT TEXT: overflow + word spans */
 .am-split {
   overflow: hidden;
 }
@@ -40,6 +64,9 @@
   .am-scale,
   .am-blur,
   .am-split,
+  .am-highlight .am-highlight-inner::after {
+    transform: scaleX(1) !important;
+  }
   .am-stagger > *,
   .am-grid-reveal > * {
     opacity: 1 !important;

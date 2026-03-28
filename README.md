@@ -4,7 +4,7 @@ Utility-first micro-animations for WordPress powered by [Motion One](https://mot
 
 ## Description
 
-Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade`, `.am-scale`, or `.am-slide-up` in your Page Builder, and you're done. Fade, Scale, all slide modules, Blur, Stagger, Grid Reveal, Parallax, Split Text, Text Reveal, and Typewriter each have their own settings with a live preview so you can tune duration, easing, delay, speed, and (where applicable) scale factor, blur amount, distance, or grid origin without leaving the admin.
+Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade`, `.am-scale`, or `.am-slide-up` in your Page Builder, and you're done. Fade, Scale, all slide modules, Blur, Stagger, Grid Reveal, Highlight, Parallax, Split Text, Text Reveal, and Typewriter each have their own settings with a live preview so you can tune duration, easing, delay, speed, and (where applicable) scale factor, blur amount, distance, grid origin, or highlight color without leaving the admin.
 
 **Philosophy**: Utility-first. No complex interfaces, no timelines. Just classes and `data-am-*` attributes.
 
@@ -33,6 +33,7 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 | Blur | `.am-blur` | Blur that clears as it appears | Pro |
 | Stagger | `.am-stagger` | Animates container children in sequence | Pro |
 | Grid Reveal | `.am-grid-reveal` | Reveals direct children from a focal point (spatial wave) | Pro |
+| Highlight | `.am-highlight` | Marker-style highlight behind text on entry | Pro |
 | Parallax | `.am-parallax` | Scroll-linked parallax movement | Pro |
 | Split Text | `.am-split-chars` / `.am-split-words` | Splits and animates text by characters or words | Pro |
 | Text Reveal | `.am-text-reveal` | Reveals text line by line with a sliding mask | Pro |
@@ -65,6 +66,8 @@ Use only one animation class per element. Do not combine `.am-fade` with `.am-sl
 | `data-am-blur` | number (px) | 4 | Initial blur amount (blur module) |
 | `data-am-stagger` | float (s) | 0.05 | Stagger delay between units (split, text-reveal, stagger, grid-reveal) |
 | `data-am-origin` | string | center | Focal point for grid-reveal: `center`, corners, `top`/`right`/`bottom`/`left`, or `random` (container only) |
+| `data-am-highlight-color` | string (hex) | #fde68a | Marker color (highlight module) |
+| `data-am-highlight-direction` | string | left | Sweep direction: `left`, `right`, or `center` (highlight module) |
 | `data-am-speed` | float | 0.5 | Parallax movement intensity (parallax module) |
 | `data-am-typing-speed` | float (s) | 0.06 | Delay per character (typewriter module) |
 
@@ -74,7 +77,7 @@ Works with Elementor, Bricks, Breakdance, Oxygen, Divi and Gutenberg. Dynamic in
 
 ## Pro License
 
-Blur, Stagger, Grid Reveal, Parallax, Split Text, Text Reveal, Typewriter, Slide Right and Slide Left require a Pro license. The Cheat Sheet (classes and data attributes reference) is also Pro-only. Activate your license under **Animicro → License** or visit [animicro.com](https://animicro.com).
+Blur, Stagger, Grid Reveal, Highlight, Parallax, Split Text, Text Reveal, Typewriter, Slide Right and Slide Left require a Pro license. The Cheat Sheet (classes and data attributes reference) is also Pro-only. Activate your license under **Animicro → License** or visit [animicro.com](https://animicro.com).
 
 ## Development
 

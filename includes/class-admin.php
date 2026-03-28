@@ -242,6 +242,12 @@ class Animicro_Admin {
 			if ( isset( $module_defaults['origin'] ) ) {
 				$entry['origin'] = isset( $raw_mod['origin'] ) ? sanitize_text_field( $raw_mod['origin'] ) : $module_defaults['origin'];
 			}
+			if ( isset( $module_defaults['highlightColor'] ) ) {
+				$entry['highlightColor'] = isset( $raw_mod['highlightColor'] ) ? sanitize_text_field( $raw_mod['highlightColor'] ) : $module_defaults['highlightColor'];
+			}
+			if ( isset( $module_defaults['highlightDirection'] ) ) {
+				$entry['highlightDirection'] = isset( $raw_mod['highlightDirection'] ) ? sanitize_text_field( $raw_mod['highlightDirection'] ) : $module_defaults['highlightDirection'];
+			}
 
 			$clean_module_settings[ $module_id ] = $entry;
 		}

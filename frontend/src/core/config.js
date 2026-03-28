@@ -23,7 +23,9 @@ export function getElementConfig(el, moduleId = '') {
     staggerDelay: d.amStagger  !== undefined ? parseFloat(d.amStagger)  : (mod.staggerDelay ?? 0.05),
     typingSpeed:  d.amTypingSpeed !== undefined ? parseFloat(d.amTypingSpeed) : (mod.typingSpeed ?? 0.06),
     speed:        d.amSpeed     !== undefined ? parseFloat(d.amSpeed)     : (mod.speed     ?? 0.5),
-    origin:       d.amOrigin    || mod.origin   || 'center',
+    origin:            d.amOrigin             || mod.origin             || 'center',
+    highlightColor:     d.amHighlightColor     || mod.highlightColor     || '#fde68a',
+    highlightDirection: d.amHighlightDirection  || mod.highlightDirection || 'left',
     margin:       d.amMargin    || mod.margin  || '-50px 0px',
   };
 }

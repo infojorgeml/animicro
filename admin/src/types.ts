@@ -10,6 +10,8 @@ export interface ModuleConfig {
   typingSpeed?: number;
   speed?: number;
   origin?: string;
+  highlightColor?: string;
+  highlightDirection?: string;
 }
 
 export interface AnimicroSettings {

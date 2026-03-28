@@ -44,7 +44,7 @@ animicro/
 ## Frontend Modules
 
 - **Entry**: `frontend/src/main.js` → `loadModules(activeModules)` from `core/registry.js`.
-- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `scale`, `blur`, `stagger`, `grid-reveal`, `parallax`, `split`, `text-reveal`, `typewriter`. Each exports `init()`.
+- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `scale`, `blur`, `stagger`, `grid-reveal`, `highlight`, `parallax`, `split`, `text-reveal`, `typewriter`. Each exports `init()`.
 - **Config**: `getElementConfig(el, moduleId)` merges `el.dataset.am*` with `moduleSettings[moduleId]` and fallbacks.
 - **Code splitting**: Dynamic `import()` per module; only active modules load.
 
@@ -59,7 +59,7 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 
 ## Pro License
 
-- **Pro modules**: blur, stagger, grid-reveal, parallax, split, slide-right, slide-left, text-reveal, typewriter. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
+- **Pro modules**: blur, stagger, grid-reveal, highlight, parallax, split, slide-right, slide-left, text-reveal, typewriter. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
 - **Cheat Sheet** tab is Pro-only.
 - License validation via Supabase; product slug `animicro`.
 
@@ -92,6 +92,13 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 | `data-am-speed` | float | 0.5 | parallax |
 | `data-am-typing-speed` | float (s) | 0.06 | typewriter |
 | `data-am-origin` | string | center | grid-reveal only — `center`, corners, `top`/`right`/`bottom`/`left`, or `random` (on container) |
+| `data-am-highlight-color` | string (hex) | #fde68a | highlight |
+| `data-am-highlight-direction` | string | left | highlight — `left`, `right`, `center` |
+
+## Highlight (typography)
+
+- **Class**: `.am-highlight` on a text element. The script wraps content in `.am-highlight-inner`; a `::after` pseudo-element animates `scaleX` via CSS transition when the element enters the viewport (`inView`).
+- **Config**: `highlightColor`, `highlightDirection` (maps to `transform-origin`); `data-am-highlight-color` and `data-am-highlight-direction` on the same element as the class.
 
 ## Grid Reveal (spatial group)
 

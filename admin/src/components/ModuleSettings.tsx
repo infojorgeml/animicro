@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_PARALLAX_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_PARALLAX_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 import CopyClassButton from './CopyClassButton';
@@ -23,6 +23,7 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   typewriter: DEFAULT_TYPEWRITER_CONFIG,
   stagger: DEFAULT_STAGGER_CONFIG,
   'grid-reveal': DEFAULT_GRID_REVEAL_CONFIG,
+  highlight: DEFAULT_HIGHLIGHT_CONFIG,
   parallax: DEFAULT_PARALLAX_CONFIG,
 };
 
@@ -328,6 +329,63 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             </button>
             <p className="mt-1.5 text-xs text-gray-400">
               Current: <span className="font-mono text-blue-600">{config.origin ?? 'center'}</span>
+            </p>
+          </div>
+        )}
+
+        {/* Highlight color (highlight only) */}
+        {moduleId === 'highlight' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Highlight color
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              The marker color drawn behind the text. Override per-element with <code className="rounded bg-gray-100 px-1 py-0.5 text-[11px]">data-am-highlight-color</code>.
+            </p>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={config.highlightColor ?? '#fde68a'}
+                onChange={e => onUpdate({ highlightColor: e.target.value })}
+                className="h-10 w-10 cursor-pointer rounded-lg border border-gray-300 p-0.5"
+              />
+              <span className="font-mono text-sm text-gray-600">{config.highlightColor ?? '#fde68a'}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Highlight direction (highlight only) */}
+        {moduleId === 'highlight' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Direction
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              The direction the highlight sweeps across the text.
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {([
+                { value: 'left',   label: 'Left → Right', icon: '→' },
+                { value: 'right',  label: 'Right → Left', icon: '←' },
+                { value: 'center', label: 'Center Out',   icon: '↔' },
+              ] as const).map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => onUpdate({ highlightDirection: opt.value })}
+                  className={`
+                    rounded-lg border px-3 py-2.5 text-left transition-colors
+                    ${config.highlightDirection === opt.value
+                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'}
+                  `}
+                >
+                  <span className="block text-sm font-medium">{opt.icon}</span>
+                  <span className="block text-xs text-gray-400 mt-0.5">{opt.label}</span>
+                </button>
+              ))}
+            </div>
+            <p className="mt-1.5 text-xs text-gray-400">
+              Current: <span className="font-mono text-blue-600">{config.highlightDirection ?? 'left'}</span>
             </p>
           </div>
         )}

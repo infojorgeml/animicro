@@ -13,6 +13,7 @@ const MODULES = {
   'blur':        () => import('../modules/blur.js'),
   'stagger':     () => import('../modules/stagger.js'),
   'grid-reveal': () => import('../modules/grid-reveal.js'),
+  'highlight':   () => import('../modules/highlight.js'),
   'parallax':    () => import('../modules/parallax.js'),
   'split':       () => import('../modules/split-text.js'),
   'text-reveal': () => import('../modules/text-reveal.js'),

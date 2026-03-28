@@ -99,6 +99,15 @@ export const DEFAULT_GRID_REVEAL_CONFIG: ModuleConfig = {
   origin: 'center',
 };
 
+export const DEFAULT_HIGHLIGHT_CONFIG: ModuleConfig = {
+  duration: 0.8,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  highlightColor: '#fde68a',
+  highlightDirection: 'left',
+};
+
 export const DEFAULT_PARALLAX_CONFIG: ModuleConfig = {
   duration: 0.6,
   easing: 'linear',
@@ -116,7 +125,6 @@ export interface ModuleInfo {
   cssClass: string;
   isPro: boolean;
   category: ModuleCategory;
-  isPlaceholder?: boolean;
 }
 
 export const MODULE_CATEGORIES: { id: ModuleCategory; label: string; description: string }[] = [
@@ -139,18 +147,15 @@ export const MODULE_INFO: ModuleInfo[] = [
   // Text
   { id: 'split',        name: 'Split Text',   description: 'Splits and animates text by letters/words', cssClass: '.am-split-chars .am-split-words', isPro: true, category: 'text' },
   { id: 'text-reveal',  name: 'Text Reveal',  description: 'Reveals text line by line with a sliding mask', cssClass: '.am-text-reveal',  isPro: true, category: 'text' },
-  { id: 'highlight',    name: 'Highlight',    description: 'Animated highlight behind text',             cssClass: '.am-highlight',    isPro: true, category: 'text', isPlaceholder: true },
+  { id: 'highlight',    name: 'Highlight',    description: 'Animated marker highlight behind text',                    cssClass: '.am-highlight',  isPro: true, category: 'text' },
   { id: 'typewriter',   name: 'Typewriter',   description: 'Types text character by character with a blinking cursor', cssClass: '.am-typewriter', isPro: true, category: 'text' },
 
   // Groups & Layouts
   { id: 'stagger',      name: 'Stagger',      description: 'Animates container children in sequence',   cssClass: '.am-stagger',      isPro: true, category: 'group' },
   { id: 'grid-reveal',  name: 'Grid Reveal',  description: 'Spatial animation that reveals grid items from a focal point', cssClass: '.am-grid-reveal', isPro: true, category: 'group' },
-  { id: 'list-reorder', name: 'List Reorder', description: 'Smooth reordering of list items',            cssClass: '.am-list-reorder', isPro: true, category: 'group', isPlaceholder: true },
 
   // Scroll & Continuous
   { id: 'parallax',        name: 'Parallax',        description: 'Scroll-linked parallax movement',       cssClass: '.am-parallax',        isPro: true, category: 'scroll' },
-  { id: 'scroll-progress', name: 'Scroll Progress', description: 'Scrubbing animation tied to scroll',    cssClass: '.am-scroll-progress', isPro: true, category: 'scroll', isPlaceholder: true },
-  { id: 'sticky-reveal',   name: 'Sticky Reveal',   description: 'Reveals content as it sticks on scroll', cssClass: '.am-sticky-reveal',   isPro: true, category: 'scroll', isPlaceholder: true },
 ];
 
 export interface DataAttribute {
@@ -172,6 +177,8 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-speed',     type: 'float',         defaultValue: '0.5',       usedBy: 'parallax' },
   { attribute: 'data-am-typing-speed', type: 'float (s)',  defaultValue: '0.06',      usedBy: 'typewriter' },
   { attribute: 'data-am-origin',       type: 'string',      defaultValue: 'center',    usedBy: 'grid-reveal' },
+  { attribute: 'data-am-highlight-color',     type: 'string (hex)', defaultValue: '#fde68a', usedBy: 'highlight' },
+  { attribute: 'data-am-highlight-direction', type: 'string',       defaultValue: 'left',    usedBy: 'highlight' },
 ];
 
 export interface EasingOption {

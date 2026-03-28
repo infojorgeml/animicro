@@ -57,8 +57,7 @@ export default function Dashboard({ settings, isPremium, onToggleModule, onUpdat
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {modules.map(mod => {
-                  const isPlaceholder = !!mod.isPlaceholder;
-                  const isLocked = isPlaceholder || (mod.isPro && !isPremium);
+                  const isLocked = mod.isPro && !isPremium;
                   const isActive = !isLocked && settings.active_modules.includes(mod.id);
 
                   return (
@@ -66,13 +65,11 @@ export default function Dashboard({ settings, isPremium, onToggleModule, onUpdat
                       key={mod.id}
                       className={`
                         rounded-lg border p-4 transition-colors
-                        ${isPlaceholder
-                          ? 'border-dashed border-gray-200 bg-gray-50/50 opacity-50'
-                          : isLocked
-                            ? 'border-gray-200 bg-gray-50 opacity-60'
-                            : isActive
-                              ? 'border-blue-200 bg-blue-50/50'
-                              : 'border-gray-200 bg-white'}
+                        ${isLocked
+                          ? 'border-gray-200 bg-gray-50 opacity-60'
+                          : isActive
+                            ? 'border-blue-200 bg-blue-50/50'
+                            : 'border-gray-200 bg-white'}
                       `}
                     >
                       <div className="flex items-center justify-between">
@@ -90,7 +87,7 @@ export default function Dashboard({ settings, isPremium, onToggleModule, onUpdat
                             {mod.isPro && (
                               <span className={`
                                 rounded-full px-2 py-0.5 text-xs font-semibold
-                                ${isPremium && !isPlaceholder
+                                ${isPremium
                                   ? 'bg-amber-100 text-amber-700'
                                   : 'bg-gray-200 text-gray-500'}
                               `}>
@@ -101,10 +98,7 @@ export default function Dashboard({ settings, isPremium, onToggleModule, onUpdat
                           <p className={`mt-1 text-[13px] ${isLocked ? 'text-gray-400' : 'text-gray-500'}`}>
                             {mod.description}
                           </p>
-                          {isPlaceholder && (
-                            <p className="mt-1.5 text-xs text-gray-400">Coming soon</p>
-                          )}
-                          {!isPlaceholder && isLocked && (
+                          {isLocked && (
                             <p className="mt-1.5 text-xs text-amber-600">
                               Requires Pro license.{' '}
                               <a
