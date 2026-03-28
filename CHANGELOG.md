@@ -5,6 +5,17 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.6] - 2026-02-26
+
+### Added
+
+- **Divi builder** compatibility: body class `et_pb_pagebuilder_layout`, URL check `?et_fb=1`; Divi button added to Integrations admin panel
+- **Elementor** URL check `?elementor-preview` in addition to the existing body class — prevents hiding CSS from loading in the editor iframe
+- **Oxygen Builder** URL check `?ct_builder=true` in addition to the existing body class
+- **Builder docs**: individual markdown files in `docs/` for each supported builder (Bricks, Breakdance, Elementor, Oxygen, Divi, Gutenberg) with detection details and key references
+- **Bug fix**: `type="module"` now injected via `str_replace('<script ', ...)` instead of `str_replace(' src', ...)` — more robust across all WordPress versions and attribute orders
+- **Bug fix**: Vite frontend build now uses `base: './'` so dynamic chunk imports resolve correctly from the plugin's URL instead of the server root — fixes 404 errors for all JS modules
+
 ## [0.3.5] - 2026-02-26
 
 ### Added

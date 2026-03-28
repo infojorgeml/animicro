@@ -68,7 +68,7 @@ Use only one animation class per element. Do not combine `.am-fade` with `.am-sl
 
 ## Compatibility
 
-Works with Elementor, Bricks, Breakdance, Oxygen and Gutenberg. Dynamic inline CSS adapts per builder so elements stay visible inside editors and animations only run on the live frontend. You can select multiple builders if you use more than one.
+Works with Elementor, Bricks, Breakdance, Oxygen, Divi and Gutenberg. Dynamic inline CSS adapts per builder so elements stay visible inside editors and animations only run on the live frontend. You can select multiple builders if you use more than one. See `docs/` for per-builder integration details.
 
 ## Pro License
 

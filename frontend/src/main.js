@@ -2,7 +2,7 @@
  * Animicro Frontend Entry Point
  *
  * Loads active animation modules on the real frontend.
- * Detects builder editors via URL param (?bricks=run) to skip animations.
+ * Detects builder editors via URL params to skip animations inside editors.
  */
 
 import './style.css';
@@ -11,7 +11,12 @@ import { loadModules } from './core/registry.js';
 const config = window.animicroFrontData || {};
 
 function isInBuilder() {
-  if (window.location.search.includes('bricks=run')) return true;
+  const s = window.location.search;
+  if (s.includes('bricks=run')) return true;
+  if (s.includes('breakdance=builder')) return true;
+  if (s.includes('elementor-preview')) return true;
+  if (s.includes('ct_builder=true')) return true;
+  if (s.includes('et_fb=1')) return true;
   return false;
 }
 

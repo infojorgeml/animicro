@@ -8,8 +8,9 @@ class Animicro_Compatibility {
 	private const BUILDER_EDITOR_CLASSES = [
 		'elementor'  => 'elementor-editor-active',
 		'bricks'     => 'bricks-is-builder',
-		'breakdance' => 'breakdance-builder',
+		'breakdance' => 'breakdance',
 		'oxygen'     => 'oxygen-builder-body',
+		'divi'       => 'et_pb_pagebuilder_layout',
 		'gutenberg'  => 'block-editor-page',
 	];
 
@@ -135,6 +136,7 @@ class Animicro_Compatibility {
 			'bricks'     => 'Bricks Builder',
 			'breakdance' => 'Breakdance',
 			'oxygen'     => 'Oxygen Builder',
+			'divi'       => 'Divi',
 			'gutenberg'  => 'Gutenberg',
 		];
 	}

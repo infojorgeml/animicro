@@ -7,6 +7,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: isAdmin ? [react()] : [],
+    base: isAdmin ? '/' : './',
     build: {
       outDir: isAdmin ? 'admin/dist' : 'frontend/dist',
       emptyOutDir: true,
