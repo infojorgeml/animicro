@@ -248,6 +248,18 @@ class Animicro_Admin {
 			if ( isset( $module_defaults['highlightDirection'] ) ) {
 				$entry['highlightDirection'] = isset( $raw_mod['highlightDirection'] ) ? sanitize_text_field( $raw_mod['highlightDirection'] ) : $module_defaults['highlightDirection'];
 			}
+			if ( isset( $module_defaults['colorBase'] ) ) {
+				$entry['colorBase'] = isset( $raw_mod['colorBase'] ) ? sanitize_text_field( $raw_mod['colorBase'] ) : $module_defaults['colorBase'];
+			}
+			if ( isset( $module_defaults['colorFill'] ) ) {
+				$entry['colorFill'] = isset( $raw_mod['colorFill'] ) ? sanitize_text_field( $raw_mod['colorFill'] ) : $module_defaults['colorFill'];
+			}
+			if ( isset( $module_defaults['scrollStart'] ) ) {
+				$entry['scrollStart'] = isset( $raw_mod['scrollStart'] ) ? (int) $raw_mod['scrollStart'] : $module_defaults['scrollStart'];
+			}
+			if ( isset( $module_defaults['scrollEnd'] ) ) {
+				$entry['scrollEnd'] = isset( $raw_mod['scrollEnd'] ) ? (int) $raw_mod['scrollEnd'] : $module_defaults['scrollEnd'];
+			}
 
 			$clean_module_settings[ $module_id ] = $entry;
 		}

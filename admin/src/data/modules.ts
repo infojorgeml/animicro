@@ -108,6 +108,17 @@ export const DEFAULT_HIGHLIGHT_CONFIG: ModuleConfig = {
   highlightDirection: 'left',
 };
 
+export const DEFAULT_TEXT_FILL_SCROLL_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'linear',
+  delay: 0,
+  margin: '-50px 0px',
+  colorBase: '#cccccc',
+  colorFill: '#000000',
+  scrollStart: 62,
+  scrollEnd: 60,
+};
+
 export const DEFAULT_PARALLAX_CONFIG: ModuleConfig = {
   duration: 0.6,
   easing: 'linear',
@@ -155,7 +166,8 @@ export const MODULE_INFO: ModuleInfo[] = [
   { id: 'grid-reveal',  name: 'Grid Reveal',  description: 'Spatial animation that reveals grid items from a focal point', cssClass: '.am-grid-reveal', isPro: true, category: 'group' },
 
   // Scroll & Continuous
-  { id: 'parallax',        name: 'Parallax',        description: 'Scroll-linked parallax movement',       cssClass: '.am-parallax',        isPro: true, category: 'scroll' },
+  { id: 'text-fill-scroll', name: 'Text Fill on Scroll', description: 'Fills text word by word as user scrolls', cssClass: '.am-text-fill-scroll', isPro: true, category: 'scroll' },
+  { id: 'parallax',         name: 'Parallax',            description: 'Scroll-linked parallax movement',         cssClass: '.am-parallax',         isPro: true, category: 'scroll' },
 ];
 
 export interface DataAttribute {
@@ -179,6 +191,10 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-origin',       type: 'string',      defaultValue: 'center',    usedBy: 'grid-reveal' },
   { attribute: 'data-am-highlight-color',     type: 'string (hex)', defaultValue: '#fde68a', usedBy: 'highlight' },
   { attribute: 'data-am-highlight-direction', type: 'string',       defaultValue: 'left',    usedBy: 'highlight' },
+  { attribute: 'data-am-color-base',         type: 'string (hex)', defaultValue: '#cccccc', usedBy: 'text-fill-scroll' },
+  { attribute: 'data-am-color-fill',         type: 'string (hex)', defaultValue: '#000000', usedBy: 'text-fill-scroll' },
+  { attribute: 'data-am-scroll-start',       type: 'int (%)',      defaultValue: '62',      usedBy: 'text-fill-scroll' },
+  { attribute: 'data-am-scroll-end',         type: 'int (%)',      defaultValue: '60',      usedBy: 'text-fill-scroll' },
 ];
 
 export interface EasingOption {

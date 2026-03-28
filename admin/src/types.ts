@@ -12,6 +12,10 @@ export interface ModuleConfig {
   origin?: string;
   highlightColor?: string;
   highlightDirection?: string;
+  colorBase?: string;
+  colorFill?: string;
+  scrollStart?: number;
+  scrollEnd?: number;
 }
 
 export interface AnimicroSettings {

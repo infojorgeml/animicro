@@ -44,7 +44,7 @@ animicro/
 ## Frontend Modules
 
 - **Entry**: `frontend/src/main.js` → `loadModules(activeModules)` from `core/registry.js`.
-- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `scale`, `blur`, `stagger`, `grid-reveal`, `highlight`, `parallax`, `split`, `text-reveal`, `typewriter`. Each exports `init()`.
+- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `scale`, `blur`, `stagger`, `grid-reveal`, `highlight`, `text-fill-scroll`, `parallax`, `split`, `text-reveal`, `typewriter`. Each exports `init()`.
 - **Config**: `getElementConfig(el, moduleId)` merges `el.dataset.am*` with `moduleSettings[moduleId]` and fallbacks.
 - **Code splitting**: Dynamic `import()` per module; only active modules load.
 
@@ -59,7 +59,7 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 
 ## Pro License
 
-- **Pro modules**: blur, stagger, grid-reveal, highlight, parallax, split, slide-right, slide-left, text-reveal, typewriter. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
+- **Pro modules**: blur, stagger, grid-reveal, highlight, text-fill-scroll, parallax, split, slide-right, slide-left, text-reveal, typewriter. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
 - **Cheat Sheet** tab is Pro-only.
 - License validation via Supabase; product slug `animicro`.
 
@@ -94,6 +94,15 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 | `data-am-origin` | string | center | grid-reveal only — `center`, corners, `top`/`right`/`bottom`/`left`, or `random` (on container) |
 | `data-am-highlight-color` | string (hex) | #fde68a | highlight |
 | `data-am-highlight-direction` | string | left | highlight — `left`, `right`, `center` |
+| `data-am-color-base` | string (hex) | #cccccc | text-fill-scroll |
+| `data-am-color-fill` | string (hex) | #000000 | text-fill-scroll |
+| `data-am-scroll-start` | int (%) | 62 | text-fill-scroll — scroll offset start |
+| `data-am-scroll-end` | int (%) | 60 | text-fill-scroll — scroll offset end |
+
+## Text Fill on Scroll (scroll-linked text)
+
+- **Class**: `.am-text-fill-scroll` on a text element. The script splits `innerText` into words, wraps each in `.am-tfs-wrapper` with `.am-tfs-base` (muted) and `.am-tfs-fill` (target color, opacity animated).
+- **Animation**: `scroll(animate(...), { target: el, offset: [...] })` per word; `colorBase`, `colorFill`, `scrollStart`, `scrollEnd` from `getElementConfig(el, 'text-fill-scroll')`.
 
 ## Highlight (typography)
 

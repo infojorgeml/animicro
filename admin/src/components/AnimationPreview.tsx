@@ -21,6 +21,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
   const isStagger = moduleId === 'stagger';
   const isGridReveal = moduleId === 'grid-reveal';
   const isHighlight = moduleId === 'highlight';
+  const isTextFillScroll = moduleId === 'text-fill-scroll';
   const isParallax = moduleId === 'parallax';
 
   const play = useCallback(() => {
@@ -82,6 +83,27 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
         requestAnimationFrame(() => {
           inner.classList.add('am-highlight-active');
         });
+      });
+      return;
+    }
+
+    if (isTextFillScroll) {
+      const fills = el.querySelectorAll<HTMLSpanElement>('[data-tfs-fill]');
+      if (!fills.length) return;
+
+      fills.forEach(f => { f.style.opacity = '0'; });
+
+      requestAnimationFrame(() => {
+        controlsRef.current = animate(
+          fills,
+          { opacity: [0, 1] },
+          {
+            duration: 0.4,
+            delay: stagger(0.3),
+            easing: 'linear',
+          },
+        );
+        controlsRef.current.finished.catch(() => {});
       });
       return;
     }
@@ -272,7 +294,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
       controlsRef.current.finished.catch(() => {});
     });
-  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, config.speed, config.origin, config.highlightColor, config.highlightDirection, moduleId, isSplit, isTextReveal, isTypewriter, isHighlight, isStagger, isGridReveal, isParallax]);
+  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, config.speed, config.origin, config.highlightColor, config.highlightDirection, config.colorBase, config.colorFill, config.scrollStart, config.scrollEnd, moduleId, isSplit, isTextReveal, isTypewriter, isHighlight, isTextFillScroll, isStagger, isGridReveal, isParallax]);
 
   useEffect(() => {
     play();
@@ -318,6 +340,28 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
             }
             .am-highlight-inner.am-highlight-active::after { transform: scaleX(1); }
           `}</style>
+        </div>
+      );
+    }
+
+    if (isTextFillScroll) {
+      const words = ['Animicro', 'is', 'cool'];
+      const baseColor = config.colorBase ?? '#cccccc';
+      const fillColor = config.colorFill ?? '#000000';
+      return (
+        <div ref={ref} style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '0.02em', lineHeight: 1.4, textAlign: 'center' }}>
+          {words.map((w, i) => (
+            <span key={i}>
+              <span style={{ position: 'relative', display: 'inline-block' }}>
+                <span style={{ color: baseColor }}>{w}</span>
+                <span
+                  data-tfs-fill=""
+                  style={{ position: 'absolute', left: 0, top: 0, color: fillColor, opacity: 0 }}
+                >{w}</span>
+              </span>
+              {i < words.length - 1 ? ' ' : ''}
+            </span>
+          ))}
         </div>
       );
     }
@@ -477,7 +521,9 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
       <div className="w-full text-center space-y-1">
         <p className="text-[10px] text-gray-400 font-mono">
-          {isParallax
+          {isTextFillScroll
+            ? `${config.colorBase ?? '#ccc'} → ${config.colorFill ?? '#000'} · start ${config.scrollStart ?? 62}% · end ${config.scrollEnd ?? 60}%`
+            : isParallax
             ? `speed ${config.speed ?? 0.5} · ${((config.speed ?? 0.5) * 100).toFixed(0)}px range`
             : isTypewriter
             ? `${config.typingSpeed ?? 0.06}s/char · ${config.delay}s delay`

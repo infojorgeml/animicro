@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_PARALLAX_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 import CopyClassButton from './CopyClassButton';
@@ -24,6 +24,7 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   stagger: DEFAULT_STAGGER_CONFIG,
   'grid-reveal': DEFAULT_GRID_REVEAL_CONFIG,
   highlight: DEFAULT_HIGHLIGHT_CONFIG,
+  'text-fill-scroll': DEFAULT_TEXT_FILL_SCROLL_CONFIG,
   parallax: DEFAULT_PARALLAX_CONFIG,
 };
 
@@ -124,8 +125,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Duration (hidden for typewriter and parallax) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && (
+        {/* Duration (hidden for typewriter, parallax, text-fill-scroll) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Duration
@@ -150,8 +151,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
         )}
 
-        {/* Delay (hidden for parallax) */}
-        {moduleId !== 'parallax' && (
+        {/* Delay (hidden for parallax, text-fill-scroll) */}
+        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Delay
@@ -390,8 +391,100 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Easing (hidden for typewriter and parallax) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && (
+        {/* Text Fill on Scroll colors */}
+        {moduleId === 'text-fill-scroll' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Base color
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              The muted color words start with before being filled. Override per-element with <code className="rounded bg-gray-100 px-1 py-0.5 text-[11px]">data-am-color-base</code>.
+            </p>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={config.colorBase ?? '#cccccc'}
+                onChange={e => onUpdate({ colorBase: e.target.value })}
+                className="h-10 w-10 cursor-pointer rounded-lg border border-gray-300 p-0.5"
+              />
+              <span className="font-mono text-sm text-gray-600">{config.colorBase ?? '#cccccc'}</span>
+            </div>
+          </div>
+        )}
+
+        {moduleId === 'text-fill-scroll' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Fill color
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              The color words transition to as you scroll. Override per-element with <code className="rounded bg-gray-100 px-1 py-0.5 text-[11px]">data-am-color-fill</code>.
+            </p>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={config.colorFill ?? '#000000'}
+                onChange={e => onUpdate({ colorFill: e.target.value })}
+                className="h-10 w-10 cursor-pointer rounded-lg border border-gray-300 p-0.5"
+              />
+              <span className="font-mono text-sm text-gray-600">{config.colorFill ?? '#000000'}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Text Fill on Scroll offsets */}
+        {moduleId === 'text-fill-scroll' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Scroll start
+              <span className="font-mono text-blue-600">{config.scrollStart ?? 62}%</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Viewport position where the first word begins to fill.
+            </p>
+            <input
+              type="range"
+              min="40"
+              max="80"
+              step="1"
+              value={config.scrollStart ?? 62}
+              onChange={e => onUpdate({ scrollStart: parseInt(e.target.value, 10) })}
+              className="w-full accent-blue-600"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>40% — Early</span>
+              <span>80% — Late</span>
+            </div>
+          </div>
+        )}
+
+        {moduleId === 'text-fill-scroll' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Scroll end
+              <span className="font-mono text-blue-600">{config.scrollEnd ?? 60}%</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Viewport position where each word finishes filling.
+            </p>
+            <input
+              type="range"
+              min="40"
+              max="80"
+              step="1"
+              value={config.scrollEnd ?? 60}
+              onChange={e => onUpdate({ scrollEnd: parseInt(e.target.value, 10) })}
+              className="w-full accent-blue-600"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>40% — Early</span>
+              <span>80% — Late</span>
+            </div>
+          </div>
+        )}
+
+        {/* Easing (hidden for typewriter, parallax, text-fill-scroll) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Easing curve
@@ -417,8 +510,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
         )}
 
-        {/* Activation margin (hidden for parallax) */}
-        {moduleId !== 'parallax' && (
+        {/* Activation margin (hidden for parallax, text-fill-scroll) */}
+        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Activation margin

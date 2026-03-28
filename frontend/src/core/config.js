@@ -26,6 +26,10 @@ export function getElementConfig(el, moduleId = '') {
     origin:            d.amOrigin             || mod.origin             || 'center',
     highlightColor:     d.amHighlightColor     || mod.highlightColor     || '#fde68a',
     highlightDirection: d.amHighlightDirection  || mod.highlightDirection || 'left',
+    colorBase:    d.amColorBase  || mod.colorBase  || '#cccccc',
+    colorFill:    d.amColorFill  || mod.colorFill  || '#000000',
+    scrollStart:  d.amScrollStart !== undefined ? parseInt(d.amScrollStart, 10) : (mod.scrollStart ?? 62),
+    scrollEnd:    d.amScrollEnd   !== undefined ? parseInt(d.amScrollEnd, 10)   : (mod.scrollEnd   ?? 60),
     margin:       d.amMargin    || mod.margin  || '-50px 0px',
   };
 }
