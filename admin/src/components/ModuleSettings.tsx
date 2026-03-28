@@ -1,6 +1,7 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_PARALLAX_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_PARALLAX_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
+import CopyClassButton from './CopyClassButton';
 
 interface ModuleSettingsProps {
   moduleId: string;
@@ -21,10 +22,23 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   'text-reveal': DEFAULT_TEXT_REVEAL_CONFIG,
   typewriter: DEFAULT_TYPEWRITER_CONFIG,
   stagger: DEFAULT_STAGGER_CONFIG,
+  'grid-reveal': DEFAULT_GRID_REVEAL_CONFIG,
   parallax: DEFAULT_PARALLAX_CONFIG,
 };
 
-const hasDistance = (id: string) => id.startsWith('slide-') || id === 'split' || id === 'stagger';
+const hasDistance = (id: string) => id.startsWith('slide-') || id === 'split' || id === 'stagger' || id === 'grid-reveal';
+
+const ORIGIN_OPTIONS: { value: string; label: string; row: number; col: number }[] = [
+  { value: 'top-left',     label: '\u2196', row: 0, col: 0 },
+  { value: 'top',          label: '\u2191', row: 0, col: 1 },
+  { value: 'top-right',    label: '\u2197', row: 0, col: 2 },
+  { value: 'left',         label: '\u2190', row: 1, col: 0 },
+  { value: 'center',       label: '\u25CF', row: 1, col: 1 },
+  { value: 'right',        label: '\u2192', row: 1, col: 2 },
+  { value: 'bottom-left',  label: '\u2199', row: 2, col: 0 },
+  { value: 'bottom',       label: '\u2193', row: 2, col: 1 },
+  { value: 'bottom-right', label: '\u2198', row: 2, col: 2 },
+];
 
 export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: ModuleSettingsProps) {
   const mod = MODULE_INFO.find(m => m.id === moduleId);
@@ -45,7 +59,10 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         <div className="flex items-center gap-2 flex-wrap">
           <span className="font-semibold text-gray-900">{mod?.name ?? moduleId}</span>
           {(mod?.cssClass ?? '').trim().split(/\s+/).filter(Boolean).map((cls, i) => (
-            <code key={i} className="rounded bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-600">{cls}</code>
+            <span key={i} className="inline-flex items-center gap-1">
+              <code className="rounded bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-600">{cls}</code>
+              <CopyClassButton text={cls} label={`Copy ${cls}`} />
+            </span>
           ))}
         </div>
       </div>
@@ -210,32 +227,34 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Stagger delay (split, text-reveal, stagger) */}
-        {(moduleId === 'split' || moduleId === 'text-reveal' || moduleId === 'stagger') && (
+        {/* Stagger delay (split, text-reveal, stagger, grid-reveal) */}
+        {(moduleId === 'split' || moduleId === 'text-reveal' || moduleId === 'stagger' || moduleId === 'grid-reveal') && (
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
               Stagger delay
-              <span className="font-mono text-blue-600">{config.staggerDelay ?? (moduleId === 'text-reveal' ? 0.12 : moduleId === 'stagger' ? 0.1 : 0.05)}s</span>
+              <span className="font-mono text-blue-600">{config.staggerDelay ?? (moduleId === 'text-reveal' ? 0.12 : moduleId === 'stagger' ? 0.1 : moduleId === 'grid-reveal' ? 0.08 : 0.05)}s</span>
             </label>
             <p className="text-xs text-gray-400 mb-2">
               {moduleId === 'text-reveal'
                 ? 'Time between each line starting its reveal.'
                 : moduleId === 'stagger'
                 ? 'Time between each child element starting its animation.'
+                : moduleId === 'grid-reveal'
+                ? 'Controls how spread out the ripple wave feels across all items.'
                 : 'Time between each letter or word starting its animation.'}
             </p>
             <input
               type="range"
-              min={moduleId === 'text-reveal' ? '0.05' : moduleId === 'stagger' ? '0.03' : '0.01'}
-              max={moduleId === 'text-reveal' ? '0.3' : moduleId === 'stagger' ? '0.5' : '0.2'}
+              min={moduleId === 'text-reveal' ? '0.05' : moduleId === 'stagger' ? '0.03' : moduleId === 'grid-reveal' ? '0.03' : '0.01'}
+              max={moduleId === 'text-reveal' ? '0.3' : moduleId === 'stagger' ? '0.5' : moduleId === 'grid-reveal' ? '0.3' : '0.2'}
               step="0.01"
-              value={config.staggerDelay ?? (moduleId === 'text-reveal' ? 0.12 : moduleId === 'stagger' ? 0.1 : 0.05)}
+              value={config.staggerDelay ?? (moduleId === 'text-reveal' ? 0.12 : moduleId === 'stagger' ? 0.1 : moduleId === 'grid-reveal' ? 0.08 : 0.05)}
               onChange={e => onUpdate({ staggerDelay: parseFloat(e.target.value) })}
               className="w-full accent-blue-600"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
-              <span>{moduleId === 'text-reveal' ? '0.05s — Quick' : moduleId === 'stagger' ? '0.03s — Fast cascade' : '0.01s — Fast cascade'}</span>
-              <span>{moduleId === 'text-reveal' ? '0.3s — Dramatic' : moduleId === 'stagger' ? '0.5s — Slow sequence' : '0.2s — Slow reveal'}</span>
+              <span>{moduleId === 'text-reveal' ? '0.05s — Quick' : moduleId === 'stagger' ? '0.03s — Fast cascade' : moduleId === 'grid-reveal' ? '0.03s — Tight ripple' : '0.01s — Fast cascade'}</span>
+              <span>{moduleId === 'text-reveal' ? '0.3s — Dramatic' : moduleId === 'stagger' ? '0.5s — Slow sequence' : moduleId === 'grid-reveal' ? '0.3s — Wide wave' : '0.2s — Slow reveal'}</span>
             </div>
           </div>
         )}
@@ -267,6 +286,49 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
               <span>{moduleId === 'split' ? '5px — Subtle' : '10px — Subtle'}</span>
               <span>{moduleId === 'split' ? '50px — Dramatic' : '100px — Dramatic'}</span>
             </div>
+          </div>
+        )}
+
+        {/* Origin (grid-reveal only) */}
+        {moduleId === 'grid-reveal' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Origin point
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Where the ripple animation starts. Items closest to this point appear first.
+            </p>
+            <div className="grid grid-cols-3 gap-1.5 w-fit mb-2">
+              {ORIGIN_OPTIONS.map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => onUpdate({ origin: opt.value })}
+                  title={opt.value}
+                  className={`
+                    w-10 h-10 rounded-lg border text-sm font-medium transition-colors flex items-center justify-center
+                    ${config.origin === opt.value
+                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}
+                  `}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => onUpdate({ origin: 'random' })}
+              className={`
+                rounded-lg border px-3 py-2 text-sm font-medium transition-colors
+                ${config.origin === 'random'
+                  ? 'border-blue-500 bg-blue-50 text-blue-700'
+                  : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}
+              `}
+            >
+              Random
+            </button>
+            <p className="mt-1.5 text-xs text-gray-400">
+              Current: <span className="font-mono text-blue-600">{config.origin ?? 'center'}</span>
+            </p>
           </div>
         )}
 

@@ -19,6 +19,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
   const isTextReveal = moduleId === 'text-reveal';
   const isTypewriter = moduleId === 'typewriter';
   const isStagger = moduleId === 'stagger';
+  const isGridReveal = moduleId === 'grid-reveal';
   const isParallax = moduleId === 'parallax';
 
   const play = useCallback(() => {
@@ -83,6 +84,59 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
           },
         );
         controlsRef.current.finished.catch(() => {});
+      });
+      return;
+    }
+
+    if (isGridReveal) {
+      const squares = el.querySelectorAll<HTMLDivElement>('[data-grid-item]');
+      if (!squares.length) return;
+
+      const dist = config.distance ?? 20;
+      squares.forEach(s => {
+        s.style.opacity = '0';
+        s.style.transform = `translateY(${dist}px)`;
+      });
+
+      requestAnimationFrame(() => {
+        const origin = config.origin ?? 'center';
+        const count = squares.length;
+        const cols = 3;
+        const originMap: Record<string, [number, number]> = {
+          'top-left': [0, 0], 'top': [0, 1], 'top-right': [0, 2],
+          'left': [1, 0], 'center': [1, 1], 'right': [1, 2],
+          'bottom-left': [2, 0], 'bottom': [2, 1], 'bottom-right': [2, 2],
+        };
+
+        const stag = config.staggerDelay ?? 0.08;
+        let delays: number[];
+        if (origin === 'random') {
+          delays = Array.from({ length: count }, () =>
+            config.delay + Math.random() * stag * (count - 1)
+          );
+        } else {
+          const [or, oc] = originMap[origin] ?? [1, 1];
+          const indexed = Array.from(squares).map((_, i) => {
+            const r = Math.floor(i / cols);
+            const c = i % cols;
+            return { i, dist: Math.sqrt((r - or) ** 2 + (c - oc) ** 2) };
+          });
+          indexed.sort((a, b) => a.dist - b.dist);
+          delays = new Array(count);
+          indexed.forEach((entry, rank) => {
+            delays[entry.i] = config.delay + rank * stag;
+          });
+        }
+
+        const anims = Array.from(squares).map((sq, i) =>
+          animate(
+            sq,
+            { opacity: [0, 1], y: [dist, 0] },
+            { duration: config.duration, delay: delays[i], easing: config.easing as any },
+          )
+        );
+        controlsRef.current = anims[0];
+        anims.forEach(a => a.finished.catch(() => {}));
       });
       return;
     }
@@ -195,7 +249,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
       controlsRef.current.finished.catch(() => {});
     });
-  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, config.speed, moduleId, isSplit, isTextReveal, isTypewriter, isStagger, isParallax]);
+  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, config.speed, config.origin, moduleId, isSplit, isTextReveal, isTypewriter, isStagger, isGridReveal, isParallax]);
 
   useEffect(() => {
     play();
@@ -217,6 +271,24 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
             <div
               key={i}
               data-stagger-item=""
+              className="w-12 h-12 rounded-lg"
+              style={{
+                background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                opacity: 0,
+              }}
+            />
+          ))}
+        </div>
+      );
+    }
+
+    if (isGridReveal) {
+      return (
+        <div ref={ref} className="grid grid-cols-3 gap-3 p-4">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <div
+              key={i}
+              data-grid-item=""
               className="w-12 h-12 rounded-lg"
               style={{
                 background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
@@ -359,6 +431,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
                 {isSplit && ` · stagger ${config.staggerDelay ?? 0.05}s · ${config.distance ?? 15}px`}
                 {isTextReveal && ` · stagger ${config.staggerDelay ?? 0.12}s`}
                 {isStagger && ` · stagger ${config.staggerDelay ?? 0.1}s · ${config.distance ?? 20}px`}
+                {isGridReveal && ` · ${config.origin ?? 'center'} · stagger ${config.staggerDelay ?? 0.08}s · ${config.distance ?? 20}px`}
               </>
           }
         </p>

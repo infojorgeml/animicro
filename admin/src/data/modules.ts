@@ -89,6 +89,16 @@ export const DEFAULT_STAGGER_CONFIG: ModuleConfig = {
   distance: 20,
 };
 
+export const DEFAULT_GRID_REVEAL_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  staggerDelay: 0.08,
+  distance: 20,
+  origin: 'center',
+};
+
 export const DEFAULT_PARALLAX_CONFIG: ModuleConfig = {
   duration: 0.6,
   easing: 'linear',
@@ -134,7 +144,7 @@ export const MODULE_INFO: ModuleInfo[] = [
 
   // Groups & Layouts
   { id: 'stagger',      name: 'Stagger',      description: 'Animates container children in sequence',   cssClass: '.am-stagger',      isPro: true, category: 'group' },
-  { id: 'grid-reveal',  name: 'Grid Reveal',  description: 'Reveals grid items with staggered entries',  cssClass: '.am-grid-reveal',  isPro: true, category: 'group', isPlaceholder: true },
+  { id: 'grid-reveal',  name: 'Grid Reveal',  description: 'Spatial animation that reveals grid items from a focal point', cssClass: '.am-grid-reveal', isPro: true, category: 'group' },
   { id: 'list-reorder', name: 'List Reorder', description: 'Smooth reordering of list items',            cssClass: '.am-list-reorder', isPro: true, category: 'group', isPlaceholder: true },
 
   // Scroll & Continuous
@@ -155,12 +165,13 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-delay',     type: 'float (s)',     defaultValue: '0',         usedBy: 'All' },
   { attribute: 'data-am-easing',    type: 'string',        defaultValue: 'ease-out',  usedBy: 'All' },
   { attribute: 'data-am-margin',    type: 'string',        defaultValue: '-50px 0px', usedBy: 'All' },
-  { attribute: 'data-am-distance',  type: 'float (px)',    defaultValue: '30',        usedBy: 'slide-up, slide-down, slide-right, slide-left, split, stagger' },
+  { attribute: 'data-am-distance',  type: 'float (px)',    defaultValue: '30',        usedBy: 'slide-up, slide-down, slide-right, slide-left, split, stagger, grid-reveal' },
   { attribute: 'data-am-scale',     type: 'float',         defaultValue: '0.95',      usedBy: 'scale' },
   { attribute: 'data-am-blur',      type: 'float (px)',    defaultValue: '4',         usedBy: 'blur' },
-  { attribute: 'data-am-stagger',   type: 'float (s)',     defaultValue: '0.05',      usedBy: 'stagger, split, text-reveal' },
+  { attribute: 'data-am-stagger',   type: 'float (s)',     defaultValue: '0.05',      usedBy: 'stagger, split, text-reveal, grid-reveal' },
   { attribute: 'data-am-speed',     type: 'float',         defaultValue: '0.5',       usedBy: 'parallax' },
   { attribute: 'data-am-typing-speed', type: 'float (s)',  defaultValue: '0.06',      usedBy: 'typewriter' },
+  { attribute: 'data-am-origin',       type: 'string',      defaultValue: 'center',    usedBy: 'grid-reveal' },
 ];
 
 export interface EasingOption {

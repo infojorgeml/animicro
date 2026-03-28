@@ -23,6 +23,7 @@ class Animicro_Compatibility {
 		'scale'       => 'opacity:0;transform:scale(0.95);will-change:opacity,transform;',
 		'blur'       => 'opacity:0;filter:blur(4px);will-change:opacity,transform,filter;',
 		'stagger'    => 'opacity:0;transform:translateY(20px);will-change:opacity,transform;',
+		'grid-reveal' => 'opacity:0;transform:translateY(20px);will-change:opacity,transform;',
 		'parallax'   => '',
 		'split-chars' => 'opacity:0;will-change:opacity,transform;',
 		'split-words' => 'opacity:0;will-change:opacity,transform;',
@@ -79,6 +80,15 @@ class Animicro_Compatibility {
 				if ( $stagger_css ) {
 					$rules[] = "{$prefix} .am-stagger>*{{$stagger_css}}";
 					$rules[] = "{$prefix} .am-stagger.is-ready>*{opacity:1;transform:none;}";
+				}
+				continue;
+			}
+
+			if ( 'grid-reveal' === $module ) {
+				$gr_css = self::MODULE_INITIAL_CSS['grid-reveal'] ?? '';
+				if ( $gr_css ) {
+					$rules[] = "{$prefix} .am-grid-reveal>*{{$gr_css}}";
+					$rules[] = "{$prefix} .am-grid-reveal.is-ready>*{opacity:1;transform:none;}";
 				}
 				continue;
 			}

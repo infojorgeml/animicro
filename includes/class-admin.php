@@ -239,6 +239,9 @@ class Animicro_Admin {
 			if ( isset( $module_defaults['speed'] ) ) {
 				$entry['speed'] = isset( $raw_mod['speed'] ) ? (float) $raw_mod['speed'] : $module_defaults['speed'];
 			}
+			if ( isset( $module_defaults['origin'] ) ) {
+				$entry['origin'] = isset( $raw_mod['origin'] ) ? sanitize_text_field( $raw_mod['origin'] ) : $module_defaults['origin'];
+			}
 
 			$clean_module_settings[ $module_id ] = $entry;
 		}

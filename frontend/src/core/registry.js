@@ -12,6 +12,7 @@ const MODULES = {
   'scale':       () => import('../modules/scale.js'),
   'blur':        () => import('../modules/blur.js'),
   'stagger':     () => import('../modules/stagger.js'),
+  'grid-reveal': () => import('../modules/grid-reveal.js'),
   'parallax':    () => import('../modules/parallax.js'),
   'split':       () => import('../modules/split-text.js'),
   'text-reveal': () => import('../modules/text-reveal.js'),

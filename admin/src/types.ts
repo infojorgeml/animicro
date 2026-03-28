@@ -9,6 +9,7 @@ export interface ModuleConfig {
   staggerDelay?: number;
   typingSpeed?: number;
   speed?: number;
+  origin?: string;
 }
 
 export interface AnimicroSettings {

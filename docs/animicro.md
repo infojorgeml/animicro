@@ -44,7 +44,7 @@ animicro/
 ## Frontend Modules
 
 - **Entry**: `frontend/src/main.js` → `loadModules(activeModules)` from `core/registry.js`.
-- **Modules**: `fade`, `slide-up`, `slide-down`, `scale`, `blur`, `stagger`, `parallax`, `split`. Each exports `init()`.
+- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `scale`, `blur`, `stagger`, `grid-reveal`, `parallax`, `split`, `text-reveal`, `typewriter`. Each exports `init()`.
 - **Config**: `getElementConfig(el, moduleId)` merges `el.dataset.am*` with `moduleSettings[moduleId]` and fallbacks.
 - **Code splitting**: Dynamic `import()` per module; only active modules load.
 
@@ -59,7 +59,7 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 
 ## Pro License
 
-- **Pro modules**: blur, stagger, parallax, split. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
+- **Pro modules**: blur, stagger, grid-reveal, parallax, split, slide-right, slide-left, text-reveal, typewriter. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
 - **Cheat Sheet** tab is Pro-only.
 - License validation via Supabase; product slug `animicro`.
 
@@ -85,12 +85,19 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 | `data-am-delay` | float (s) | 0 | All |
 | `data-am-easing` | string | ease-out | All |
 | `data-am-margin` | string | -50px 0px | All |
-| `data-am-distance` | float (px) | 30 | slide-up, slide-down |
+| `data-am-distance` | float (px) | 30 | slide-*, split, stagger, grid-reveal |
 | `data-am-scale` | float | 0.95 | scale |
 | `data-am-blur` | float (px) | 4 | blur |
-| `data-am-stagger` | float (s) | 0.1 | stagger, split |
+| `data-am-stagger` | float (s) | 0.05–0.1 | stagger, split, text-reveal, grid-reveal |
 | `data-am-speed` | float | 0.5 | parallax |
-| `data-am-split` | chars \| words | chars | split |
+| `data-am-typing-speed` | float (s) | 0.06 | typewriter |
+| `data-am-origin` | string | center | grid-reveal only — `center`, corners, `top`/`right`/`bottom`/`left`, or `random` (on container) |
+
+## Grid Reveal (spatial group)
+
+- **Class**: `.am-grid-reveal` on the **container**; animates **direct children** only (`container.children`).
+- **Config**: `getElementConfig(container, 'grid-reveal')` — `data-am-origin` on the same container as the class (not on children).
+- **Timing**: Children are sorted by distance from the focal point; each gets `delay + rank * staggerDelay` so every item has a unique stagger (wave order preserved).
 
 ## Adding a New Animation Module
 
@@ -99,3 +106,4 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 3. Add to `MODULE_INITIAL_CSS` in `class-compatibility.php` (initial hidden state).
 4. Add to `MODULE_INFO` and `available_modules` in PHP/React.
 5. If Pro: set `isPro: true` in MODULE_INFO; add to `PRO_MODULES` in class-license-manager.php.
+6. If new settings keys are stored in options: whitelist them in `class-admin.php` `update_settings()` so REST save does not strip fields.

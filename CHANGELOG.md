@@ -5,6 +5,17 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.7] - 2026-03-28
+
+### Added
+
+- **Grid Reveal module** (Pro): `.am-grid-reveal` on a container animates **direct children** with spatial timing from a focal point. Nine origins (corners, edges, center) plus **random** (`data-am-origin` on the container, utility-first). Per-module settings: origin picker, stagger delay, slide distance, live 3×3 preview. Frontend uses `getBoundingClientRect()` and **rank-based delays** so each child gets a unique stagger while preserving wave order (no more paired simultaneous items when distances tie).
+- **Copy class** buttons next to each module class in the Dashboard and in module settings headers; copies the class string to the clipboard with a brief check-state feedback.
+
+### Fixed
+
+- **REST API**: `origin` is now whitelisted when saving `module_settings` so Grid Reveal origin persists after Save (was dropped by PHP sanitization).
+
 ## [0.3.6] - 2026-02-26
 
 ### Added
