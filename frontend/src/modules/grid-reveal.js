@@ -56,6 +56,10 @@ export function init() {
     const items = Array.from(container.children);
     if (!items.length) return;
 
+    items.forEach(child => {
+      child.style.opacity = '0';
+      child.style.transform = `translateY(${cfg.distance}px)`;
+    });
     container.classList.add('is-ready');
 
     inView(container, () => {

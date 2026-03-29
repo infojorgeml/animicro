@@ -5,6 +5,13 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2026-03-28
+
+### Fixed
+
+- **Grid Reveal flicker**: eliminated the 1-2 frame flash where children appeared at full opacity before the entrance animation started. Children now receive inline `opacity: 0` before the `.is-ready` class is added, ensuring the CSS override never wins.
+- **Stagger flicker prevention**: applied the same inline initial-style technique to the Stagger module as a preventive measure against the same race condition.
+
 ## [0.4.0] - 2026-03-28
 
 ### Fixed
