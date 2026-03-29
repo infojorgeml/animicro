@@ -50,12 +50,12 @@ animicro/
 
 ## Builder Compatibility
 
-- **Admin**: Integrations tab — multiselect of builders (None, Elementor, Bricks, Breakdance, Oxygen, Gutenberg).
+- **Admin**: Integrations tab — multiselect of builders (None, Elementor, Bricks, Breakdance, Oxygen, Divi, Gutenberg).
 - **CSS**: `includes/class-compatibility.php` → `get_editor_css()` generates rules like `body:not(.bricks-is-builder) .am-fade { opacity: 0; }` so elements stay visible in editors.
 - **JS**: `frontend/src/main.js` checks `?bricks=run` (and similar) to skip loading animation modules in builder preview.
 - **PHP**: `class-frontend.php` skips printing hide CSS when `?bricks=run` in URL (Bricks iframe).
 
-Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdance-builder`, `oxygen-builder-body`, `block-editor-page`.
+Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdance`, `oxygen-builder-body`, `et_pb_pagebuilder_layout`, `block-editor-page`.
 
 ## Pro License
 

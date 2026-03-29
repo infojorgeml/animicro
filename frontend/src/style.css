@@ -68,9 +68,18 @@
   .am-fade,
   .am-slide-up,
   .am-slide-down,
+  .am-slide-right,
+  .am-slide-left,
   .am-scale,
   .am-blur,
   .am-split,
+  .am-text-reveal,
+  .am-typewriter,
+  .am-parallax {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
   .am-highlight .am-highlight-inner::after {
     transform: scaleX(1) !important;
   }

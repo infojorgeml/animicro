@@ -82,12 +82,12 @@ class Animicro_Frontend {
 
 	public function print_dynamic_css(): void {
 		// Bricks editor iframe loads with ?bricks=run — skip hiding CSS there.
-		if ( isset( $_GET['bricks'] ) && 'run' === $_GET['bricks'] ) {
+		if ( isset( $_GET['bricks'] ) && 'run' === sanitize_text_field( wp_unslash( $_GET['bricks'] ) ) ) {
 			return;
 		}
 
 		// Breakdance editor loads with ?breakdance=builder — skip hiding CSS there.
-		if ( isset( $_GET['breakdance'] ) && 'builder' === $_GET['breakdance'] ) {
+		if ( isset( $_GET['breakdance'] ) && 'builder' === sanitize_text_field( wp_unslash( $_GET['breakdance'] ) ) ) {
 			return;
 		}
 
@@ -97,12 +97,12 @@ class Animicro_Frontend {
 		}
 
 		// Oxygen builder loads with ?ct_builder=true — skip hiding CSS there.
-		if ( isset( $_GET['ct_builder'] ) && 'true' === $_GET['ct_builder'] ) {
+		if ( isset( $_GET['ct_builder'] ) && 'true' === sanitize_text_field( wp_unslash( $_GET['ct_builder'] ) ) ) {
 			return;
 		}
 
 		// Divi builder frontend editor loads with ?et_fb=1 — skip hiding CSS there.
-		if ( isset( $_GET['et_fb'] ) && '1' === $_GET['et_fb'] ) {
+		if ( isset( $_GET['et_fb'] ) && '1' === sanitize_text_field( wp_unslash( $_GET['et_fb'] ) ) ) {
 			return;
 		}
 

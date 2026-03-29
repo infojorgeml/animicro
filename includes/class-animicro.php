@@ -34,7 +34,7 @@ class Animicro {
 			'active_modules'    => [],
 			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'split', 'text-reveal', 'typewriter' ],
 			'active_builders'   => [ 'none' ],
-		'module_settings'   => [
+			'module_settings'   => [
 			'fade' => [
 				'duration' => 0.6,
 				'easing'   => 'ease-out',
@@ -131,6 +131,10 @@ class Animicro {
 				'highlightDirection' => 'left',
 			],
 			'text-fill-scroll' => [
+				'duration'    => 0.6,
+				'easing'      => 'linear',
+				'delay'       => 0.0,
+				'margin'      => '-50px 0px',
 				'colorBase'   => '#cccccc',
 				'colorFill'   => '#000000',
 				'scrollStart' => 62,

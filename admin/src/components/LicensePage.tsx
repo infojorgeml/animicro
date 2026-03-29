@@ -105,7 +105,7 @@ export default function LicensePage() {
       <div className="mb-6">
         <h2 className="text-lg font-semibold text-gray-900">Pro License</h2>
         <p className="text-sm text-gray-500 mt-1">
-          Activate your license to unlock Pro modules: Blur, Stagger, Parallax and Split Text.
+          Activate your license to unlock Pro modules: Blur, Stagger, Grid Reveal, Highlight, Text Fill on Scroll, Parallax, Split Text, Text Reveal, Typewriter, Slide Right and Slide Left.
         </p>
       </div>
 

@@ -11,3 +11,8 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 delete_option( 'animicro_settings' );
+delete_option( 'animicro_license_key' );
+delete_option( 'animicro_license_data' );
+delete_option( 'animicro_premium_active' );
+delete_transient( 'animicro_license_check' );
+delete_transient( 'animicro_license_last_check' );

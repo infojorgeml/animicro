@@ -83,10 +83,7 @@ class Animicro_License_Manager {
 		}
 
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( '=== Animicro License Validation ===' );
-			error_log( 'License Key: ' . $license_key_normalized );
-			error_log( 'Domain: ' . $domain );
-			error_log( 'Product: ' . $this->product_slug );
+			error_log( 'Animicro: validating license for domain ' . $domain );
 		}
 
 		$response = wp_remote_get(

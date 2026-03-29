@@ -62,7 +62,7 @@ Use only one animation class per element. Do not combine `.am-fade` with `.am-sl
 | `data-am-delay` | float (s) | 0 | Delay before starting |
 | `data-am-easing` | string | ease-out | Easing curve |
 | `data-am-margin` | string | -50px 0px | Activation margin (inView) |
-| `data-am-distance` | number (px) | 30 | Slide/stagger distance (slide-up, slide-down, slide-right, slide-left, stagger, grid-reveal) |
+| `data-am-distance` | number (px) | 30 | Slide/stagger distance (slide-up, slide-down, slide-right, slide-left, split, stagger, grid-reveal) |
 | `data-am-scale` | float | 0.95 | Starting scale (scale module) |
 | `data-am-blur` | number (px) | 4 | Initial blur amount (blur module) |
 | `data-am-stagger` | float (s) | 0.05 | Stagger delay between units (split, text-reveal, stagger, grid-reveal) |

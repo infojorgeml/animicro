@@ -3,7 +3,7 @@
  * Plugin Name:       Animicro
  * Plugin URI:        https://animicro.com
  * Description:       Utility-first micro-animations powered by Motion One for WordPress. Simple CSS classes, extreme performance.
- * Version:           0.3.9
+ * Version:           0.4.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Animicro
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ANIMICRO_VERSION', '0.3.9' );
+define( 'ANIMICRO_VERSION', '0.4.0' );
 define( 'ANIMICRO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ANIMICRO_URL', plugin_dir_url( __FILE__ ) );
 define( 'ANIMICRO_BASENAME', plugin_basename( __FILE__ ) );

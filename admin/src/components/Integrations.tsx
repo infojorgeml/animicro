@@ -8,6 +8,23 @@ interface IntegrationsProps {
 export default function Integrations({ settings, toggleBuilder }: IntegrationsProps) {
   const builders = window.animicroData.builders;
 
+  const handleToggle = (id: string) => {
+    if (id === 'none') {
+      const currentlyActive = settings.active_builders.includes('none');
+      if (!currentlyActive) {
+        settings.active_builders
+          .filter((b: string) => b !== 'none')
+          .forEach((b: string) => toggleBuilder(b));
+      }
+      toggleBuilder('none');
+    } else {
+      if (settings.active_builders.includes('none')) {
+        toggleBuilder('none');
+      }
+      toggleBuilder(id);
+    }
+  };
+
   return (
     <div>
       <div className="mb-4">
@@ -25,7 +42,7 @@ export default function Integrations({ settings, toggleBuilder }: IntegrationsPr
             <button
               key={id}
               type="button"
-              onClick={() => toggleBuilder(id)}
+              onClick={() => handleToggle(id)}
               className={`
                 flex items-center gap-3 rounded-lg border-2 p-4 text-left transition-all
                 ${isSelected

@@ -9,27 +9,39 @@
 
 const globals = window.animicroFrontData || {};
 
+function safeFloat(raw, fallback) {
+  if (raw === undefined) return fallback;
+  const v = parseFloat(raw);
+  return isNaN(v) ? fallback : v;
+}
+
+function safeInt(raw, fallback) {
+  if (raw === undefined) return fallback;
+  const v = parseInt(raw, 10);
+  return isNaN(v) ? fallback : v;
+}
+
 export function getElementConfig(el, moduleId = '') {
   const d    = el.dataset;
   const mod  = (globals.moduleSettings && moduleId) ? (globals.moduleSettings[moduleId] || {}) : {};
 
   return {
-    duration:     d.amDuration  !== undefined ? parseFloat(d.amDuration)  : (mod.duration  ?? 0.6),
-    delay:        d.amDelay     !== undefined ? parseFloat(d.amDelay)     : (mod.delay     ?? 0),
+    duration:     safeFloat(d.amDuration,    mod.duration     ?? 0.6),
+    delay:        safeFloat(d.amDelay,       mod.delay        ?? 0),
     easing:       d.amEasing    || mod.easing  || 'ease-out',
-    distance:     d.amDistance  !== undefined ? parseFloat(d.amDistance)  : (mod.distance  ?? 30),
-    scale:        d.amScale    !== undefined ? parseFloat(d.amScale)    : (mod.scale    ?? 0.95),
-    blur:         d.amBlur     !== undefined ? parseFloat(d.amBlur)     : (mod.blur     ?? 4),
-    staggerDelay: d.amStagger  !== undefined ? parseFloat(d.amStagger)  : (mod.staggerDelay ?? 0.05),
-    typingSpeed:  d.amTypingSpeed !== undefined ? parseFloat(d.amTypingSpeed) : (mod.typingSpeed ?? 0.06),
-    speed:        d.amSpeed     !== undefined ? parseFloat(d.amSpeed)     : (mod.speed     ?? 0.5),
+    distance:     safeFloat(d.amDistance,     mod.distance     ?? 30),
+    scale:        safeFloat(d.amScale,       mod.scale        ?? 0.95),
+    blur:         safeFloat(d.amBlur,        mod.blur         ?? 4),
+    staggerDelay: safeFloat(d.amStagger,     mod.staggerDelay ?? 0.05),
+    typingSpeed:  safeFloat(d.amTypingSpeed, mod.typingSpeed  ?? 0.06),
+    speed:        safeFloat(d.amSpeed,       mod.speed        ?? 0.5),
     origin:            d.amOrigin             || mod.origin             || 'center',
     highlightColor:     d.amHighlightColor     || mod.highlightColor     || '#fde68a',
     highlightDirection: d.amHighlightDirection  || mod.highlightDirection || 'left',
     colorBase:    d.amColorBase  || mod.colorBase  || '#cccccc',
     colorFill:    d.amColorFill  || mod.colorFill  || '#000000',
-    scrollStart:  d.amScrollStart !== undefined ? parseInt(d.amScrollStart, 10) : (mod.scrollStart ?? 62),
-    scrollEnd:    d.amScrollEnd   !== undefined ? parseInt(d.amScrollEnd, 10)   : (mod.scrollEnd   ?? 60),
+    scrollStart:  safeInt(d.amScrollStart,   mod.scrollStart  ?? 62),
+    scrollEnd:    safeInt(d.amScrollEnd,     mod.scrollEnd    ?? 60),
     margin:       d.amMargin    || mod.margin  || '-50px 0px',
   };
 }

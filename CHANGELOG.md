@@ -5,6 +5,23 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-03-28
+
+### Fixed
+
+- **PHP defaults**: added missing `duration`, `easing`, `delay`, `margin` to `text-fill-scroll` module defaults, preventing PHP 8+ undefined key warnings.
+- **Uninstall cleanup**: `uninstall.php` now deletes all license options (`animicro_license_key`, `animicro_license_data`, `animicro_premium_active`) and transients (`animicro_license_check`, `animicro_license_last_check`).
+- **License page**: updated Pro modules list to include all 11 current Pro modules.
+- **Dead code removed**: deleted unused `GlobalSettings.tsx` component.
+- **CSS no-JS fallback**: completed `@media (scripting: none)` block with missing modules (`slide-right`, `slide-left`, `text-reveal`, `typewriter`, `parallax`).
+- **Security**: removed `error_log` statements that exposed license key and domain in `class-license-manager.php`.
+- **Security**: wrapped `$_GET` values with `sanitize_text_field( wp_unslash() )` in `class-frontend.php`.
+- **Clipboard fallback**: `CheatSheet.tsx` now uses `try/catch` with `document.execCommand('copy')` fallback for older browsers.
+- **Documentation**: corrected `README.md` (`data-am-distance` now includes `split`) and `docs/animicro.md` (added Divi, fixed Breakdance body class, added `et_pb_pagebuilder_layout`).
+- **NaN protection**: `config.js` now uses safe `parseFloat`/`parseInt` wrappers that fall back to defaults on invalid input.
+- **Indentation**: fixed misaligned `module_settings` key in `class-animicro.php`.
+- **Integrations UX**: selecting "None" now deselects all builders, and selecting a builder deselects "None".
+
 ## [0.3.9] - 2026-03-28
 
 ### Added
