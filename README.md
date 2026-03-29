@@ -4,7 +4,7 @@
 **Tags:** animation, motion, css, performance, page-builder
 **Requires at least:** 6.0
 **Tested up to:** 6.8
-**Stable tag:** 0.4.2
+**Stable tag:** 0.5.0
 **Requires PHP:** 7.4
 **License:** GPLv2 or later
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
@@ -91,7 +91,7 @@ Works with Elementor, Bricks, Breakdance, Oxygen, Divi and Gutenberg. Dynamic in
 
 ## Pro License
 
-Blur, Stagger, Grid Reveal, Highlight, Text Fill on Scroll, Parallax, Split Text, Text Reveal, Typewriter, Slide Right and Slide Left require a Pro license. The Cheat Sheet (classes and data attributes reference) is also Pro-only. Activate your license under **Animicro → License** or visit [animicro.com](https://animicro.com).
+Blur, Stagger, Grid Reveal, Highlight, Text Fill on Scroll, Parallax, Split Text, Text Reveal, Typewriter, Slide Right and Slide Left require a Pro license. **Smooth Scroll** (site-wide smooth scrolling) and the **Cheat Sheet** (classes and data attributes reference) are also Pro-only. Activate your license under **Animicro → License** or visit [animicro.com](https://animicro.com).
 
 ## Development
 

@@ -288,6 +288,18 @@ class Animicro_Admin {
 
 		$clean['module_settings'] = $clean_module_settings;
 
+		$default_smooth = $defaults['smooth_scroll'] ?? [];
+		$raw_smooth     = isset( $raw['smooth_scroll'] ) && is_array( $raw['smooth_scroll'] ) ? $raw['smooth_scroll'] : [];
+
+		$clean['smooth_scroll'] = [
+			'enabled'         => isset( $raw_smooth['enabled'] )         ? (bool) $raw_smooth['enabled']              : ( $default_smooth['enabled'] ?? false ),
+			'lerp'            => isset( $raw_smooth['lerp'] )            ? (float) $raw_smooth['lerp']                : ( $default_smooth['lerp'] ?? 0.1 ),
+			'duration'        => isset( $raw_smooth['duration'] )        ? (float) $raw_smooth['duration']            : ( $default_smooth['duration'] ?? 1.2 ),
+			'smoothWheel'     => isset( $raw_smooth['smoothWheel'] )     ? (bool) $raw_smooth['smoothWheel']          : ( $default_smooth['smoothWheel'] ?? true ),
+			'wheelMultiplier' => isset( $raw_smooth['wheelMultiplier'] ) ? (float) $raw_smooth['wheelMultiplier']     : ( $default_smooth['wheelMultiplier'] ?? 1.0 ),
+			'anchors'         => isset( $raw_smooth['anchors'] )         ? (bool) $raw_smooth['anchors']              : ( $default_smooth['anchors'] ?? true ),
+		];
+
 		update_option( 'animicro_settings', $clean );
 
 		return new \WP_REST_Response( $clean, 200 );

@@ -148,6 +148,14 @@ class Animicro {
 				'speed'    => 0.5,
 			],
 		],
+			'smooth_scroll' => [
+				'enabled'         => false,
+				'lerp'            => 0.1,
+				'duration'        => 1.2,
+				'smoothWheel'     => true,
+				'wheelMultiplier' => 1.0,
+				'anchors'         => true,
+			],
 		];
 	}
 

@@ -13,7 +13,9 @@ class Animicro_Frontend {
 	public function enqueue_assets(): void {
 		$settings = Animicro::get_settings();
 
-		if ( empty( $settings['active_modules'] ) ) {
+		$smooth_enabled = ! empty( $settings['smooth_scroll']['enabled'] ) && Animicro_License_Manager::is_premium();
+
+		if ( empty( $settings['active_modules'] ) && ! $smooth_enabled ) {
 			return;
 		}
 
@@ -62,10 +64,23 @@ class Animicro_Frontend {
 			)
 		);
 
-		$data = wp_json_encode( [
+		$front_data = [
 			'modules'        => array_map( 'sanitize_text_field', $active_modules ),
 			'moduleSettings' => $module_settings,
-		] );
+		];
+
+		$smooth_scroll = $settings['smooth_scroll'] ?? [];
+		if ( ! empty( $smooth_scroll['enabled'] ) && $is_premium ) {
+			$front_data['smoothScroll'] = [
+				'lerp'            => (float) ( $smooth_scroll['lerp'] ?? 0.1 ),
+				'duration'        => (float) ( $smooth_scroll['duration'] ?? 1.2 ),
+				'smoothWheel'     => (bool) ( $smooth_scroll['smoothWheel'] ?? true ),
+				'wheelMultiplier' => (float) ( $smooth_scroll['wheelMultiplier'] ?? 1.0 ),
+				'anchors'         => (bool) ( $smooth_scroll['anchors'] ?? true ),
+			];
+		}
+
+		$data = wp_json_encode( $front_data );
 
 		wp_add_inline_script( 'animicro-front', "window.animicroFrontData = {$data};", 'before' );
 	}

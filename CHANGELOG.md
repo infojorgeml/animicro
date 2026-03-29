@@ -5,6 +5,16 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-03-29
+
+### Added
+
+- **Smooth Scroll** (Pro): global smooth scrolling via Lenis, configured under **Animicro → Smooth Scroll**. Settings (`lerp`, `duration`, `smoothWheel`, `wheelMultiplier`, `anchors`) are saved in `animicro_settings.smooth_scroll` and passed to the frontend as `animicroFrontData.smoothScroll` only when enabled and the site has an active Pro license. The implementation uses a dynamic import so Lenis loads as a separate chunk only when the feature is on.
+
+### Changed
+
+- **Smooth Scroll** admin copy: introductory text no longer names the underlying library; it describes behavior only.
+
 ## [0.4.2] - 2026-03-29
 
 ### Added

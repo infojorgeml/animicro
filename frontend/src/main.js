@@ -22,6 +22,11 @@ function isInBuilder() {
 
 function init() {
   if (isInBuilder()) return;
+
+  if (config.smoothScroll) {
+    import('./smooth-scroll.js').then(m => m.init(config.smoothScroll));
+  }
+
   const modules = config.modules || [];
   if (!modules.length) return;
   loadModules(modules);

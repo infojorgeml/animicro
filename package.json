@@ -1,7 +1,7 @@
 {
   "name": "animicro",
   "private": true,
-  "version": "0.4.2",
+  "version": "0.5.0",
   "type": "module",
   "scripts": {
     "dev:admin": "vite build --watch --mode admin",
@@ -11,6 +11,7 @@
     "build": "vite build --mode admin && vite build --mode frontend"
   },
   "dependencies": {
+    "lenis": "^1.3.21",
     "motion": "^11.18.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

@@ -16,7 +16,7 @@ Utility-first micro-animations for WordPress powered by [Motion One](https://mot
 | Backend | PHP 7.4+ OOP |
 | Admin UI | React 19, TypeScript, Tailwind CSS, Vite |
 | Frontend | Vanilla JS (ES Modules), CSS, Vite |
-| Animation | Motion One (~3.8kb) |
+| Animation | Motion One (~3.8kb); optional Lenis (smooth scroll, Pro, separate chunk) |
 | Build | Vite multi-entry (admin + frontend), `manifest.json` for dynamic enqueue |
 
 ## Folder Structure
@@ -36,9 +36,9 @@ animicro/
 
 ## Data Flow
 
-1. **Settings** stored in `animicro_settings` (options API). Includes `active_modules`, `active_builders`, `module_settings`.
+1. **Settings** stored in `animicro_settings` (options API). Includes `active_modules`, `active_builders`, `module_settings`, and `smooth_scroll` (Pro global smooth scrolling).
 2. **Admin** passes `animicroData` via `wp_add_inline_script` (REST URL, nonce, settings, builders, isPremium, etc.).
-3. **Frontend** receives `animicroFrontData` with `modules` (active list) and `moduleSettings` (per-module defaults).
+3. **Frontend** receives `animicroFrontData` with `modules` (active list) and `moduleSettings` (per-module defaults). If Pro and smooth scroll is enabled, `smoothScroll` is included with Lenis options (`lerp`, `duration`, `smoothWheel`, `wheelMultiplier`, `anchors`).
 4. **Per-element** `data-am-*` attributes override module defaults. See `frontend/src/core/config.js` → `getElementConfig(el, moduleId)`.
 
 ## Frontend Modules
@@ -46,7 +46,13 @@ animicro/
 - **Entry**: `frontend/src/main.js` → `loadModules(activeModules)` from `core/registry.js`.
 - **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `scale`, `blur`, `stagger`, `grid-reveal`, `highlight`, `text-fill-scroll`, `parallax`, `split`, `text-reveal`, `typewriter`. Each exports `init()`.
 - **Config**: `getElementConfig(el, moduleId)` merges `el.dataset.am*` with `moduleSettings[moduleId]` and fallbacks.
-- **Code splitting**: Dynamic `import()` per module; only active modules load.
+- **Code splitting**: Dynamic `import()` per module; only active modules load. **Smooth scroll** (`frontend/src/smooth-scroll.js`) is loaded only when `animicroFrontData.smoothScroll` is present (Pro + enabled in settings).
+
+## Smooth Scroll (Pro, global)
+
+- Not a per-element module: no CSS class on content. Enable in **Animicro → Smooth Scroll** (Pro tab).
+- **Frontend**: `main.js` dynamically imports `./smooth-scroll.js`, which initializes Lenis with the options from PHP and imports `lenis/dist/lenis.css` in that chunk.
+- **Builder detection**: Same URL checks as `main.js` — Lenis does not start inside Bricks, Elementor, Breakdance, Oxygen, or Divi builder previews.
 
 ## Builder Compatibility
 
@@ -60,7 +66,7 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 ## Pro License
 
 - **Pro modules**: blur, stagger, grid-reveal, highlight, text-fill-scroll, parallax, split, slide-right, slide-left, text-reveal, typewriter. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
-- **Cheat Sheet** tab is Pro-only.
+- **Cheat Sheet** and **Smooth Scroll** tabs are Pro-only.
 - License validation via Supabase; product slug `animicro`.
 
 ## Key Files
@@ -70,7 +76,9 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 | `animicro.php` | Bootstrap, constants, activation |
 | `includes/class-animicro.php` | Orchestrator, defaults, get_settings() |
 | `includes/class-admin.php` | Menu (SVG menu icon as base64 data URL), REST API, enqueue admin assets, plugin_action_links |
-| `includes/class-frontend.php` | Enqueue frontend assets, print_dynamic_css |
+| `includes/class-frontend.php` | Enqueue frontend assets, `animicroFrontData` (includes optional `smoothScroll`), print_dynamic_css |
+| `admin/src/components/SmoothScroll.tsx` | Pro settings UI for global smooth scroll |
+| `frontend/src/smooth-scroll.js` | Lenis init (dynamic chunk) |
 | `includes/class-compatibility.php` | get_editor_css(), BUILDER_EDITOR_CLASSES, MODULE_INITIAL_CSS |
 | `includes/class-license-manager.php` | Validation, is_premium(), is_pro_module() |
 | `frontend/src/core/config.js` | getElementConfig(el, moduleId) |

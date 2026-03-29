@@ -18,11 +18,21 @@ export interface ModuleConfig {
   scrollEnd?: number;
 }
 
+export interface SmoothScrollConfig {
+  enabled: boolean;
+  lerp: number;
+  duration: number;
+  smoothWheel: boolean;
+  wheelMultiplier: number;
+  anchors: boolean;
+}
+
 export interface AnimicroSettings {
   active_modules: string[];
   available_modules: string[];
   active_builders: string[];
   module_settings: Record<string, ModuleConfig>;
+  smooth_scroll: SmoothScrollConfig;
 }
 
 export interface AnimicroData {

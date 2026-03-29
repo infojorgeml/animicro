@@ -4,12 +4,13 @@ import { useSettings } from './hooks/useSettings';
 import TabNav, { type TabId } from './components/TabNav';
 import Dashboard from './components/Dashboard';
 import CheatSheet from './components/CheatSheet';
+import SmoothScroll from './components/SmoothScroll';
 import Integrations from './components/Integrations';
 import LicensePage from './components/LicensePage';
 
 export default function App() {
   const { version, page, isPremium } = window.animicroData;
-  const { settings, updateModuleSettings, toggleModule, toggleBuilder, save, isDirty, isSaving, saveMessage } = useSettings();
+  const { settings, updateModuleSettings, updateSmoothScroll, toggleModule, toggleBuilder, save, isDirty, isSaving, saveMessage } = useSettings();
   const [activeTab, setActiveTab] = useState<TabId>('modules');
 
   const isLicensePage = page === 'license';
@@ -70,6 +71,9 @@ export default function App() {
               />
             )}
             {activeTab === 'cheatsheet' && isPremium && <CheatSheet />}
+            {activeTab === 'smooth-scroll' && isPremium && (
+              <SmoothScroll config={settings.smooth_scroll} onChange={updateSmoothScroll} />
+            )}
             {activeTab === 'integrations' && (
               <Integrations settings={settings} toggleBuilder={toggleBuilder} />
             )}
