@@ -81,30 +81,27 @@ class Animicro_Frontend {
 	}
 
 	public function print_dynamic_css(): void {
-		// Bricks editor iframe loads with ?bricks=run — skip hiding CSS there.
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- read-only builder detection via URL params, not form processing.
 		if ( isset( $_GET['bricks'] ) && 'run' === sanitize_text_field( wp_unslash( $_GET['bricks'] ) ) ) {
 			return;
 		}
 
-		// Breakdance editor loads with ?breakdance=builder — skip hiding CSS there.
 		if ( isset( $_GET['breakdance'] ) && 'builder' === sanitize_text_field( wp_unslash( $_GET['breakdance'] ) ) ) {
 			return;
 		}
 
-		// Elementor preview iframe loads with ?elementor-preview — skip hiding CSS there.
 		if ( isset( $_GET['elementor-preview'] ) ) {
 			return;
 		}
 
-		// Oxygen builder loads with ?ct_builder=true — skip hiding CSS there.
 		if ( isset( $_GET['ct_builder'] ) && 'true' === sanitize_text_field( wp_unslash( $_GET['ct_builder'] ) ) ) {
 			return;
 		}
 
-		// Divi builder frontend editor loads with ?et_fb=1 — skip hiding CSS there.
 		if ( isset( $_GET['et_fb'] ) && '1' === sanitize_text_field( wp_unslash( $_GET['et_fb'] ) ) ) {
 			return;
 		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		$settings = Animicro::get_settings();
 
@@ -116,7 +113,7 @@ class Animicro_Frontend {
 		$css             = Animicro_Compatibility::get_editor_css( $settings['active_modules'], $active_builders );
 
 		if ( ! empty( $css ) ) {
-			echo "<style id=\"animicro-dynamic-css\">\n" . $css . "</style>\n";
+			echo "<style id=\"animicro-dynamic-css\">\n" . wp_strip_all_tags( $css ) . "</style>\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS generated internally by get_editor_css(), stripped of tags for safety
 		}
 	}
 

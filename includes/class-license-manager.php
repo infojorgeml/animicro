@@ -82,10 +82,6 @@ class Animicro_License_Manager {
 			$headers['Authorization'] = 'Bearer ' . $this->supabase_anon_key;
 		}
 
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( 'Animicro: validating license for domain ' . $domain );
-		}
-
 		$response = wp_remote_get(
 			$url,
 			[
@@ -98,9 +94,6 @@ class Animicro_License_Manager {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( 'Animicro License Error: ' . $response->get_error_message() );
-			}
 			return [
 				'valid'  => false,
 				'reason' => 'connection_error',

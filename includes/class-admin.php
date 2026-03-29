@@ -108,7 +108,7 @@ class Animicro_Admin {
 
 		add_filter( 'script_loader_tag', [ $this, 'add_module_type' ], 10, 3 );
 
-		$current_page = isset( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : 'animicro';
+		$current_page = isset( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : 'animicro'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page routing
 		$page         = ( 'animicro-license' === $current_page ) ? 'license' : 'modules';
 
 		$license_manager = new Animicro_License_Manager();

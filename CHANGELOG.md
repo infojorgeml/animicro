@@ -5,12 +5,17 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.4.1] - 2026-03-28
+## [0.4.1] - 2026-03-29
 
 ### Fixed
 
 - **Grid Reveal flicker**: eliminated the 1-2 frame flash where children appeared at full opacity before the entrance animation started. Children now receive inline `opacity: 0` before the `.is-ready` class is added, ensuring the CSS override never wins.
 - **Stagger flicker prevention**: applied the same inline initial-style technique to the Stagger module as a preventive measure against the same race condition.
+- **WordPress Plugin Check compliance**: removed remaining `error_log()` calls from `class-license-manager.php`, escaped CSS output with `wp_strip_all_tags()` in `class-frontend.php`, added `phpcs:ignore` annotations for legitimate nonce-free `$_GET` reads (builder detection).
+- **README headers**: added required WordPress.org headers (Tested up to, Stable tag, License, Short Description, Contributors, Tags).
+- **Distribution**: created `.distignore` to exclude dev files from WordPress.org SVN packages, created `languages/` folder for the Domain Path header.
+- **Hidden files**: removed `.DS_Store` from git tracking.
+- **Directory rename**: renamed plugin folder from `Animicro/` to `animicro/` (lowercase) to match WordPress.org slug conventions and resolve text domain mismatch warnings.
 
 ## [0.4.0] - 2026-03-28
 

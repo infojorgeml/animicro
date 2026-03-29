@@ -1,0 +1,20 @@
+# Files and folders excluded from the WordPress.org distribution package
+.git
+.gitignore
+.distignore
+.DS_Store
+.agent/
+.agents/
+.cursor/
+node_modules/
+admin/src/
+frontend/src/
+docs/
+*.md
+!README.md
+package.json
+package-lock.json
+vite.config.ts
+tsconfig.json
+tsconfig.*.json
+*.log

@@ -1,6 +1,15 @@
 # Animicro
 
-Utility-first micro-animations for WordPress powered by [Motion One](https://motion.dev/). Simple CSS classes, extreme performance.
+**Contributors:** animicro
+**Tags:** animation, motion, css, performance, page-builder
+**Requires at least:** 6.0
+**Tested up to:** 6.8
+**Stable tag:** 0.4.1
+**Requires PHP:** 7.4
+**License:** GPLv2 or later
+**License URI:** https://www.gnu.org/licenses/gpl-2.0.html
+
+Utility-first micro-animations for WordPress. Simple CSS classes, extreme performance.
 
 ## Description
 
@@ -15,7 +24,7 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 
 ## Installation
 
-1. Download or clone the plugin to `wp-content/plugins/Animicro/`
+1. Download or clone the plugin to `wp-content/plugins/animicro/`
 2. Run `npm install` and `npm run build` in the plugin root
 3. Activate the plugin from the WordPress dashboard
 4. Go to **Animicro** in the sidebar menu to configure modules
