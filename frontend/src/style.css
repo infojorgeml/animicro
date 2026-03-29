@@ -63,7 +63,30 @@
   white-space: pre-wrap;
 }
 
-/* 4. ACCESSIBILITY: if JS is disabled, force everything visible */
+/* 5. ACCESSIBILITY: respect prefers-reduced-motion (CSS-only safety net) */
+@media (prefers-reduced-motion: reduce) {
+  .am-fade,
+  .am-slide-up,
+  .am-slide-down,
+  .am-slide-right,
+  .am-slide-left,
+  .am-scale,
+  .am-blur,
+  .am-split-chars,
+  .am-split-words,
+  .am-text-reveal,
+  .am-typewriter,
+  .am-parallax,
+  .am-highlight,
+  .am-text-fill-scroll,
+  .am-stagger > *,
+  .am-grid-reveal > * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* 6. ACCESSIBILITY: if JS is disabled, force everything visible */
 @media (scripting: none) {
   .am-fade,
   .am-slide-up,

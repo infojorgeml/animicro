@@ -5,6 +5,18 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-03-29
+
+### Added
+
+- **Advanced** tab (last in the admin nav, after Integrations): global options stored in `animicro_settings.advanced` and passed as `animicroFrontData.advanced`.
+- **Respect Reduced Motion** (Free, on by default): when enabled and the visitor’s OS reports `prefers-reduced-motion: reduce`, the frontend script skips loading animation modules and smooth scroll. A CSS `@media (prefers-reduced-motion: reduce)` block in `style.css` disables transitions/animations on `.am-*` elements as a fallback.
+- **Debug Mode** (Free): optional red dashed outlines on elements whose class list contains `am-`, plus `console.time` / `console.timeEnd` around module loading for troubleshooting.
+
+### Removed
+
+- **Replay animations on scroll** (previously Pro): feature and UI removed; entry animations behave as one-shot again.
+
 ## [0.5.0] - 2026-03-29
 
 ### Added

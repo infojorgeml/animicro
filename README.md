@@ -3,8 +3,8 @@
 **Contributors:** animicro
 **Tags:** animation, motion, css, performance, page-builder
 **Requires at least:** 6.0
-**Tested up to:** 6.8
-**Stable tag:** 0.5.0
+**Tested up to:** 6.9
+**Stable tag:** 0.6.0
 **Requires PHP:** 7.4
 **License:** GPLv2 or later
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
@@ -16,6 +16,8 @@ Utility-first micro-animations for WordPress. Simple CSS classes, extreme perfor
 Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade`, `.am-scale`, or `.am-slide-up` in your Page Builder, and you're done. Fade, Scale, all slide modules, Blur, Stagger, Grid Reveal, Highlight, Text Fill on Scroll, Parallax, Split Text, Text Reveal, and Typewriter each have their own settings with a live preview so you can tune duration, easing, delay, speed, and (where applicable) scale factor, blur amount, distance, grid origin, highlight color, or scroll fill colors without leaving the admin.
 
 **Philosophy**: Utility-first. No complex interfaces, no timelines. Just classes and `data-am-*` attributes.
+
+Under **Animicro → Advanced** you can enable **Respect Reduced Motion** (skips JS-driven animations when the visitor prefers reduced motion) and **Debug Mode** (outlines `.am-*` elements and logs script timing in the browser console).
 
 ## Requirements
 

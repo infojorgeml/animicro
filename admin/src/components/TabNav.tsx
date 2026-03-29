@@ -1,4 +1,4 @@
-export type TabId = 'modules' | 'cheatsheet' | 'smooth-scroll' | 'integrations';
+export type TabId = 'modules' | 'cheatsheet' | 'smooth-scroll' | 'advanced' | 'integrations';
 
 interface Tab {
   id: TabId;
@@ -11,6 +11,7 @@ const TABS: Tab[] = [
   { id: 'cheatsheet',   label: 'Cheat Sheet', isPro: true },
   { id: 'smooth-scroll', label: 'Smooth Scroll', isPro: true },
   { id: 'integrations', label: 'Integrations' },
+  { id: 'advanced',      label: 'Advanced' },
 ];
 
 interface TabNavProps {

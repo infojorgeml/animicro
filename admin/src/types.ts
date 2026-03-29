@@ -27,12 +27,18 @@ export interface SmoothScrollConfig {
   anchors: boolean;
 }
 
+export interface AdvancedConfig {
+  reducedMotion: boolean;
+  debugMode: boolean;
+}
+
 export interface AnimicroSettings {
   active_modules: string[];
   available_modules: string[];
   active_builders: string[];
   module_settings: Record<string, ModuleConfig>;
   smooth_scroll: SmoothScrollConfig;
+  advanced: AdvancedConfig;
 }
 
 export interface AnimicroData {

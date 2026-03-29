@@ -156,6 +156,10 @@ class Animicro {
 				'wheelMultiplier' => 1.0,
 				'anchors'         => true,
 			],
+			'advanced' => [
+				'reducedMotion' => true,
+				'debugMode'     => false,
+			],
 		];
 	}
 

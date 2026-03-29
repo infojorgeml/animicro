@@ -80,6 +80,12 @@ class Animicro_Frontend {
 			];
 		}
 
+		$advanced = $settings['advanced'] ?? [];
+		$front_data['advanced'] = [
+			'reducedMotion' => (bool) ( $advanced['reducedMotion'] ?? true ),
+			'debugMode'     => (bool) ( $advanced['debugMode'] ?? false ),
+		];
+
 		$data = wp_json_encode( $front_data );
 
 		wp_add_inline_script( 'animicro-front', "window.animicroFrontData = {$data};", 'before' );

@@ -300,6 +300,14 @@ class Animicro_Admin {
 			'anchors'         => isset( $raw_smooth['anchors'] )         ? (bool) $raw_smooth['anchors']              : ( $default_smooth['anchors'] ?? true ),
 		];
 
+		$default_advanced = $defaults['advanced'] ?? [];
+		$raw_advanced     = isset( $raw['advanced'] ) && is_array( $raw['advanced'] ) ? $raw['advanced'] : [];
+
+		$clean['advanced'] = [
+			'reducedMotion' => isset( $raw_advanced['reducedMotion'] ) ? (bool) $raw_advanced['reducedMotion'] : ( $default_advanced['reducedMotion'] ?? true ),
+			'debugMode'     => isset( $raw_advanced['debugMode'] )     ? (bool) $raw_advanced['debugMode']     : ( $default_advanced['debugMode'] ?? false ),
+		];
+
 		update_option( 'animicro_settings', $clean );
 
 		return new \WP_REST_Response( $clean, 200 );

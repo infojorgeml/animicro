@@ -36,9 +36,9 @@ animicro/
 
 ## Data Flow
 
-1. **Settings** stored in `animicro_settings` (options API). Includes `active_modules`, `active_builders`, `module_settings`, and `smooth_scroll` (Pro global smooth scrolling).
+1. **Settings** stored in `animicro_settings` (options API). Includes `active_modules`, `active_builders`, `module_settings`, `smooth_scroll` (Pro), and `advanced` (`reducedMotion`, `debugMode`).
 2. **Admin** passes `animicroData` via `wp_add_inline_script` (REST URL, nonce, settings, builders, isPremium, etc.).
-3. **Frontend** receives `animicroFrontData` with `modules` (active list) and `moduleSettings` (per-module defaults). If Pro and smooth scroll is enabled, `smoothScroll` is included with Lenis options (`lerp`, `duration`, `smoothWheel`, `wheelMultiplier`, `anchors`).
+3. **Frontend** receives `animicroFrontData` with `modules` (active list), `moduleSettings` (per-module defaults), and `advanced`. If Pro and smooth scroll is enabled, `smoothScroll` is included with Lenis options (`lerp`, `duration`, `smoothWheel`, `wheelMultiplier`, `anchors`).
 4. **Per-element** `data-am-*` attributes override module defaults. See `frontend/src/core/config.js` → `getElementConfig(el, moduleId)`.
 
 ## Frontend Modules
@@ -53,6 +53,12 @@ animicro/
 - Not a per-element module: no CSS class on content. Enable in **Animicro → Smooth Scroll** (Pro tab).
 - **Frontend**: `main.js` dynamically imports `./smooth-scroll.js`, which initializes Lenis with the options from PHP and imports `lenis/dist/lenis.css` in that chunk.
 - **Builder detection**: Same URL checks as `main.js` — Lenis does not start inside Bricks, Elementor, Breakdance, Oxygen, or Divi builder previews.
+
+## Advanced (global, Free)
+
+- Tab order: **Advanced** is the last tab (after Integrations).
+- **Respect Reduced Motion**: When on (default) and `prefers-reduced-motion: reduce` matches, `main.js` returns early (no `loadModules`, no Lenis). Complemented by CSS in `style.css` under `@media (prefers-reduced-motion: reduce)`.
+- **Debug Mode**: When on, `console.time`/`timeEnd` around `loadModules`, and a red dashed outline on elements matching `[class*="am-"]`.
 
 ## Builder Compatibility
 
@@ -76,8 +82,9 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 | `animicro.php` | Bootstrap, constants, activation |
 | `includes/class-animicro.php` | Orchestrator, defaults, get_settings() |
 | `includes/class-admin.php` | Menu (SVG menu icon as base64 data URL), REST API, enqueue admin assets, plugin_action_links |
-| `includes/class-frontend.php` | Enqueue frontend assets, `animicroFrontData` (includes optional `smoothScroll`), print_dynamic_css |
+| `includes/class-frontend.php` | Enqueue frontend assets, `animicroFrontData` (`advanced`, optional `smoothScroll`), print_dynamic_css |
 | `admin/src/components/SmoothScroll.tsx` | Pro settings UI for global smooth scroll |
+| `admin/src/components/AdvancedSettings.tsx` | Free: reduced motion + debug mode |
 | `frontend/src/smooth-scroll.js` | Lenis init (dynamic chunk) |
 | `includes/class-compatibility.php` | get_editor_css(), BUILDER_EDITOR_CLASSES, MODULE_INITIAL_CSS |
 | `includes/class-license-manager.php` | Validation, is_premium(), is_pro_module() |

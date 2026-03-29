@@ -23,13 +23,31 @@ function isInBuilder() {
 function init() {
   if (isInBuilder()) return;
 
+  const adv = config.advanced || {};
+
+  if (adv.reducedMotion && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return;
+  }
+
   if (config.smoothScroll) {
     import('./smooth-scroll.js').then(m => m.init(config.smoothScroll));
   }
 
   const modules = config.modules || [];
   if (!modules.length) return;
+
+  if (adv.debugMode) console.time('animicro');
+
   loadModules(modules);
+
+  if (adv.debugMode) {
+    console.timeEnd('animicro');
+    requestAnimationFrame(() => {
+      document.querySelectorAll('[class*="am-"]').forEach(el => {
+        el.style.outline = '2px dashed red';
+      });
+    });
+  }
 }
 
 if (document.readyState === 'loading') {

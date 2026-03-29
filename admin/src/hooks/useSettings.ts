@@ -1,11 +1,12 @@
 import { useState, useCallback, useRef } from 'react';
-import type { AnimicroSettings, ModuleConfig, SmoothScrollConfig } from '../types';
+import type { AnimicroSettings, ModuleConfig, SmoothScrollConfig, AdvancedConfig } from '../types';
 
 interface UseSettingsReturn {
   settings: AnimicroSettings;
   updateSettings: (partial: Partial<AnimicroSettings>) => void;
   updateModuleSettings: (moduleId: string, partial: Partial<ModuleConfig>) => void;
   updateSmoothScroll: <K extends keyof SmoothScrollConfig>(key: K, value: SmoothScrollConfig[K]) => void;
+  updateAdvanced: <K extends keyof AdvancedConfig>(key: K, value: AdvancedConfig[K]) => void;
   toggleModule: (moduleId: string) => void;
   toggleBuilder: (builderId: string) => void;
   save: () => Promise<boolean>;
@@ -54,6 +55,18 @@ export function useSettings(): UseSettingsReturn {
     setSaveMessage('');
   }, []);
 
+  const updateAdvanced = useCallback(<K extends keyof AdvancedConfig>(key: K, value: AdvancedConfig[K]) => {
+    setSettings(prev => ({
+      ...prev,
+      advanced: {
+        ...prev.advanced,
+        [key]: value,
+      },
+    }));
+    setIsDirty(true);
+    setSaveMessage('');
+  }, []);
+
   const toggleModule = useCallback((moduleId: string) => {
     setSettings(prev => {
       const active = prev.active_modules.includes(moduleId)
@@ -93,6 +106,7 @@ export function useSettings(): UseSettingsReturn {
           active_builders: settings.active_builders,
           module_settings: settings.module_settings,
           smooth_scroll:   settings.smooth_scroll,
+          advanced:        settings.advanced,
         }),
       });
 
@@ -114,5 +128,5 @@ export function useSettings(): UseSettingsReturn {
     }
   }, [settings]);
 
-  return { settings, updateSettings, updateModuleSettings, updateSmoothScroll, toggleModule, toggleBuilder, save, isDirty, isSaving, saveMessage };
+  return { settings, updateSettings, updateModuleSettings, updateSmoothScroll, updateAdvanced, toggleModule, toggleBuilder, save, isDirty, isSaving, saveMessage };
 }
