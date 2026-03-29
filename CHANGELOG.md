@@ -5,6 +5,18 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2026-03-29
+
+### Added
+
+- **Admin menu icon**: custom Animicro logo as an inline SVG passed to `add_menu_page()` via `data:image/svg+xml;base64,...` (no extra HTTP request).
+
+### Changed
+
+- **Admin UI branding**: primary accent color set to brand violet (`#A200FF`) via Tailwind `brand` palette in `tailwind.config.js` (replaces generic blue across dashboard, tabs, toggles, module settings, license, integrations, cheat sheet class badges).
+- **License page**: simplified copy to “Activate your license to unlock Pro modules.” and removed the “Pro modules included” list block.
+- **Cheat Sheet**: copy actions use the same icon-style `CopyClassButton` as the module list (stroke copy icon + check feedback).
+
 ## [0.4.1] - 2026-03-29
 
 ### Fixed

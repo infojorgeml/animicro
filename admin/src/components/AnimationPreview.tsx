@@ -546,7 +546,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
         <button
           type="button"
           onClick={onReset}
-          className="rounded-lg bg-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-blue-100 hover:text-blue-700"
+          className="rounded-lg bg-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-brand-100 hover:text-brand-700"
         >
           Reset to default
         </button>

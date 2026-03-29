@@ -46,14 +46,14 @@ export default function Integrations({ settings, toggleBuilder }: IntegrationsPr
               className={`
                 flex items-center gap-3 rounded-lg border-2 p-4 text-left transition-all
                 ${isSelected
-                  ? 'border-blue-500 bg-blue-50/50 ring-1 ring-blue-500'
+                  ? 'border-brand-500 bg-brand-50/50 ring-1 ring-brand-500'
                   : 'border-gray-200 bg-white hover:border-gray-300'}
               `}
             >
               <span
                 className={`
                   flex h-5 w-5 shrink-0 items-center justify-center rounded border-2
-                  ${isSelected ? 'border-blue-500 bg-blue-500' : 'border-gray-300'}
+                  ${isSelected ? 'border-brand-500 bg-brand-500' : 'border-gray-300'}
                 `}
               >
                 {isSelected && (
@@ -62,7 +62,7 @@ export default function Integrations({ settings, toggleBuilder }: IntegrationsPr
                   </svg>
                 )}
               </span>
-              <span className={`text-sm font-medium ${isSelected ? 'text-blue-900' : 'text-gray-700'}`}>
+              <span className={`text-sm font-medium ${isSelected ? 'text-brand-900' : 'text-gray-700'}`}>
                 {name}
               </span>
             </button>

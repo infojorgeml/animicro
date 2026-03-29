@@ -45,13 +45,20 @@ class Animicro_Admin {
 	}
 
 	public function register_menu(): void {
+		$svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">'
+			. '<path d="M2 17.5H5.38131L7.89689 12.3749H4.55676L2 17.5Z" fill="black"/>'
+			. '<path d="M10.1238 1.5L8.26797 4.83326L14.6599 17.5H18L10.1238 1.5Z" fill="black"/>'
+			. '</svg>';
+
+		$icon_url = 'data:image/svg+xml;base64,' . base64_encode( $svg );
+
 		$this->page_hook = add_menu_page(
 			__( 'Animicro', 'animicro' ),
 			__( 'Animicro', 'animicro' ),
 			'manage_options',
 			'animicro',
 			[ $this, 'render_page' ],
-			'dashicons-superhero-alt',
+			$icon_url,
 			80
 		);
 

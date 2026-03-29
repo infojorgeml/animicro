@@ -69,13 +69,19 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 |------|------|
 | `animicro.php` | Bootstrap, constants, activation |
 | `includes/class-animicro.php` | Orchestrator, defaults, get_settings() |
-| `includes/class-admin.php` | Menu, REST API, enqueue admin assets, plugin_action_links |
+| `includes/class-admin.php` | Menu (SVG menu icon as base64 data URL), REST API, enqueue admin assets, plugin_action_links |
 | `includes/class-frontend.php` | Enqueue frontend assets, print_dynamic_css |
 | `includes/class-compatibility.php` | get_editor_css(), BUILDER_EDITOR_CLASSES, MODULE_INITIAL_CSS |
 | `includes/class-license-manager.php` | Validation, is_premium(), is_pro_module() |
 | `frontend/src/core/config.js` | getElementConfig(el, moduleId) |
 | `frontend/src/core/registry.js` | loadModules(), MODULES map |
 | `admin/src/data/modules.ts` | MODULE_INFO, DATA_ATTRIBUTES, EASING_OPTIONS, MARGIN_OPTIONS |
+| `tailwind.config.js` | Tailwind content scope; `theme.extend.colors.brand` for admin accent (`#A200FF` and related shades) |
+
+## Admin branding
+
+- **Accent**: React admin uses Tailwind `brand-*` utilities (see `tailwind.config.js`).
+- **WP sidebar icon**: Built in `Animicro_Admin::register_menu()` as a minimal SVG string + `base64_encode` for the sixth argument of `add_menu_page()`.
 
 ## Data Attributes (data-am-*)
 

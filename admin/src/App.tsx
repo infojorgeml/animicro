@@ -42,7 +42,7 @@ export default function App() {
               className={`
                 rounded-lg px-4 py-2 text-sm font-medium text-white transition-all
                 ${isDirty && !isSaving
-                  ? 'bg-blue-600 hover:bg-blue-700 shadow-sm'
+                  ? 'bg-brand-500 hover:bg-brand-600 shadow-sm'
                   : 'bg-gray-300 cursor-not-allowed'}
               `}
             >

@@ -78,7 +78,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
               Speed
-              <span className="font-mono text-blue-600">{config.speed ?? 0.5}</span>
+              <span className="font-mono text-brand-500">{config.speed ?? 0.5}</span>
             </label>
             <p className="text-xs text-gray-400 mb-2">
               Movement intensity. Higher values produce stronger parallax displacement as the user scrolls.
@@ -90,7 +90,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
               step="0.1"
               value={config.speed ?? 0.5}
               onChange={e => onUpdate({ speed: parseFloat(e.target.value) })}
-              className="w-full accent-blue-600"
+              className="w-full accent-brand-500"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>0.1 — Subtle</span>
@@ -104,7 +104,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
               Typing speed
-              <span className="font-mono text-blue-600">{config.typingSpeed ?? 0.06}s</span>
+              <span className="font-mono text-brand-500">{config.typingSpeed ?? 0.06}s</span>
             </label>
             <p className="text-xs text-gray-400 mb-2">
               Delay between each character. Lower values type faster.
@@ -116,7 +116,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
               step="0.01"
               value={config.typingSpeed ?? 0.06}
               onChange={e => onUpdate({ typingSpeed: parseFloat(e.target.value) })}
-              className="w-full accent-blue-600"
+              className="w-full accent-brand-500"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>0.02s — Very fast</span>
@@ -130,7 +130,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Duration
-            <span className="font-mono text-blue-600">{config.duration}s</span>
+            <span className="font-mono text-brand-500">{config.duration}s</span>
           </label>
           <p className="text-xs text-gray-400 mb-2">
             Defines whether the animation feels fast and snappy, or smooth and cinematic.
@@ -142,7 +142,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             step="0.1"
             value={config.duration}
             onChange={e => onUpdate({ duration: parseFloat(e.target.value) })}
-            className="w-full accent-blue-600"
+            className="w-full accent-brand-500"
           />
           <div className="flex justify-between text-xs text-gray-400 mt-1">
             <span>0.1s — Snappy</span>
@@ -156,7 +156,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Delay
-            <span className="font-mono text-blue-600">{config.delay}s</span>
+            <span className="font-mono text-brand-500">{config.delay}s</span>
           </label>
           <p className="text-xs text-gray-400 mb-2">
             Wait time before the animation starts.
@@ -168,7 +168,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             step="0.1"
             value={config.delay}
             onChange={e => onUpdate({ delay: parseFloat(e.target.value) })}
-            className="w-full accent-blue-600"
+            className="w-full accent-brand-500"
           />
           <div className="flex justify-between text-xs text-gray-400 mt-1">
             <span>0s — Immediate</span>
@@ -182,7 +182,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
               Scale factor
-              <span className="font-mono text-blue-600">{config.scale ?? 0.95}</span>
+              <span className="font-mono text-brand-500">{config.scale ?? 0.95}</span>
             </label>
             <p className="text-xs text-gray-400 mb-2">
               Starting scale of the element before it grows to full size.
@@ -194,7 +194,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
               step="0.05"
               value={config.scale ?? 0.95}
               onChange={e => onUpdate({ scale: parseFloat(e.target.value) })}
-              className="w-full accent-blue-600"
+              className="w-full accent-brand-500"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>0.5 — Half size</span>
@@ -208,7 +208,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
               Blur amount
-              <span className="font-mono text-blue-600">{config.blur ?? 4}px</span>
+              <span className="font-mono text-brand-500">{config.blur ?? 4}px</span>
             </label>
             <p className="text-xs text-gray-400 mb-2">
               Initial blur intensity before it clears to sharp.
@@ -220,7 +220,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
               step="1"
               value={config.blur ?? 4}
               onChange={e => onUpdate({ blur: parseInt(e.target.value, 10) })}
-              className="w-full accent-blue-600"
+              className="w-full accent-brand-500"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>1px — Subtle</span>
@@ -234,7 +234,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
               Stagger delay
-              <span className="font-mono text-blue-600">{config.staggerDelay ?? (moduleId === 'text-reveal' ? 0.12 : moduleId === 'stagger' ? 0.1 : moduleId === 'grid-reveal' ? 0.08 : 0.05)}s</span>
+              <span className="font-mono text-brand-500">{config.staggerDelay ?? (moduleId === 'text-reveal' ? 0.12 : moduleId === 'stagger' ? 0.1 : moduleId === 'grid-reveal' ? 0.08 : 0.05)}s</span>
             </label>
             <p className="text-xs text-gray-400 mb-2">
               {moduleId === 'text-reveal'
@@ -252,7 +252,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
               step="0.01"
               value={config.staggerDelay ?? (moduleId === 'text-reveal' ? 0.12 : moduleId === 'stagger' ? 0.1 : moduleId === 'grid-reveal' ? 0.08 : 0.05)}
               onChange={e => onUpdate({ staggerDelay: parseFloat(e.target.value) })}
-              className="w-full accent-blue-600"
+              className="w-full accent-brand-500"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>{moduleId === 'text-reveal' ? '0.05s — Quick' : moduleId === 'stagger' ? '0.03s — Fast cascade' : moduleId === 'grid-reveal' ? '0.03s — Tight ripple' : '0.01s — Fast cascade'}</span>
@@ -266,7 +266,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
               Distance
-              <span className="font-mono text-blue-600">{config.distance ?? (moduleId === 'split' ? 15 : moduleId === 'stagger' ? 20 : 30)}px</span>
+              <span className="font-mono text-brand-500">{config.distance ?? (moduleId === 'split' ? 15 : moduleId === 'stagger' ? 20 : 30)}px</span>
             </label>
             <p className="text-xs text-gray-400 mb-2">
               {moduleId === 'split'
@@ -282,7 +282,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
               step="5"
               value={config.distance ?? (moduleId === 'split' ? 15 : moduleId === 'stagger' ? 20 : 30)}
               onChange={e => onUpdate({ distance: parseInt(e.target.value, 10) })}
-              className="w-full accent-blue-600"
+              className="w-full accent-brand-500"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>{moduleId === 'split' ? '5px — Subtle' : '10px — Subtle'}</span>
@@ -309,7 +309,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
                   className={`
                     w-10 h-10 rounded-lg border text-sm font-medium transition-colors flex items-center justify-center
                     ${config.origin === opt.value
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      ? 'border-brand-500 bg-brand-50 text-brand-700'
                       : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}
                   `}
                 >
@@ -322,14 +322,14 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
               className={`
                 rounded-lg border px-3 py-2 text-sm font-medium transition-colors
                 ${config.origin === 'random'
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
+                  ? 'border-brand-500 bg-brand-50 text-brand-700'
                   : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}
               `}
             >
               Random
             </button>
             <p className="mt-1.5 text-xs text-gray-400">
-              Current: <span className="font-mono text-blue-600">{config.origin ?? 'center'}</span>
+              Current: <span className="font-mono text-brand-500">{config.origin ?? 'center'}</span>
             </p>
           </div>
         )}
@@ -376,7 +376,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
                   className={`
                     rounded-lg border px-3 py-2.5 text-left transition-colors
                     ${config.highlightDirection === opt.value
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      ? 'border-brand-500 bg-brand-50 text-brand-700'
                       : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'}
                   `}
                 >
@@ -386,7 +386,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
               ))}
             </div>
             <p className="mt-1.5 text-xs text-gray-400">
-              Current: <span className="font-mono text-blue-600">{config.highlightDirection ?? 'left'}</span>
+              Current: <span className="font-mono text-brand-500">{config.highlightDirection ?? 'left'}</span>
             </p>
           </div>
         )}
@@ -437,7 +437,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
               Scroll start
-              <span className="font-mono text-blue-600">{config.scrollStart ?? 62}%</span>
+              <span className="font-mono text-brand-500">{config.scrollStart ?? 62}%</span>
             </label>
             <p className="text-xs text-gray-400 mb-2">
               Viewport position where the first word begins to fill.
@@ -449,7 +449,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
               step="1"
               value={config.scrollStart ?? 62}
               onChange={e => onUpdate({ scrollStart: parseInt(e.target.value, 10) })}
-              className="w-full accent-blue-600"
+              className="w-full accent-brand-500"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>40% — Early</span>
@@ -462,7 +462,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
               Scroll end
-              <span className="font-mono text-blue-600">{config.scrollEnd ?? 60}%</span>
+              <span className="font-mono text-brand-500">{config.scrollEnd ?? 60}%</span>
             </label>
             <p className="text-xs text-gray-400 mb-2">
               Viewport position where each word finishes filling.
@@ -474,7 +474,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
               step="1"
               value={config.scrollEnd ?? 60}
               onChange={e => onUpdate({ scrollEnd: parseInt(e.target.value, 10) })}
-              className="w-full accent-blue-600"
+              className="w-full accent-brand-500"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>40% — Early</span>
@@ -496,7 +496,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             value={config.easing}
             onChange={e => onUpdate({ easing: e.target.value })}
             className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm
-                       focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                       focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
           >
             {EASING_OPTIONS.map(opt => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -527,7 +527,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
                 className={`
                   rounded-lg border px-3 py-2.5 text-left transition-colors
                   ${config.margin === opt.value
-                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                    ? 'border-brand-500 bg-brand-50 text-brand-700'
                     : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'}
                 `}
               >

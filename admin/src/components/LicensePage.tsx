@@ -105,7 +105,7 @@ export default function LicensePage() {
       <div className="mb-6">
         <h2 className="text-lg font-semibold text-gray-900">Pro License</h2>
         <p className="text-sm text-gray-500 mt-1">
-          Activate your license to unlock Pro modules: Blur, Stagger, Grid Reveal, Highlight, Text Fill on Scroll, Parallax, Split Text, Text Reveal, Typewriter, Slide Right and Slide Left.
+          Activate your license to unlock Pro modules.
         </p>
       </div>
 
@@ -150,7 +150,7 @@ export default function LicensePage() {
           onChange={e => setLicenseKey(e.target.value.toUpperCase())}
           placeholder="XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX"
           className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 font-mono text-sm
-                     focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                     focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
           spellCheck={false}
         />
 
@@ -161,7 +161,7 @@ export default function LicensePage() {
             className={`
               rounded-lg px-4 py-2 text-sm font-medium text-white transition-all
               ${!isSaving && licenseKey.trim()
-                ? 'bg-blue-600 hover:bg-blue-700 shadow-sm'
+                ? 'bg-brand-500 hover:bg-brand-600 shadow-sm'
                 : 'bg-gray-300 cursor-not-allowed'}
             `}
           >
@@ -202,27 +202,6 @@ export default function LicensePage() {
           )}
         </div>
       )}
-
-      {/* Info */}
-      <div className="mt-8 rounded-lg border border-gray-200 bg-gray-50 p-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-2">Pro modules included</h3>
-        <ul className="space-y-1">
-          {[
-            { name: 'Blur', css: '.am-blur' },
-            { name: 'Stagger', css: '.am-stagger' },
-            { name: 'Parallax', css: '.am-parallax' },
-            { name: 'Split Text', css: '.am-split' },
-          ].map(m => (
-            <li key={m.css} className="flex items-center gap-2 text-sm text-gray-600">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-amber-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-              <span>{m.name}</span>
-              <code className="text-xs text-gray-400">{m.css}</code>
-            </li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 }

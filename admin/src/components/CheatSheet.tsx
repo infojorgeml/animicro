@@ -1,36 +1,5 @@
-import { useState } from 'react';
 import { MODULE_INFO, DATA_ATTRIBUTES } from '../data/modules';
-
-function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-
-  async function handleCopy() {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-    }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  }
-
-  return (
-    <button
-      onClick={handleCopy}
-      className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600
-                 hover:bg-gray-200 transition-colors"
-    >
-      {copied ? 'Copied!' : 'Copy'}
-    </button>
-  );
-}
+import CopyClassButton from './CopyClassButton';
 
 export default function CheatSheet() {
   return (
@@ -55,13 +24,13 @@ export default function CheatSheet() {
                 <tr key={mod.id} className="hover:bg-gray-50/50">
                   <td className="px-4 py-2.5 font-medium text-gray-900">{mod.name}</td>
                   <td className="px-4 py-2.5">
-                    <code className="rounded bg-blue-50 px-1.5 py-0.5 text-blue-700 text-xs">
+                    <code className="rounded bg-brand-50 px-1.5 py-0.5 text-brand-700 text-xs">
                       {mod.cssClass}
                     </code>
                   </td>
                   <td className="px-4 py-2.5 text-gray-500">{mod.description}</td>
                   <td className="px-4 py-2.5">
-                    <CopyButton text={mod.cssClass} />
+                    <CopyClassButton text={mod.cssClass} label={`Copy ${mod.cssClass}`} />
                   </td>
                 </tr>
               ))}
@@ -98,7 +67,10 @@ export default function CheatSheet() {
                   <td className="px-4 py-2.5 font-mono text-gray-700">{attr.defaultValue}</td>
                   <td className="px-4 py-2.5 text-gray-500">{attr.usedBy}</td>
                   <td className="px-4 py-2.5">
-                    <CopyButton text={`${attr.attribute}="${attr.defaultValue}"`} />
+                    <CopyClassButton
+                      text={`${attr.attribute}="${attr.defaultValue}"`}
+                      label={`Copy ${attr.attribute}`}
+                    />
                   </td>
                 </tr>
               ))}
