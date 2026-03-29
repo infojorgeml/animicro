@@ -5,3 +5,4 @@ frontend/dist/
 .agents/
 .DS_Store
 *.log
+release/

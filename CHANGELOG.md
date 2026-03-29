@@ -5,6 +5,25 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-03-29
+
+### Fixed
+
+- **WordPress.org automated scan**: removed `languages/.gitkeep` (hidden files are not permitted). Replaced with `languages/index.php` (standard “silence is golden” stub). Release zip script now skips any file whose name starts with `.` to avoid packing dotfiles by mistake.
+
+## [1.0.0] - 2026-03-29
+
+### Initial public release
+
+- **15 animation modules** — Free: Fade, Scale, Slide Up, Slide Down. Pro: Slide Left, Slide Right, Blur, Stagger, Grid Reveal, Highlight, Text Fill on Scroll, Parallax, Split Text, Text Reveal, Typewriter.
+- **Builder-aware** — Compatible with Elementor, Bricks, Breakdance, Oxygen, Divi, and Gutenberg (per-builder CSS so elements stay editable in editors; animations run on the live site).
+- **Per-module settings** with live preview in the WordPress admin.
+- **Pro license** — Unlock Pro modules, Smooth Scroll (Lenis), and the Cheat Sheet tab.
+- **`data-am-*` attributes** — Per-element overrides for duration, easing, delay, margins, distances, colors, and more.
+- **Smooth Scroll** (Pro) — Optional site-wide smooth scrolling via a separate JS chunk.
+- **Advanced** (Free) — Respect Reduced Motion (accessibility) and Debug Mode (outline `.am-*` elements + console timing).
+- **REST API** — Settings saved in `animicro_settings`; frontend receives `animicroFrontData` for module loading and options.
+
 ## [0.6.0] - 2026-03-29
 
 ### Added

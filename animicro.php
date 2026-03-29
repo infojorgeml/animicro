@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name:       Animicro
- * Plugin URI:        https://animicro.com
  * Description:       Utility-first micro-animations for WordPress. Simple CSS classes, extreme performance.
- * Version:           0.6.0
+ * Version:           1.0.1
  * Requires at least: 6.0
  * Requires PHP:      7.4
+ * Contributors:      jorgemml
  * Author:            Animicro
  * Author URI:        https://animicro.com
  * License:           GPL-2.0-or-later
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ANIMICRO_VERSION', '0.6.0' );
+define( 'ANIMICRO_VERSION', '1.0.1' );
 define( 'ANIMICRO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ANIMICRO_URL', plugin_dir_url( __FILE__ ) );
 define( 'ANIMICRO_BASENAME', plugin_basename( __FILE__ ) );
