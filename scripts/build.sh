@@ -8,8 +8,9 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD="$ROOT/build"
 RELEASE="$ROOT/release"
 
-# Extract version from animicro.php
-VERSION=$(grep -oP "define\(\s*'ANIMICRO_VERSION'\s*,\s*'\K[^']+" "$ROOT/animicro.php" || echo "0.0.0")
+# Extract version from animicro.php (macOS-compatible)
+VERSION=$(sed -n "s/.*define( 'ANIMICRO_VERSION', '\([^']*\)'.*/\1/p" "$ROOT/animicro.php" | head -1)
+VERSION="${VERSION:-0.0.0}"
 
 echo "==> Animicro v${VERSION}"
 echo ""
@@ -44,8 +45,9 @@ copy_shared() {
     cp "$ROOT/includes/class-frontend.php"       "$TARGET/includes/"
     cp "$ROOT/includes/class-compatibility.php"  "$TARGET/includes/"
 
-    cp -r "$ROOT/admin/dist"    "$TARGET/admin/dist"
-    cp -r "$ROOT/frontend/dist" "$TARGET/frontend/dist"
+    mkdir -p "$TARGET/admin" "$TARGET/frontend"
+    cp -r "$ROOT/admin/dist"    "$TARGET/admin/"
+    cp -r "$ROOT/frontend/dist" "$TARGET/frontend/"
 
     mkdir -p "$TARGET/languages"
     if [[ -f "$ROOT/languages/index.php" ]]; then
