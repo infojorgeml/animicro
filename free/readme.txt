@@ -59,6 +59,13 @@ Use `data-am-*` attributes. For example: `data-am-duration="1"`, `data-am-delay=
 
 Animicro Pro is a separate plugin that replaces the free version and unlocks 11 additional animation modules plus Smooth Scroll and a Cheat Sheet. Visit [animicro.com](https://animicro.com) to learn more.
 
+== External Services ==
+
+This plugin does not connect to any external services. All animation logic runs
+locally in the visitor's browser using JavaScript bundled with the plugin.
+
+No data is collected, transmitted, or stored outside your WordPress installation.
+
 == Screenshots ==
 
 1. Module dashboard with toggle switches and settings

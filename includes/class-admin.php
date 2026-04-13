@@ -204,7 +204,10 @@ class Animicro_Admin {
 		if ( 'animicro-admin' !== $handle ) {
 			return $tag;
 		}
-		return str_replace( ' src', ' type="module" src', $tag );
+		if ( strpos( $tag, 'type="module"' ) !== false ) {
+			return $tag;
+		}
+		return str_replace( '<script ', '<script type="module" ', $tag );
 	}
 
 	public function register_rest_routes(): void {

@@ -7,7 +7,6 @@ class Animicro_Frontend {
 
 	public function __construct() {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_assets' ] );
-		add_action( 'wp_head', [ $this, 'print_dynamic_css' ], 5 );
 	}
 
 	private function is_premium(): bool {
@@ -95,6 +94,17 @@ class Animicro_Frontend {
 		$data = wp_json_encode( $front_data );
 
 		wp_add_inline_script( 'animicro-front', "window.animicroFrontData = {$data};", 'before' );
+
+		if ( ! empty( $settings['active_modules'] ) && ! $this->is_builder_editor() ) {
+			$active_builders = $settings['active_builders'] ?? [ 'none' ];
+			$css             = Animicro_Compatibility::get_editor_css( $settings['active_modules'], $active_builders );
+
+			if ( ! empty( $css ) ) {
+				wp_register_style( 'animicro-dynamic', false, [], ANIMICRO_VERSION );
+				wp_enqueue_style( 'animicro-dynamic' );
+				wp_add_inline_style( 'animicro-dynamic', $css );
+			}
+		}
 	}
 
 	public function add_module_type( string $tag, string $handle, string $src ): string {
@@ -107,41 +117,28 @@ class Animicro_Frontend {
 		return str_replace( '<script ', '<script type="module" ', $tag );
 	}
 
-	public function print_dynamic_css(): void {
+	/**
+	 * Detect whether the current request is a page-builder editor preview.
+	 */
+	private function is_builder_editor(): bool {
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- read-only builder detection via URL params, not form processing.
 		if ( isset( $_GET['bricks'] ) && 'run' === sanitize_text_field( wp_unslash( $_GET['bricks'] ) ) ) {
-			return;
+			return true;
 		}
-
 		if ( isset( $_GET['breakdance'] ) && 'builder' === sanitize_text_field( wp_unslash( $_GET['breakdance'] ) ) ) {
-			return;
+			return true;
 		}
-
 		if ( isset( $_GET['elementor-preview'] ) ) {
-			return;
+			return true;
 		}
-
 		if ( isset( $_GET['ct_builder'] ) && 'true' === sanitize_text_field( wp_unslash( $_GET['ct_builder'] ) ) ) {
-			return;
+			return true;
 		}
-
 		if ( isset( $_GET['et_fb'] ) && '1' === sanitize_text_field( wp_unslash( $_GET['et_fb'] ) ) ) {
-			return;
+			return true;
 		}
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
-
-		$settings = Animicro::get_settings();
-
-		if ( empty( $settings['active_modules'] ) ) {
-			return;
-		}
-
-		$active_builders = $settings['active_builders'] ?? [ 'none' ];
-		$css             = Animicro_Compatibility::get_editor_css( $settings['active_modules'], $active_builders );
-
-		if ( ! empty( $css ) ) {
-			echo "<style id=\"animicro-dynamic-css\">\n" . wp_strip_all_tags( $css ) . "</style>\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS generated internally by get_editor_css(), stripped of tags for safety
-		}
+		return false;
 	}
 
 	private function read_manifest( string $relative_path ): ?array {
