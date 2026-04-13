@@ -102,10 +102,11 @@ export default function Dashboard({ settings, isPremium, onToggleModule, onUpdat
                             <p className="mt-1.5 text-xs text-amber-600">
                               Requires Pro license.{' '}
                               <a
-                                href="?page=animicro-license"
+                                href={window.animicroData.upgradeUrl}
                                 className="underline hover:text-amber-700"
+                                {...(!window.animicroData.proPlugin ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                               >
-                                Activate license
+                                {window.animicroData.proPlugin ? 'Activate license' : 'Upgrade to Pro'}
                               </a>
                             </p>
                           )}

@@ -4,7 +4,7 @@
 **Tags:** animation, motion, css, performance, page-builder
 **Requires at least:** 6.0
 **Tested up to:** 6.9
-**Stable tag:** 1.0.1
+**Stable tag:** 1.1.0
 **Requires PHP:** 7.4
 **License:** GPLv2 or later
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
@@ -93,7 +93,14 @@ Works with Elementor, Bricks, Breakdance, Oxygen, Divi and Gutenberg. Dynamic in
 
 ## Pro License
 
-Blur, Stagger, Grid Reveal, Highlight, Text Fill on Scroll, Parallax, Split Text, Text Reveal, Typewriter, Slide Right and Slide Left require a Pro license. **Smooth Scroll** (site-wide smooth scrolling) and the **Cheat Sheet** (classes and data attributes reference) are also Pro-only. Activate your license under **Animicro → License** or visit [animicro.com](https://animicro.com).
+Blur, Stagger, Grid Reveal, Highlight, Text Fill on Scroll, Parallax, Split Text, Text Reveal, Typewriter, Slide Right and Slide Left require a Pro license. **Smooth Scroll** (site-wide smooth scrolling) and the **Cheat Sheet** (classes and data attributes reference) are also Pro-only.
+
+The plugin ships in two builds from a single source (replacement model):
+
+- **Animicro** (free) — distributed via WordPress.org. No license manager, no Supabase calls. Pro modules appear locked with a link to animicro.com.
+- **Animicro Pro** — distributed via [animicro.com](https://animicro.com). Includes the license manager, Supabase validation, and all Pro features. Replaces the free plugin.
+
+Use `bash scripts/build.sh` to generate both ZIPs. The `ANIMICRO_PRO` constant in `animicro.php` controls which build is active (`false` = free, `true` = pro).
 
 ## Development
 
@@ -103,6 +110,14 @@ npm run build          # Build admin + frontend
 npm run dev:admin      # Watch mode admin
 npm run dev:frontend   # Watch mode frontend
 ```
+
+### Release builds
+
+```bash
+bash scripts/build.sh  # Generates release/animicro-X.Y.Z.zip (free) and release/animicro-pro-X.Y.Z.zip
+```
+
+To test Pro features locally, temporarily set `ANIMICRO_PRO` to `true` in `animicro.php` (do not commit this change).
 
 ## License
 

@@ -8,6 +8,9 @@ class Animicro_Admin {
 	private string $page_hook        = '';
 	private string $license_page_hook = '';
 
+	/** Whether admin JS/CSS were enqueued (manifest + entry found). */
+	private bool $admin_assets_enqueued = false;
+
 	public function __construct() {
 		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
 		add_filter( 'plugin_action_links_' . ANIMICRO_BASENAME, [ $this, 'plugin_action_links' ], 10, 2 );
@@ -27,7 +30,6 @@ class Animicro_Admin {
 		}
 
 		$settings_url = admin_url( 'admin.php?page=animicro' );
-		$upgrade_url  = 'https://animicro.com/';
 
 		$settings_link = sprintf(
 			'<a href="%s">%s</a>',
@@ -35,13 +37,17 @@ class Animicro_Admin {
 			esc_html__( 'Settings', 'animicro' )
 		);
 
-		$upgrade_link = sprintf(
-			'<a href="%s" target="_blank" rel="noopener noreferrer" style="font-weight: 700; color: #16a34a;">%s</a>',
-			esc_url( $upgrade_url ),
-			esc_html__( 'Upgrade to Pro', 'animicro' )
-		);
+		$action_links = [ $settings_link ];
 
-		return array_merge( [ $settings_link, $upgrade_link ], $links );
+		if ( ! Animicro::is_pro_plugin() ) {
+			$action_links[] = sprintf(
+				'<a href="%s" target="_blank" rel="noopener noreferrer" style="font-weight: 700; color: #16a34a;">%s</a>',
+				esc_url( 'https://animicro.com/' ),
+				esc_html__( 'Upgrade to Pro', 'animicro' )
+			);
+		}
+
+		return array_merge( $action_links, $links );
 	}
 
 	public function register_menu(): void {
@@ -62,18 +68,29 @@ class Animicro_Admin {
 			80
 		);
 
-		$this->license_page_hook = add_submenu_page(
-			'animicro',
-			__( 'Pro License', 'animicro' ),
-			__( 'License', 'animicro' ),
-			'manage_options',
-			'animicro-license',
-			[ $this, 'render_page' ]
-		);
+		if ( Animicro::is_pro_plugin() ) {
+			$this->license_page_hook = add_submenu_page(
+				'animicro',
+				__( 'Pro License', 'animicro' ),
+				__( 'License', 'animicro' ),
+				'manage_options',
+				'animicro-license',
+				[ $this, 'render_page' ]
+			);
+		}
 	}
 
 	public function render_page(): void {
-		echo '<div class="wrap"><div id="animicro-root"></div></div>';
+		echo '<div class="wrap">';
+		if ( ! $this->admin_assets_enqueued ) {
+			echo '<div class="notice notice-error"><p>';
+			esc_html_e(
+				'Animicro could not load the admin interface: built assets are missing. Before creating a ZIP, run npm install and npm run build so admin/dist exists. If you installed from a ZIP, reinstall a build that includes admin/dist/.vite/manifest.json.',
+				'animicro'
+			);
+			echo '</p></div>';
+		}
+		echo '<div id="animicro-root"></div></div>';
 	}
 
 	public function enqueue_assets( string $hook ): void {
@@ -82,17 +99,17 @@ class Animicro_Admin {
 			return;
 		}
 
+		$this->admin_assets_enqueued = false;
+
 		$manifest = $this->read_manifest( 'admin/dist/.vite/manifest.json' );
 		if ( ! $manifest ) {
 			return;
 		}
 
-		$entry_key = 'admin/src/main.tsx';
-		if ( ! isset( $manifest[ $entry_key ] ) ) {
+		$entry = $this->resolve_vite_entry( $manifest, 'admin/src/main.tsx' );
+		if ( ! $entry ) {
 			return;
 		}
-
-		$entry = $manifest[ $entry_key ];
 
 		if ( ! empty( $entry['css'] ) ) {
 			foreach ( $entry['css'] as $index => $css_file ) {
@@ -118,7 +135,15 @@ class Animicro_Admin {
 		$current_page = isset( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : 'animicro'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page routing
 		$page         = ( 'animicro-license' === $current_page ) ? 'license' : 'modules';
 
-		$license_manager = new Animicro_License_Manager();
+		$is_pro_plugin = Animicro::is_pro_plugin();
+		$is_premium    = false;
+		$license_key   = '';
+
+		if ( $is_pro_plugin && class_exists( 'Animicro_License_Manager' ) ) {
+			$license_manager = new Animicro_License_Manager();
+			$is_premium      = Animicro_License_Manager::is_premium();
+			$license_key     = $license_manager->get_license_key();
+		}
 
 		$data = wp_json_encode( [
 			'restUrl'    => esc_url_raw( rest_url( 'animicro/v1/' ) ),
@@ -126,12 +151,36 @@ class Animicro_Admin {
 			'settings'   => Animicro::get_settings(),
 			'version'    => ANIMICRO_VERSION,
 			'builders'   => Animicro_Compatibility::get_available_builders(),
-			'isPremium'  => Animicro_License_Manager::is_premium(),
-			'licenseKey' => $license_manager->get_license_key(),
+			'isPremium'  => $is_premium,
+			'licenseKey' => $license_key,
 			'page'       => $page,
+			'proPlugin'  => $is_pro_plugin,
+			'upgradeUrl' => $is_pro_plugin
+				? admin_url( 'admin.php?page=animicro-license' )
+				: 'https://animicro.com/',
 		] );
 
 		wp_add_inline_script( 'animicro-admin', "window.animicroData = {$data};", 'before' );
+
+		$this->admin_assets_enqueued = true;
+	}
+
+	/**
+	 * Pick Vite manifest entry (stable key or first isEntry).
+	 *
+	 * @param array<string, mixed> $manifest Decoded manifest.
+	 * @return array<string, mixed>|null
+	 */
+	private function resolve_vite_entry( array $manifest, string $preferred_key ): ?array {
+		if ( isset( $manifest[ $preferred_key ] ) && is_array( $manifest[ $preferred_key ] ) ) {
+			return $manifest[ $preferred_key ];
+		}
+		foreach ( $manifest as $item ) {
+			if ( is_array( $item ) && ! empty( $item['isEntry'] ) && ! empty( $item['file'] ) ) {
+				return $item;
+			}
+		}
+		return null;
 	}
 
 	public function add_module_type( string $tag, string $handle, string $src ): string {
@@ -155,28 +204,30 @@ class Animicro_Admin {
 			],
 		] );
 
-		register_rest_route( 'animicro/v1', '/license/status', [
-			[
-				'methods'             => 'GET',
-				'callback'            => [ $this, 'get_license_status' ],
-				'permission_callback' => [ $this, 'check_permission' ],
-			],
-		] );
+		if ( Animicro::is_pro_plugin() ) {
+			register_rest_route( 'animicro/v1', '/license/status', [
+				[
+					'methods'             => 'GET',
+					'callback'            => [ $this, 'get_license_status' ],
+					'permission_callback' => [ $this, 'check_permission' ],
+				],
+			] );
 
-		register_rest_route( 'animicro/v1', '/license/save', [
-			[
-				'methods'             => 'POST',
-				'callback'            => [ $this, 'save_license' ],
-				'permission_callback' => [ $this, 'check_permission' ],
-				'args'                => [
-					'license_key' => [
-						'required'          => false,
-						'type'              => 'string',
-						'sanitize_callback' => 'sanitize_text_field',
+			register_rest_route( 'animicro/v1', '/license/save', [
+				[
+					'methods'             => 'POST',
+					'callback'            => [ $this, 'save_license' ],
+					'permission_callback' => [ $this, 'check_permission' ],
+					'args'                => [
+						'license_key' => [
+							'required'          => false,
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
 					],
 				],
-			],
-		] );
+			] );
+		}
 	}
 
 	public function check_permission(): bool {
@@ -196,13 +247,18 @@ class Animicro_Admin {
 			? array_map( 'sanitize_text_field', $raw['active_modules'] )
 			: $defaults['active_modules'];
 
-		// Filter out pro modules from active_modules if not premium.
-		if ( ! Animicro_License_Manager::is_premium() ) {
+		if ( Animicro::is_pro_plugin() ) {
+			$is_premium = class_exists( 'Animicro_License_Manager' ) && Animicro_License_Manager::is_premium();
+		} else {
+			$is_premium = false;
+		}
+
+		if ( ! $is_premium ) {
 			$clean['active_modules'] = array_values(
 				array_filter(
 					$clean['active_modules'],
 					function ( $m ) {
-						return ! Animicro_License_Manager::is_pro_module( $m );
+						return ! Animicro::is_pro_module( $m );
 					}
 				)
 			);

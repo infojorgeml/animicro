@@ -5,6 +5,21 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-04-13
+
+### Changed
+
+- **Freemium architecture** — The plugin now ships as two separate builds from a single source repository (replacement model): `animicro` (free, for WordPress.org) and `animicro-pro` (paid, distributed directly). The free version has no license checks, no Supabase calls, and no license manager code included.
+- **`ANIMICRO_PRO` constant** — New PHP constant (`false` in free, `true` in pro) gates all premium-only code paths. Pro modules, Smooth Scroll, and the License admin page are fully absent from the free build at the file level.
+- **`Animicro::PRO_MODULES` and `Animicro::is_pro_plugin()`** — Pro module list and pro-plugin detection moved to the core `Animicro` class so all PHP files can reference them without depending on `class-license-manager.php`.
+- **Admin UI** — In the free version, locked Pro module cards link directly to `animicro.com` ("Upgrade to Pro") instead of the internal license page. Pro tabs (Cheat Sheet, Smooth Scroll) open `animicro.com` when clicked. In the pro version behaviour is unchanged.
+- **Build script** (`scripts/build.sh`) — New shell script generates both ZIPs in one command: compiles Vite assets, copies shared files, excludes `class-license-manager.php` from the free build, flips `ANIMICRO_PRO` to `true` for the pro build, and zips both into `release/`.
+- **`free/readme.txt`** — Added WordPress.org-format `readme.txt` required for directory submission.
+
+### Removed
+
+- **`class-license-manager.php` from free build** — License validation, Supabase API calls, and option management are not present in the plugin distributed via WordPress.org.
+
 ## [1.0.1] - 2026-03-29
 
 ### Fixed

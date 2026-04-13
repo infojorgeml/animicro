@@ -10,6 +10,10 @@ node_modules/
 admin/src/
 frontend/src/
 docs/
+free/
+build/
+release/
+includes/class-license-manager.php
 *.md
 !README.md
 package.json

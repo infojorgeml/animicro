@@ -25,10 +25,17 @@ export default function TabNav({ activeTab, onTabChange, isPremium }: TabNavProp
     <nav className="flex border-b border-gray-200 mb-6">
       {TABS.map(tab => {
         const locked = tab.isPro && !isPremium;
+        const handleClick = () => {
+          if (locked && !window.animicroData.proPlugin) {
+            window.open(window.animicroData.upgradeUrl, '_blank', 'noopener');
+          } else if (!locked) {
+            onTabChange(tab.id);
+          }
+        };
         return (
           <button
             key={tab.id}
-            onClick={() => !locked && onTabChange(tab.id)}
+            onClick={handleClick}
             className={`
               px-4 py-2.5 text-sm font-medium -mb-px border-b-2 transition-colors flex items-center gap-1.5
               ${locked

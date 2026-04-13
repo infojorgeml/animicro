@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Build animicro-{version}.zip for distribution (WordPress plugin root)."""
+"""Build animicro-{version}.zip (free, WP.org) from the plugin root.
+
+For the full free + pro build, use scripts/build.sh instead.
+This script generates only the free ZIP and excludes all pro-only files.
+"""
 import os
 import re
 import sys
@@ -26,7 +30,7 @@ def should_skip(rel: Path) -> bool:
         return True
     if parts[0] == "node_modules":
         return True
-    if parts[0] in (".agent", ".agents", ".cursor", "docs", "scripts", "release"):
+    if parts[0] in (".agent", ".agents", ".cursor", "docs", "scripts", "release", "build", "free"):
         return True
     if parts[:2] == ("admin", "src"):
         return True
@@ -34,7 +38,12 @@ def should_skip(rel: Path) -> bool:
         return True
 
     name = rel.name
-    if name.startswith("."):
+
+    if name == "class-license-manager.php":
+        return True
+
+    # Allow .vite/ (Vite manifest folder inside dist) but skip all other dot-files/dirs.
+    if name.startswith(".") and name != ".vite":
         return True
     if name in {
         ".gitignore", ".distignore", ".DS_Store", "package.json", "package-lock.json",
@@ -75,6 +84,11 @@ def main() -> None:
                 continue
             arc = Path("animicro") / rel
             files.append((p, str(arc).replace("\\", "/")))
+
+    # Include free/readme.txt as readme.txt in the ZIP root.
+    readme_src = ROOT / "free" / "readme.txt"
+    if readme_src.exists():
+        files.append((readme_src, "animicro/readme.txt"))
 
     with zipfile.ZipFile(out_zip, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
         for path, arcname in sorted(files, key=lambda x: x[1]):

@@ -50,6 +50,8 @@ export interface AnimicroData {
   isPremium: boolean;
   licenseKey: string;
   page?: string;
+  proPlugin: boolean;
+  upgradeUrl: string;
 }
 
 declare global {

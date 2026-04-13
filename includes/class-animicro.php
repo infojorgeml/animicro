@@ -5,6 +5,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Animicro {
 
+	const PRO_MODULES = [
+		'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll',
+		'parallax', 'split', 'slide-right', 'slide-left', 'text-reveal', 'typewriter',
+	];
+
 	private static ?Animicro $instance = null;
 
 	private function __construct() {
@@ -163,6 +168,14 @@ class Animicro {
 		];
 	}
 
+	public static function is_pro_plugin(): bool {
+		return defined( 'ANIMICRO_PRO' ) && ANIMICRO_PRO;
+	}
+
+	public static function is_pro_module( string $module_id ): bool {
+		return in_array( $module_id, self::PRO_MODULES, true );
+	}
+
 	public static function get_settings(): array {
 		$settings = get_option( 'animicro_settings', [] );
 		$merged   = wp_parse_args( $settings, self::get_default_settings() );
@@ -176,14 +189,18 @@ class Animicro {
 	}
 
 	private function load_dependencies(): void {
-		require_once ANIMICRO_DIR . 'includes/class-license-manager.php';
+		if ( self::is_pro_plugin() ) {
+			require_once ANIMICRO_DIR . 'includes/class-license-manager.php';
+		}
 		require_once ANIMICRO_DIR . 'includes/class-compatibility.php';
 		require_once ANIMICRO_DIR . 'includes/class-admin.php';
 		require_once ANIMICRO_DIR . 'includes/class-frontend.php';
 	}
 
 	private function register_hooks(): void {
-		add_action( 'admin_init', [ 'Animicro_License_Manager', 'validate_license_periodically' ] );
+		if ( self::is_pro_plugin() ) {
+			add_action( 'admin_init', [ 'Animicro_License_Manager', 'validate_license_periodically' ] );
+		}
 		new Animicro_Admin();
 		new Animicro_Frontend();
 	}

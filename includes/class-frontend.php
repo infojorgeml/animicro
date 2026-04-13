@@ -10,10 +10,16 @@ class Animicro_Frontend {
 		add_action( 'wp_head', [ $this, 'print_dynamic_css' ], 5 );
 	}
 
+	private function is_premium(): bool {
+		return Animicro::is_pro_plugin()
+			&& class_exists( 'Animicro_License_Manager' )
+			&& Animicro_License_Manager::is_premium();
+	}
+
 	public function enqueue_assets(): void {
 		$settings = Animicro::get_settings();
 
-		$smooth_enabled = ! empty( $settings['smooth_scroll']['enabled'] ) && Animicro_License_Manager::is_premium();
+		$smooth_enabled = ! empty( $settings['smooth_scroll']['enabled'] ) && $this->is_premium();
 
 		if ( empty( $settings['active_modules'] ) && ! $smooth_enabled ) {
 			return;
@@ -53,13 +59,13 @@ class Animicro_Frontend {
 		add_filter( 'script_loader_tag', [ $this, 'add_module_type' ], 10, 3 );
 
 		$module_settings = $settings['module_settings'] ?? [];
-		$is_premium      = Animicro_License_Manager::is_premium();
+		$is_premium      = $this->is_premium();
 
 		$active_modules = array_values(
 			array_filter(
 				$settings['active_modules'],
 				function ( $m ) use ( $is_premium ) {
-					return $is_premium || ! Animicro_License_Manager::is_pro_module( $m );
+					return $is_premium || ! Animicro::is_pro_module( $m );
 				}
 			)
 		);
@@ -70,7 +76,7 @@ class Animicro_Frontend {
 		];
 
 		$smooth_scroll = $settings['smooth_scroll'] ?? [];
-		if ( ! empty( $smooth_scroll['enabled'] ) && $is_premium ) {
+		if ( ! empty( $smooth_scroll['enabled'] ) && $this->is_premium() ) {
 			$front_data['smoothScroll'] = [
 				'lerp'            => (float) ( $smooth_scroll['lerp'] ?? 0.1 ),
 				'duration'        => (float) ( $smooth_scroll['duration'] ?? 1.2 ),
