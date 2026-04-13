@@ -18,7 +18,24 @@ class Animicro_Admin {
 		if ( is_admin() ) {
 			add_action( 'admin_menu', [ $this, 'register_menu' ] );
 			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+			add_action( 'admin_notices', [ $this, 'notice_free_deactivated' ] );
 		}
+	}
+
+	/**
+	 * Show a one-time success notice when Pro auto-deactivated the free version.
+	 */
+	public function notice_free_deactivated(): void {
+		if ( ! Animicro::is_pro_plugin() ) {
+			return;
+		}
+		if ( ! get_transient( 'animicro_pro_deactivated_free' ) ) {
+			return;
+		}
+		delete_transient( 'animicro_pro_deactivated_free' );
+		echo '<div class="notice notice-success is-dismissible"><p>'
+			. esc_html__( 'Animicro (free) has been deactivated automatically. Animicro Pro is now active.', 'animicro' )
+			. '</p></div>';
 	}
 
 	/**

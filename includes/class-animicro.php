@@ -24,6 +24,15 @@ class Animicro {
 	}
 
 	public static function activate(): void {
+		// When Pro activates, silently deactivate the free version if it is running.
+		if ( self::is_pro_plugin() ) {
+			$free_basename = 'animicro/animicro.php';
+			if ( function_exists( 'is_plugin_active' ) && is_plugin_active( $free_basename ) ) {
+				deactivate_plugins( $free_basename, true );
+				set_transient( 'animicro_pro_deactivated_free', true, 30 );
+			}
+		}
+
 		$defaults = self::get_default_settings();
 		if ( false === get_option( 'animicro_settings' ) ) {
 			update_option( 'animicro_settings', $defaults );
