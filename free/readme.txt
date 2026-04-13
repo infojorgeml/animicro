@@ -22,12 +22,14 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 * **Scale** (`.am-scale`) — Scales from small to full size
 * **Slide Up** (`.am-slide-up`) — Slides up when appearing
 * **Slide Down** (`.am-slide-down`) — Slides down when appearing
+* **Highlight** (`.am-highlight`) — Animated marker highlight behind text on entry
+* **Typewriter** (`.am-typewriter`) — Types text character by character with a blinking cursor
 
 Each module has its own settings panel with live preview so you can tune duration, easing, delay, and activation margin without leaving the admin.
 
 = Pro modules (available with Animicro Pro) =
 
-Blur, Stagger, Grid Reveal, Highlight, Text Fill on Scroll, Parallax, Split Text, Text Reveal, Typewriter, Slide Right, and Slide Left. Plus Smooth Scroll and a Cheat Sheet reference panel. Learn more at [animicro.com](https://animicro.com).
+Blur, Stagger, Grid Reveal, Text Fill on Scroll, Parallax, Split Text, Text Reveal, Slide Right, and Slide Left. Plus Smooth Scroll and a Cheat Sheet reference panel. Learn more at [animicro.com](https://animicro.com).
 
 = Builder compatibility =
 

@@ -158,8 +158,8 @@ export const MODULE_INFO: ModuleInfo[] = [
   // Text
   { id: 'split',        name: 'Split Text',   description: 'Splits and animates text by letters/words', cssClass: '.am-split-chars .am-split-words', isPro: true, category: 'text' },
   { id: 'text-reveal',  name: 'Text Reveal',  description: 'Reveals text line by line with a sliding mask', cssClass: '.am-text-reveal',  isPro: true, category: 'text' },
-  { id: 'highlight',    name: 'Highlight',    description: 'Animated marker highlight behind text',                    cssClass: '.am-highlight',  isPro: true, category: 'text' },
-  { id: 'typewriter',   name: 'Typewriter',   description: 'Types text character by character with a blinking cursor', cssClass: '.am-typewriter', isPro: true, category: 'text' },
+  { id: 'highlight',    name: 'Highlight',    description: 'Animated marker highlight behind text',                    cssClass: '.am-highlight',  isPro: false, category: 'text' },
+  { id: 'typewriter',   name: 'Typewriter',   description: 'Types text character by character with a blinking cursor', cssClass: '.am-typewriter', isPro: false, category: 'text' },
 
   // Groups & Layouts
   { id: 'stagger',      name: 'Stagger',      description: 'Animates container children in sequence',   cssClass: '.am-stagger',      isPro: true, category: 'group' },

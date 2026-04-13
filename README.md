@@ -39,17 +39,17 @@ Under **Animicro → Advanced** you can enable **Respect Reduced Motion** (skips
 | Scale | `.am-scale` | Scales from small to full size | Free |
 | Slide Up | `.am-slide-up` | Slides up when appearing | Free |
 | Slide Down | `.am-slide-down` | Slides down when appearing | Free |
+| Highlight | `.am-highlight` | Marker-style highlight behind text on entry | Free |
+| Typewriter | `.am-typewriter` | Types text character by character with blinking cursor | Free |
 | Slide Right | `.am-slide-right` | Slides in from the left | Pro |
 | Slide Left | `.am-slide-left` | Slides in from the right | Pro |
 | Blur | `.am-blur` | Blur that clears as it appears | Pro |
 | Stagger | `.am-stagger` | Animates container children in sequence | Pro |
 | Grid Reveal | `.am-grid-reveal` | Reveals direct children from a focal point (spatial wave) | Pro |
-| Highlight | `.am-highlight` | Marker-style highlight behind text on entry | Pro |
 | Text Fill on Scroll | `.am-text-fill-scroll` | Fills text word by word as you scroll | Pro |
 | Parallax | `.am-parallax` | Scroll-linked parallax movement | Pro |
 | Split Text | `.am-split-chars` / `.am-split-words` | Splits and animates text by characters or words | Pro |
 | Text Reveal | `.am-text-reveal` | Reveals text line by line with a sliding mask | Pro |
-| Typewriter | `.am-typewriter` | Types text character by character with blinking cursor | Pro |
 
 ## Basic usage
 
@@ -93,7 +93,7 @@ Works with Elementor, Bricks, Breakdance, Oxygen, Divi and Gutenberg. Dynamic in
 
 ## Pro License
 
-Blur, Stagger, Grid Reveal, Highlight, Text Fill on Scroll, Parallax, Split Text, Text Reveal, Typewriter, Slide Right and Slide Left require a Pro license. **Smooth Scroll** (site-wide smooth scrolling) and the **Cheat Sheet** (classes and data attributes reference) are also Pro-only.
+Blur, Stagger, Grid Reveal, Text Fill on Scroll, Parallax, Split Text, Text Reveal, Slide Right and Slide Left require a Pro license. **Smooth Scroll** (site-wide smooth scrolling) and the **Cheat Sheet** (classes and data attributes reference) are also Pro-only.
 
 The plugin ships in two builds from a single source (replacement model):
 
