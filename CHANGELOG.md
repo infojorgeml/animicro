@@ -5,6 +5,25 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-04-13
+
+### Added
+
+- **Upgrade button in plugin row** — Free version now shows a lilac "Upgrade" link next to "Deactivate" in the WordPress plugins list, pointing to animicro.com.
+- **Pro auto-deactivates Free** — When Animicro Pro is activated, the free plugin is deactivated automatically and a success notice is shown in the admin.
+
+### Changed
+
+- **Highlight and Typewriter are now Free** — Both modules moved from the Pro tier to the Free tier. All users (free and pro) have access to `.am-highlight` and `.am-typewriter` without a license.
+- **Dynamic CSS output** — Builder-compatibility CSS is now injected via `wp_add_inline_style()` instead of `echo "<style>"` in `wp_head`, fully complying with WordPress.org Plugin Check requirements.
+- **Pro plugin name** — Animicro Pro is now correctly displayed as "Animicro Pro" in the WordPress admin (plugin list and menu), distinguishing it from the free "Animicro" plugin.
+- **`add_module_type()` hardened** — Uses `str_replace('<script ', ...)` with a duplicate-type guard, preventing false matches on `data-src` or similar attributes.
+
+### Fixed
+
+- **`free/readme.txt`** — Added `== External Services ==` section confirming no external connections, as required by WordPress.org review guidelines.
+- **`PRO_MODULES` / `FREE_MODULES`** in `class-license-manager.php` updated to reflect that Highlight and Typewriter are now Free.
+
 ## [1.1.0] - 2026-04-13
 
 ### Changed
@@ -313,6 +332,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Vite 6 for admin (React + TypeScript + Tailwind) and frontend (Vanilla JS) build
 - REST API: `animicro/v1/settings`, `animicro/v1/license/status`, `animicro/v1/license/save`
 
+[1.2.0]: https://github.com/infojorgeml/animicro/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/infojorgeml/animicro/compare/v1.0.1...v1.1.0
 [0.3.4]: https://github.com/infojorgeml/animicro/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/infojorgeml/animicro/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/infojorgeml/animicro/compare/v0.3.1...v0.3.2

@@ -1,6 +1,6 @@
 # Animicro — Development Reference
 
-**Release:** 1.0.1 (2026-03-29). See CHANGELOG for history.
+**Release:** 1.2.0 (2026-04-13). See CHANGELOG for history.
 
 Utility-first micro-animations for WordPress powered by [Motion One](https://motion.dev/). This document describes the architecture and conventions for developers and AI assistants.
 
@@ -67,13 +67,14 @@ animicro/
 - **Admin**: Integrations tab — multiselect of builders (None, Elementor, Bricks, Breakdance, Oxygen, Divi, Gutenberg).
 - **CSS**: `includes/class-compatibility.php` → `get_editor_css()` generates rules like `body:not(.bricks-is-builder) .am-fade { opacity: 0; }` so elements stay visible in editors.
 - **JS**: `frontend/src/main.js` checks `?bricks=run` (and similar) to skip loading animation modules in builder preview.
-- **PHP**: `class-frontend.php` skips printing hide CSS when `?bricks=run` in URL (Bricks iframe).
+- **PHP**: `class-frontend.php` uses `is_builder_editor()` to skip registering the inline CSS when a builder iframe URL param is detected.
 
 Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdance`, `oxygen-builder-body`, `et_pb_pagebuilder_layout`, `block-editor-page`.
 
 ## Pro License
 
-- **Pro modules**: blur, stagger, grid-reveal, highlight, text-fill-scroll, parallax, split, slide-right, slide-left, text-reveal, typewriter. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
+- **Free modules**: fade, scale, slide-up, slide-down, highlight, typewriter.
+- **Pro modules**: blur, stagger, grid-reveal, text-fill-scroll, parallax, split, slide-right, slide-left, text-reveal. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
 - **Cheat Sheet** and **Smooth Scroll** tabs are Pro-only.
 - License validation via Supabase; product slug `animicro`.
 
@@ -84,7 +85,7 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 | `animicro.php` | Bootstrap, constants, activation |
 | `includes/class-animicro.php` | Orchestrator, defaults, get_settings() |
 | `includes/class-admin.php` | Menu (SVG menu icon as base64 data URL), REST API, enqueue admin assets, plugin_action_links |
-| `includes/class-frontend.php` | Enqueue frontend assets, `animicroFrontData` (`advanced`, optional `smoothScroll`), print_dynamic_css |
+| `includes/class-frontend.php` | Enqueue frontend assets, `animicroFrontData` (`advanced`, optional `smoothScroll`), builder-compat CSS via `wp_add_inline_style()` |
 | `admin/src/components/SmoothScroll.tsx` | Pro settings UI for global smooth scroll |
 | `admin/src/components/AdvancedSettings.tsx` | Free: reduced motion + debug mode |
 | `frontend/src/smooth-scroll.js` | Lenis init (dynamic chunk) |

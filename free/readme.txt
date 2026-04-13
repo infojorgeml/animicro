@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -74,6 +74,13 @@ No data is collected, transmitted, or stored outside your WordPress installation
 
 == Changelog ==
 
+= 1.2.0 =
+* Highlight and Typewriter modules moved to the Free tier — available to all users without a Pro license
+* Dynamic builder-compatibility CSS now injected via wp_add_inline_style() (WP.org Plugin Check compliant)
+* Free plugin row shows an "Upgrade" link pointing to animicro.com
+* Added External Services disclosure section
+* Minor internal hardening of script type injection
+
 = 1.1.0 =
 * Freemium architecture: free plugin ships without any license code, Supabase calls, or premium gating at the PHP level
 * New `ANIMICRO_PRO` constant controls pro/free behaviour at build time
@@ -88,6 +95,9 @@ No data is collected, transmitted, or stored outside your WordPress installation
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+Free users gain two new modules: Highlight and Typewriter. No breaking changes.
 
 = 1.1.0 =
 No breaking changes. Free users get the same 4 core modules. All premium code has been moved out of the free package.
