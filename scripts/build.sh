@@ -89,8 +89,11 @@ echo "==> Building PRO (animicro-pro) ..."
 
 copy_shared "$BUILD/animicro-pro"
 
-# Set ANIMICRO_PRO to true
-sed -i.bak "s/define( 'ANIMICRO_PRO', false )/define( 'ANIMICRO_PRO', true )/" "$BUILD/animicro-pro/animicro.php"
+# Set ANIMICRO_PRO to true and rename plugin for WP dashboard
+sed -i.bak \
+    -e "s/define( 'ANIMICRO_PRO', false )/define( 'ANIMICRO_PRO', true )/" \
+    -e "s/ \* Plugin Name:       Animicro$/ \* Plugin Name:       Animicro Pro/" \
+    "$BUILD/animicro-pro/animicro.php"
 rm -f "$BUILD/animicro-pro/animicro.php.bak"
 
 # Include license manager
