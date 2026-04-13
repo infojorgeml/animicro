@@ -37,17 +37,17 @@ class Animicro_Admin {
 			esc_html__( 'Settings', 'animicro' )
 		);
 
-		$action_links = [ $settings_link ];
+		$merged = array_merge( [ $settings_link ], $links );
 
 		if ( ! Animicro::is_pro_plugin() ) {
-			$action_links[] = sprintf(
-				'<a href="%s" target="_blank" rel="noopener noreferrer" style="font-weight: 700; color: #16a34a;">%s</a>',
+			$merged[] = sprintf(
+				'<a href="%s" target="_blank" rel="noopener noreferrer" style="font-weight: 700; color: #A200FF;">%s</a>',
 				esc_url( 'https://animicro.com/' ),
-				esc_html__( 'Upgrade to Pro', 'animicro' )
+				esc_html__( 'Upgrade', 'animicro' )
 			);
 		}
 
-		return array_merge( $action_links, $links );
+		return $merged;
 	}
 
 	public function register_menu(): void {
