@@ -5,26 +5,9 @@ export interface ModuleConfig {
   margin: string;
   distance?: number;
   scale?: number;
-  blur?: number;
-  staggerDelay?: number;
   typingSpeed?: number;
-  speed?: number;
-  origin?: string;
   highlightColor?: string;
   highlightDirection?: string;
-  colorBase?: string;
-  colorFill?: string;
-  scrollStart?: number;
-  scrollEnd?: number;
-}
-
-export interface SmoothScrollConfig {
-  enabled: boolean;
-  lerp: number;
-  duration: number;
-  smoothWheel: boolean;
-  wheelMultiplier: number;
-  anchors: boolean;
 }
 
 export interface AdvancedConfig {
@@ -37,7 +20,6 @@ export interface AnimicroSettings {
   available_modules: string[];
   active_builders: string[];
   module_settings: Record<string, ModuleConfig>;
-  smooth_scroll: SmoothScrollConfig;
   advanced: AdvancedConfig;
 }
 
@@ -47,10 +29,6 @@ export interface AnimicroData {
   settings: AnimicroSettings;
   version: string;
   builders: Record<string, string>;
-  isPremium: boolean;
-  licenseKey: string;
-  page?: string;
-  proPlugin: boolean;
   upgradeUrl: string;
 }
 

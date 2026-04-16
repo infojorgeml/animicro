@@ -9,18 +9,10 @@ class Animicro_Frontend {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 	}
 
-	private function is_premium(): bool {
-		return Animicro::is_pro_plugin()
-			&& class_exists( 'Animicro_License_Manager' )
-			&& Animicro_License_Manager::is_premium();
-	}
-
 	public function enqueue_assets(): void {
 		$settings = Animicro::get_settings();
 
-		$smooth_enabled = ! empty( $settings['smooth_scroll']['enabled'] ) && $this->is_premium();
-
-		if ( empty( $settings['active_modules'] ) && ! $smooth_enabled ) {
+		if ( empty( $settings['active_modules'] ) ) {
 			return;
 		}
 
@@ -58,32 +50,11 @@ class Animicro_Frontend {
 		add_filter( 'script_loader_tag', [ $this, 'add_module_type' ], 10, 3 );
 
 		$module_settings = $settings['module_settings'] ?? [];
-		$is_premium      = $this->is_premium();
-
-		$active_modules = array_values(
-			array_filter(
-				$settings['active_modules'],
-				function ( $m ) use ( $is_premium ) {
-					return $is_premium || ! Animicro::is_pro_module( $m );
-				}
-			)
-		);
 
 		$front_data = [
-			'modules'        => array_map( 'sanitize_text_field', $active_modules ),
+			'modules'        => array_map( 'sanitize_text_field', $settings['active_modules'] ),
 			'moduleSettings' => $module_settings,
 		];
-
-		$smooth_scroll = $settings['smooth_scroll'] ?? [];
-		if ( ! empty( $smooth_scroll['enabled'] ) && $this->is_premium() ) {
-			$front_data['smoothScroll'] = [
-				'lerp'            => (float) ( $smooth_scroll['lerp'] ?? 0.1 ),
-				'duration'        => (float) ( $smooth_scroll['duration'] ?? 1.2 ),
-				'smoothWheel'     => (bool) ( $smooth_scroll['smoothWheel'] ?? true ),
-				'wheelMultiplier' => (float) ( $smooth_scroll['wheelMultiplier'] ?? 1.0 ),
-				'anchors'         => (bool) ( $smooth_scroll['anchors'] ?? true ),
-			];
-		}
 
 		$advanced = $settings['advanced'] ?? [];
 		$front_data['advanced'] = [
@@ -95,7 +66,7 @@ class Animicro_Frontend {
 
 		wp_add_inline_script( 'animicro-front', "window.animicroFrontData = {$data};", 'before' );
 
-		if ( ! empty( $settings['active_modules'] ) && ! $this->is_builder_editor() ) {
+		if ( ! $this->is_builder_editor() ) {
 			$active_builders = $settings['active_builders'] ?? [ 'none' ];
 			$css             = Animicro_Compatibility::get_editor_css( $settings['active_modules'], $active_builders );
 

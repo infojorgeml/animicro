@@ -4,21 +4,12 @@
  */
 
 const MODULES = {
-  'fade':        () => import('../modules/fade.js'),
-  'slide-up':    () => import('../modules/slide.js'),
-  'slide-down':  () => import('../modules/slide.js'),
-  'slide-right': () => import('../modules/slide.js'),
-  'slide-left':  () => import('../modules/slide.js'),
-  'scale':       () => import('../modules/scale.js'),
-  'blur':        () => import('../modules/blur.js'),
-  'stagger':     () => import('../modules/stagger.js'),
-  'grid-reveal': () => import('../modules/grid-reveal.js'),
-  'highlight':        () => import('../modules/highlight.js'),
-  'text-fill-scroll': () => import('../modules/text-fill-scroll.js'),
-  'parallax':         () => import('../modules/parallax.js'),
-  'split':       () => import('../modules/split-text.js'),
-  'text-reveal': () => import('../modules/text-reveal.js'),
-  'typewriter':  () => import('../modules/typewriter.js'),
+  'fade':       () => import('../modules/fade.js'),
+  'slide-up':   () => import('../modules/slide.js'),
+  'slide-down': () => import('../modules/slide.js'),
+  'scale':      () => import('../modules/scale.js'),
+  'highlight':  () => import('../modules/highlight.js'),
+  'typewriter': () => import('../modules/typewriter.js'),
 };
 
 export async function loadModules(activeModules) {

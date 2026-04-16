@@ -5,8 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Animicro_Admin {
 
-	private string $page_hook        = '';
-	private string $license_page_hook = '';
+	private string $page_hook = '';
 
 	/** Whether admin JS/CSS were enqueued (manifest + entry found). */
 	private bool $admin_assets_enqueued = false;
@@ -18,24 +17,7 @@ class Animicro_Admin {
 		if ( is_admin() ) {
 			add_action( 'admin_menu', [ $this, 'register_menu' ] );
 			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
-			add_action( 'admin_notices', [ $this, 'notice_free_deactivated' ] );
 		}
-	}
-
-	/**
-	 * Show a one-time success notice when Pro auto-deactivated the free version.
-	 */
-	public function notice_free_deactivated(): void {
-		if ( ! Animicro::is_pro_plugin() ) {
-			return;
-		}
-		if ( ! get_transient( 'animicro_pro_deactivated_free' ) ) {
-			return;
-		}
-		delete_transient( 'animicro_pro_deactivated_free' );
-		echo '<div class="notice notice-success is-dismissible"><p>'
-			. esc_html__( 'Animicro (free) has been deactivated automatically. Animicro Pro is now active.', 'animicro' )
-			. '</p></div>';
 	}
 
 	/**
@@ -56,13 +38,11 @@ class Animicro_Admin {
 
 		$merged = array_merge( [ $settings_link ], $links );
 
-		if ( ! Animicro::is_pro_plugin() ) {
-			$merged[] = sprintf(
-				'<a href="%s" target="_blank" rel="noopener noreferrer" style="font-weight: 700; color: #A200FF;">%s</a>',
-				esc_url( 'https://animicro.com/' ),
-				esc_html__( 'Upgrade', 'animicro' )
-			);
-		}
+		$merged[] = sprintf(
+			'<a href="%s" target="_blank" rel="noopener noreferrer" style="font-weight: 700; color: #A200FF;">%s</a>',
+			esc_url( 'https://animicro.com/' ),
+			esc_html__( 'Upgrade', 'animicro' )
+		);
 
 		return $merged;
 	}
@@ -84,17 +64,6 @@ class Animicro_Admin {
 			$icon_url,
 			80
 		);
-
-		if ( Animicro::is_pro_plugin() ) {
-			$this->license_page_hook = add_submenu_page(
-				'animicro',
-				__( 'Pro License', 'animicro' ),
-				__( 'License', 'animicro' ),
-				'manage_options',
-				'animicro-license',
-				[ $this, 'render_page' ]
-			);
-		}
 	}
 
 	public function render_page(): void {
@@ -111,8 +80,7 @@ class Animicro_Admin {
 	}
 
 	public function enqueue_assets( string $hook ): void {
-		$allowed_hooks = [ $this->page_hook, $this->license_page_hook ];
-		if ( ! in_array( $hook, $allowed_hooks, true ) ) {
+		if ( $hook !== $this->page_hook ) {
 			return;
 		}
 
@@ -149,32 +117,13 @@ class Animicro_Admin {
 
 		add_filter( 'script_loader_tag', [ $this, 'add_module_type' ], 10, 3 );
 
-		$current_page = isset( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : 'animicro'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page routing
-		$page         = ( 'animicro-license' === $current_page ) ? 'license' : 'modules';
-
-		$is_pro_plugin = Animicro::is_pro_plugin();
-		$is_premium    = false;
-		$license_key   = '';
-
-		if ( $is_pro_plugin && class_exists( 'Animicro_License_Manager' ) ) {
-			$license_manager = new Animicro_License_Manager();
-			$is_premium      = Animicro_License_Manager::is_premium();
-			$license_key     = $license_manager->get_license_key();
-		}
-
 		$data = wp_json_encode( [
 			'restUrl'    => esc_url_raw( rest_url( 'animicro/v1/' ) ),
 			'nonce'      => wp_create_nonce( 'wp_rest' ),
 			'settings'   => Animicro::get_settings(),
 			'version'    => ANIMICRO_VERSION,
 			'builders'   => Animicro_Compatibility::get_available_builders(),
-			'isPremium'  => $is_premium,
-			'licenseKey' => $license_key,
-			'page'       => $page,
-			'proPlugin'  => $is_pro_plugin,
-			'upgradeUrl' => $is_pro_plugin
-				? admin_url( 'admin.php?page=animicro-license' )
-				: 'https://animicro.com/',
+			'upgradeUrl' => 'https://animicro.com/',
 		] );
 
 		wp_add_inline_script( 'animicro-admin', "window.animicroData = {$data};", 'before' );
@@ -223,31 +172,6 @@ class Animicro_Admin {
 				'permission_callback' => [ $this, 'check_permission' ],
 			],
 		] );
-
-		if ( Animicro::is_pro_plugin() ) {
-			register_rest_route( 'animicro/v1', '/license/status', [
-				[
-					'methods'             => 'GET',
-					'callback'            => [ $this, 'get_license_status' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-				],
-			] );
-
-			register_rest_route( 'animicro/v1', '/license/save', [
-				[
-					'methods'             => 'POST',
-					'callback'            => [ $this, 'save_license' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-					'args'                => [
-						'license_key' => [
-							'required'          => false,
-							'type'              => 'string',
-							'sanitize_callback' => 'sanitize_text_field',
-						],
-					],
-				],
-			] );
-		}
 	}
 
 	public function check_permission(): bool {
@@ -266,23 +190,6 @@ class Animicro_Admin {
 		$clean['active_modules'] = isset( $raw['active_modules'] ) && is_array( $raw['active_modules'] )
 			? array_map( 'sanitize_text_field', $raw['active_modules'] )
 			: $defaults['active_modules'];
-
-		if ( Animicro::is_pro_plugin() ) {
-			$is_premium = class_exists( 'Animicro_License_Manager' ) && Animicro_License_Manager::is_premium();
-		} else {
-			$is_premium = false;
-		}
-
-		if ( ! $is_premium ) {
-			$clean['active_modules'] = array_values(
-				array_filter(
-					$clean['active_modules'],
-					function ( $m ) {
-						return ! Animicro::is_pro_module( $m );
-					}
-				)
-			);
-		}
 
 		$clean['active_builders'] = isset( $raw['active_builders'] ) && is_array( $raw['active_builders'] )
 			? array_values( array_map( 'sanitize_text_field', $raw['active_builders'] ) )
@@ -310,38 +217,14 @@ class Animicro_Admin {
 			if ( isset( $module_defaults['scale'] ) ) {
 				$entry['scale'] = isset( $raw_mod['scale'] ) ? (float) $raw_mod['scale'] : $module_defaults['scale'];
 			}
-			if ( isset( $module_defaults['blur'] ) ) {
-				$entry['blur'] = isset( $raw_mod['blur'] ) ? (float) $raw_mod['blur'] : $module_defaults['blur'];
-			}
-			if ( isset( $module_defaults['staggerDelay'] ) ) {
-				$entry['staggerDelay'] = isset( $raw_mod['staggerDelay'] ) ? (float) $raw_mod['staggerDelay'] : $module_defaults['staggerDelay'];
-			}
 			if ( isset( $module_defaults['typingSpeed'] ) ) {
 				$entry['typingSpeed'] = isset( $raw_mod['typingSpeed'] ) ? (float) $raw_mod['typingSpeed'] : $module_defaults['typingSpeed'];
-			}
-			if ( isset( $module_defaults['speed'] ) ) {
-				$entry['speed'] = isset( $raw_mod['speed'] ) ? (float) $raw_mod['speed'] : $module_defaults['speed'];
-			}
-			if ( isset( $module_defaults['origin'] ) ) {
-				$entry['origin'] = isset( $raw_mod['origin'] ) ? sanitize_text_field( $raw_mod['origin'] ) : $module_defaults['origin'];
 			}
 			if ( isset( $module_defaults['highlightColor'] ) ) {
 				$entry['highlightColor'] = isset( $raw_mod['highlightColor'] ) ? sanitize_text_field( $raw_mod['highlightColor'] ) : $module_defaults['highlightColor'];
 			}
 			if ( isset( $module_defaults['highlightDirection'] ) ) {
 				$entry['highlightDirection'] = isset( $raw_mod['highlightDirection'] ) ? sanitize_text_field( $raw_mod['highlightDirection'] ) : $module_defaults['highlightDirection'];
-			}
-			if ( isset( $module_defaults['colorBase'] ) ) {
-				$entry['colorBase'] = isset( $raw_mod['colorBase'] ) ? sanitize_text_field( $raw_mod['colorBase'] ) : $module_defaults['colorBase'];
-			}
-			if ( isset( $module_defaults['colorFill'] ) ) {
-				$entry['colorFill'] = isset( $raw_mod['colorFill'] ) ? sanitize_text_field( $raw_mod['colorFill'] ) : $module_defaults['colorFill'];
-			}
-			if ( isset( $module_defaults['scrollStart'] ) ) {
-				$entry['scrollStart'] = isset( $raw_mod['scrollStart'] ) ? (int) $raw_mod['scrollStart'] : $module_defaults['scrollStart'];
-			}
-			if ( isset( $module_defaults['scrollEnd'] ) ) {
-				$entry['scrollEnd'] = isset( $raw_mod['scrollEnd'] ) ? (int) $raw_mod['scrollEnd'] : $module_defaults['scrollEnd'];
 			}
 
 			$clean_module_settings[ $module_id ] = $entry;
@@ -364,18 +247,6 @@ class Animicro_Admin {
 
 		$clean['module_settings'] = $clean_module_settings;
 
-		$default_smooth = $defaults['smooth_scroll'] ?? [];
-		$raw_smooth     = isset( $raw['smooth_scroll'] ) && is_array( $raw['smooth_scroll'] ) ? $raw['smooth_scroll'] : [];
-
-		$clean['smooth_scroll'] = [
-			'enabled'         => isset( $raw_smooth['enabled'] )         ? (bool) $raw_smooth['enabled']              : ( $default_smooth['enabled'] ?? false ),
-			'lerp'            => isset( $raw_smooth['lerp'] )            ? (float) $raw_smooth['lerp']                : ( $default_smooth['lerp'] ?? 0.1 ),
-			'duration'        => isset( $raw_smooth['duration'] )        ? (float) $raw_smooth['duration']            : ( $default_smooth['duration'] ?? 1.2 ),
-			'smoothWheel'     => isset( $raw_smooth['smoothWheel'] )     ? (bool) $raw_smooth['smoothWheel']          : ( $default_smooth['smoothWheel'] ?? true ),
-			'wheelMultiplier' => isset( $raw_smooth['wheelMultiplier'] ) ? (float) $raw_smooth['wheelMultiplier']     : ( $default_smooth['wheelMultiplier'] ?? 1.0 ),
-			'anchors'         => isset( $raw_smooth['anchors'] )         ? (bool) $raw_smooth['anchors']              : ( $default_smooth['anchors'] ?? true ),
-		];
-
 		$default_advanced = $defaults['advanced'] ?? [];
 		$raw_advanced     = isset( $raw['advanced'] ) && is_array( $raw['advanced'] ) ? $raw['advanced'] : [];
 
@@ -387,50 +258,6 @@ class Animicro_Admin {
 		update_option( 'animicro_settings', $clean );
 
 		return new \WP_REST_Response( $clean, 200 );
-	}
-
-	public function get_license_status(): \WP_REST_Response {
-		$license_manager = new Animicro_License_Manager();
-
-		return new \WP_REST_Response( [
-			'license_key'  => $license_manager->get_license_key(),
-			'license_data' => $license_manager->get_license_data(),
-			'is_premium'   => Animicro_License_Manager::is_premium(),
-			'plan'         => $license_manager->get_license_plan(),
-		], 200 );
-	}
-
-	public function save_license( \WP_REST_Request $request ): \WP_REST_Response {
-		$license_key     = $request->get_param( 'license_key' ) ?? '';
-		$license_manager = new Animicro_License_Manager();
-
-		$license_manager->save_license_key( $license_key );
-
-		if ( ! empty( $license_key ) ) {
-			$result = $license_manager->validate_license( $license_key, true );
-
-			if ( isset( $result['valid'] ) && $result['valid'] ) {
-				Animicro_License_Manager::activate_premium();
-			} else {
-				Animicro_License_Manager::deactivate_premium();
-			}
-
-			return new \WP_REST_Response( [
-				'success'    => true,
-				'is_premium' => isset( $result['valid'] ) && $result['valid'],
-				'data'       => $result,
-				'message'    => $license_manager->get_error_message( $result['reason'] ?? 'server_error' ),
-			], 200 );
-		}
-
-		Animicro_License_Manager::deactivate_premium();
-
-		return new \WP_REST_Response( [
-			'success'    => true,
-			'is_premium' => false,
-			'data'       => [ 'valid' => false, 'reason' => 'no_license', 'plan' => null ],
-			'message'    => $license_manager->get_error_message( 'no_license' ),
-		], 200 );
 	}
 
 	private function read_manifest( string $relative_path ): ?array {

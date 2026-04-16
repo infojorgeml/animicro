@@ -1,11 +1,10 @@
 import { useState, useCallback, useRef } from 'react';
-import type { AnimicroSettings, ModuleConfig, SmoothScrollConfig, AdvancedConfig } from '../types';
+import type { AnimicroSettings, ModuleConfig, AdvancedConfig } from '../types';
 
 interface UseSettingsReturn {
   settings: AnimicroSettings;
   updateSettings: (partial: Partial<AnimicroSettings>) => void;
   updateModuleSettings: (moduleId: string, partial: Partial<ModuleConfig>) => void;
-  updateSmoothScroll: <K extends keyof SmoothScrollConfig>(key: K, value: SmoothScrollConfig[K]) => void;
   updateAdvanced: <K extends keyof AdvancedConfig>(key: K, value: AdvancedConfig[K]) => void;
   toggleModule: (moduleId: string) => void;
   toggleBuilder: (builderId: string) => void;
@@ -37,18 +36,6 @@ export function useSettings(): UseSettingsReturn {
           ...prev.module_settings[moduleId],
           ...partial,
         },
-      },
-    }));
-    setIsDirty(true);
-    setSaveMessage('');
-  }, []);
-
-  const updateSmoothScroll = useCallback(<K extends keyof SmoothScrollConfig>(key: K, value: SmoothScrollConfig[K]) => {
-    setSettings(prev => ({
-      ...prev,
-      smooth_scroll: {
-        ...prev.smooth_scroll,
-        [key]: value,
       },
     }));
     setIsDirty(true);
@@ -105,7 +92,6 @@ export function useSettings(): UseSettingsReturn {
           active_modules:  settings.active_modules,
           active_builders: settings.active_builders,
           module_settings: settings.module_settings,
-          smooth_scroll:   settings.smooth_scroll,
           advanced:        settings.advanced,
         }),
       });
@@ -128,5 +114,5 @@ export function useSettings(): UseSettingsReturn {
     }
   }, [settings]);
 
-  return { settings, updateSettings, updateModuleSettings, updateSmoothScroll, updateAdvanced, toggleModule, toggleBuilder, save, isDirty, isSaving, saveMessage };
+  return { settings, updateSettings, updateModuleSettings, updateAdvanced, toggleModule, toggleBuilder, save, isDirty, isSaving, saveMessage };
 }

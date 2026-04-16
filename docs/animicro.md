@@ -1,6 +1,6 @@
 # Animicro — Development Reference
 
-**Release:** 1.2.0 (2026-04-13). See CHANGELOG for history.
+**Release:** 1.3.0 (2026-04-16). See CHANGELOG for history.
 
 Utility-first micro-animations for WordPress powered by [Motion One](https://motion.dev/). This document describes the architecture and conventions for developers and AI assistants.
 
@@ -18,7 +18,7 @@ Utility-first micro-animations for WordPress powered by [Motion One](https://mot
 | Backend | PHP 7.4+ OOP |
 | Admin UI | React 19, TypeScript, Tailwind CSS, Vite |
 | Frontend | Vanilla JS (ES Modules), CSS, Vite |
-| Animation | Motion One (~3.8kb); optional Lenis (smooth scroll, Pro, separate chunk) |
+| Animation | Motion One (~3.8kb). Smooth scroll (Lenis) exists only in the Pro product line, not in the WordPress.org free package. |
 | Build | Vite multi-entry (admin + frontend), `manifest.json` for dynamic enqueue |
 
 ## Folder Structure

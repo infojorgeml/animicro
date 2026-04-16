@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -66,6 +66,12 @@ locally in the visitor's browser using JavaScript bundled with the plugin.
 
 No data is collected, transmitted, or stored outside your WordPress installation.
 
+== Source Code ==
+
+This plugin includes compiled JavaScript and CSS built with Vite from React (admin panel) and vanilla JS (frontend animations). The full, uncompressed source code is available at:
+
+https://github.com/infojorgeml/animicro
+
 == Screenshots ==
 
 1. Module dashboard with toggle switches and settings
@@ -73,6 +79,12 @@ No data is collected, transmitted, or stored outside your WordPress installation
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.3.0 =
+* WordPress.org compliance: free package contains only free functionality (no gated Pro code in the distributed plugin)
+* Removed automatic deactivation of other plugins
+* readme.txt: Source Code section linking to GitHub for full uncompressed sources
+* Release ZIPs use versioned filenames (animicro-X.Y.Z.zip)
 
 = 1.2.0 =
 * Highlight and Typewriter modules moved to the Free tier — available to all users without a Pro license
@@ -82,10 +94,9 @@ No data is collected, transmitted, or stored outside your WordPress installation
 * Minor internal hardening of script type injection
 
 = 1.1.0 =
-* Freemium architecture: free plugin ships without any license code, Supabase calls, or premium gating at the PHP level
-* New `ANIMICRO_PRO` constant controls pro/free behaviour at build time
-* Pro module cards now link to animicro.com for upgrade instead of an internal license page
-* Added `scripts/build.sh` to generate both free and pro ZIPs from a single source
+* Architecture improvements: free plugin ships without any license code or premium gating
+* Module cards link to animicro.com for upgrade information
+* Build tooling improvements
 
 = 1.0.3 =
 * Freemium architecture: free version fully functional without license checks
@@ -96,11 +107,14 @@ No data is collected, transmitted, or stored outside your WordPress installation
 
 == Upgrade Notice ==
 
+= 1.3.0 =
+Compliance and packaging update for the WordPress.org directory. No breaking changes for free users.
+
 = 1.2.0 =
 Free users gain two new modules: Highlight and Typewriter. No breaking changes.
 
 = 1.1.0 =
-No breaking changes. Free users get the same 4 core modules. All premium code has been moved out of the free package.
+No breaking changes. Free users get the same core modules.
 
 = 1.0.3 =
 Freemium restructure. No breaking changes for free users.

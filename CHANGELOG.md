@@ -5,6 +5,20 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-04-16
+
+### Changed (WordPress.org directory compliance)
+
+- **Free plugin is 100% free code** — Removed Pro-only modules, smooth scroll, license UI, and premium gating from the free distribution. No trialware / hidden Pro code in the shipped free package.
+- **No automatic deactivation of other plugins** — Removed `deactivate_plugins()` on activation (forbidden by plugin directory guidelines).
+- **`readme.txt`** — Added `== Source Code ==` with link to the public GitHub repository for reviewers (minified bundles + human-readable source).
+- **`README.md` (bundled)** — Aligned with the free tier only (module list and docs).
+- **Build output** — Free ZIP is named `animicro-X.Y.Z.zip` alongside `animicro-pro-X.Y.Z.zip` (see `scripts/build.sh`).
+
+### Removed (free build)
+
+- Lenis / smooth-scroll chunk from the free frontend bundle; Pro-only animation modules and their JS from the free tree.
+
 ## [1.2.0] - 2026-04-13
 
 ### Added
