@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.3.0
+Stable tag: 1.6.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -80,6 +80,24 @@ https://github.com/infojorgeml/animicro
 
 == Changelog ==
 
+= 1.6.0 =
+* Highlight: fixed delay bug where a stray `data-am-delay` attribute on the page could produce absurdly long delays (e.g. 20 s). Delay and duration are now clamped in JS. Marker moved from `::after` to `::before` with `display: inline-block` for accurate width tracking inside all builders. Double-init guard added.
+* Typewriter: now respects `prefers-reduced-motion` (shows full text immediately with no animation). Cursor CSS moved out of runtime style injection into the stylesheet. New `data-am-cursor` attribute for a custom cursor character. Double-init guard added.
+* Admin: color pickers for Highlight and Text Fill on Scroll now support opacity (alpha slider + 8-char hex) and CSS variable tokens such as `var(--brand-100)`.
+
+= 1.5.0 =
+* No user-facing changes in the free tier. Internal restructuring to align the free and Pro codebases.
+
+= 1.4.0 =
+* Security: REST API settings endpoint now verifies nonce on write requests (CSRF hardening)
+* Security: Numeric animation settings (duration, delay, distance, scale, typingSpeed) clamped to safe ranges
+* Security: margin setting validated against CSS shorthand whitelist
+* Security: Module IDs validated as CSS-safe identifiers before CSS injection
+* Performance: admin menu SVG icon pre-encoded as constant (eliminates runtime base64 computation)
+* Performance: animicro_settings option now stored with autoload=false
+* Reliability: manifest read failures now logged to PHP error log when WP_DEBUG is enabled
+* Filter: animicro_upgrade_url filter added for white-label customisation
+
 = 1.3.0 =
 * WordPress.org compliance: free package contains only free functionality (no gated Pro code in the distributed plugin)
 * Removed automatic deactivation of other plugins
@@ -106,6 +124,15 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.6.0 =
+Bug fix for Highlight delay and Typewriter reduced-motion support. Recommended update.
+
+= 1.5.0 =
+Internal restructuring only. No breaking changes for free users.
+
+= 1.4.0 =
+Security and performance hardening. Recommended update for all users.
 
 = 1.3.0 =
 Compliance and packaging update for the WordPress.org directory. No breaking changes for free users.

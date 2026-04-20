@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Animicro pre-push hook: rebuild both free + pro release ZIPs before push.
+# Configure once with: git config core.hooksPath .githooks  (handled by npm postinstall)
+
+set -e
+
+ROOT="$(git rev-parse --show-toplevel)"
+
+if [[ ! -f "$ROOT/.env.build" ]]; then
+    echo "✗ pre-push: .env.build is missing — cannot build Pro ZIP."
+    echo "  Create $ROOT/.env.build with ANIMICRO_SUPABASE_ANON_KEY=..."
+    exit 1
+fi
+
+echo "==> pre-push: rebuilding Animicro release ZIPs..."
+bash "$ROOT/scripts/build.sh"
+
+if ! git diff --quiet release/ 2>/dev/null; then
+    echo ""
+    echo "⚠  release/ changed during build. Commit or stash the new ZIPs if you want them tracked."
+fi
+
+exit 0

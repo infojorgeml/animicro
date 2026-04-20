@@ -12,7 +12,7 @@ class Animicro_License_Manager {
 
 	private string $api_url = 'https://uhnaedqfygrqdptjngqb.supabase.co/functions/v1/license-check';
 
-	private string $supabase_anon_key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVobmFlZHFmeWdycWRwdGpuZ3FiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MDE2NjQsImV4cCI6MjA3ODI3NzY2NH0.USJDoMqD-B9rYYb4EHUnpwI99QHqJpty3IJLO8Kh7uM';
+	private string $supabase_anon_key = '__ANIMICRO_SUPABASE_ANON_KEY__';
 
 	private string $product_slug = 'animicro';
 
@@ -29,16 +29,60 @@ class Animicro_License_Manager {
 	}
 
 	public function get_license_key(): string {
-		return (string) get_option( $this->option_name, '' );
+		$stored = (string) get_option( $this->option_name, '' );
+		if ( '' === $stored ) {
+			return '';
+		}
+
+		$decrypted = $this->decrypt( $stored );
+		if ( '' !== $decrypted ) {
+			return $decrypted;
+		}
+
+		// Legacy plaintext value — migrate to encrypted at rest.
+		update_option( $this->option_name, $this->encrypt( $stored ) );
+		return $stored;
 	}
 
 	public function save_license_key( string $license_key ): void {
 		$sanitized = sanitize_text_field( $license_key );
-		update_option( $this->option_name, $sanitized );
+		update_option( $this->option_name, $this->encrypt( $sanitized ) );
 
 		delete_option( $this->license_data_option );
 		delete_transient( 'animicro_license_check' );
 		delete_transient( 'animicro_license_last_check' );
+	}
+
+	private function encryption_key(): string {
+		$secret  = defined( 'AUTH_KEY' ) ? AUTH_KEY : '';
+		$secret .= defined( 'SECURE_AUTH_KEY' ) ? SECURE_AUTH_KEY : '';
+		return hash( 'sha256', '' !== $secret ? $secret : 'animicro-fallback', true );
+	}
+
+	private function encrypt( string $plain ): string {
+		if ( '' === $plain ) {
+			return '';
+		}
+		$iv     = random_bytes( 16 );
+		$cipher = openssl_encrypt( $plain, 'AES-256-CBC', $this->encryption_key(), OPENSSL_RAW_DATA, $iv );
+		if ( false === $cipher ) {
+			return '';
+		}
+		return base64_encode( $iv . $cipher );
+	}
+
+	private function decrypt( string $stored ): string {
+		if ( '' === $stored ) {
+			return '';
+		}
+		$raw = base64_decode( $stored, true );
+		if ( false === $raw || strlen( $raw ) < 17 ) {
+			return '';
+		}
+		$iv     = substr( $raw, 0, 16 );
+		$cipher = substr( $raw, 16 );
+		$plain  = openssl_decrypt( $cipher, 'AES-256-CBC', $this->encryption_key(), OPENSSL_RAW_DATA, $iv );
+		return is_string( $plain ) ? $plain : '';
 	}
 
 	public function validate_license( ?string $license_key = null, bool $force = false ): array {
@@ -259,4 +303,16 @@ class Animicro_License_Manager {
 	public static function deactivate_premium(): bool {
 		return (bool) update_option( self::OPTION_NAME, false );
 	}
+
+	public static function register_hooks(): void {
+		add_action( 'update_option_siteurl', [ __CLASS__, 'on_domain_change' ] );
+		add_action( 'update_option_home', [ __CLASS__, 'on_domain_change' ] );
+	}
+
+	public static function on_domain_change(): void {
+		delete_transient( 'animicro_license_check' );
+		delete_transient( 'animicro_license_last_check' );
+	}
 }
+
+Animicro_License_Manager::register_hooks();

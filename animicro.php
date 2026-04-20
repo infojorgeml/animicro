@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Animicro
  * Description:       Utility-first animations for WordPress. Simple CSS classes, extreme performance.
- * Version:           1.3.0
+ * Version:           1.6.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Contributors:      jorgemml
@@ -18,10 +18,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ANIMICRO_VERSION', '1.3.0' );
+define( 'ANIMICRO_VERSION', '1.6.0' );
 define( 'ANIMICRO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ANIMICRO_URL', plugin_dir_url( __FILE__ ) );
 define( 'ANIMICRO_BASENAME', plugin_basename( __FILE__ ) );
+
+if ( ! defined( 'ANIMICRO_PRO' ) ) {
+	define( 'ANIMICRO_PRO', false );
+}
 
 /**
  * PHP version check.

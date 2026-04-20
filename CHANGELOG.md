@@ -5,6 +5,50 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-04-20
+
+### Improved
+
+- **Highlight module overhauled** — Fixed `--am-hl-delay` inheriting stray `data-am-delay` values from the page (e.g. `20s`). `duration` and `delay` are now clamped at the JS layer to `[0, 10]` matching PHP sanitization. Direction (`highlightDirection`) is now validated against the allowed list (`left`, `right`, `center`); anything else falls back to `left`. Switched marker from `::after` to `::before` with `display: inline-block` so the highlight width tracks the actual text box correctly in all builders. `pointer-events: none` prevents the marker from blocking clicks on links inside highlighted text. Guard against double-init added (`data-am-highlight-ready`). Child nodes are now moved (not `innerHTML`-cloned) to preserve nested event listeners.
+- **Typewriter module overhauled** — Respects `prefers-reduced-motion: reduce` (shows full text immediately, no cursor). `typingSpeed` and `delay` clamped at JS layer. Single text node updated in-place per tick instead of appending one text node per character. Cursor element removed from the DOM after fade-out. Guard against double-init added (`data-am-typewriter-ready`). Cursor blink CSS moved from runtime `<style>` injection to `style.css` (CSP-friendly). New `data-am-cursor` attribute lets you set a custom cursor character per element (e.g. `▍`, `_`, `data-am-cursor="_"`). `el._amTypewriterCancel()` exposes a canceller handle.
+- **Color picker for Highlight, Text Fill on Scroll** — Native swatch + opacity slider (0–100 %) + free-text input in the admin. Accepts `#rrggbbaa` hex with alpha, `rgba()`, `hsla()`, and CSS variable tokens (`var(--brand-100)`). Opacity slider is automatically disabled when the value already carries its own alpha. Checkerboard background visible under transparent colors.
+
+## [1.5.0] - 2026-04-17
+
+### Added
+
+- **Pro tier restored** — 9 Pro modules re-enabled (Blur, Stagger, Grid Reveal, Text Fill on Scroll, Parallax, Split Text, Text Reveal, Slide Right, Slide Left), plus Smooth Scroll and the Cheat Sheet reference panel. The free build on WP.org is unchanged.
+- **`ANIMICRO_PRO` build flag** — Source now defines `ANIMICRO_PRO` (default `false`). `scripts/build.sh` flips it to `true` for the Pro ZIP and strips the license manager from the free ZIP. Local dev sites can force Pro by setting `define('ANIMICRO_PRO', true)` in `wp-config.php`.
+- **Pre-push build hook** (`.githooks/pre-push`) — Rebuilds both ZIPs on every `git push`. Enabled automatically via `npm install` (`core.hooksPath = .githooks`).
+- **`npm run release:wp`** — `scripts/release-wp.sh` rebuilds and rsyncs the free build into the WP.org SVN trunk; prints the final `svn ci` commands rather than running them (releases stay under manual control).
+
+### Notes
+
+- The free build on WP.org remains functionally identical to 1.4.0 for end users.
+
+## [1.4.0] - 2026-04-17
+
+### Security
+
+- **REST API CSRF hardening** — `POST /animicro/v1/settings` now verifies the `X-WP-Nonce` header before processing writes. `GET` remains unauthenticated-nonce (read-only, gated by capability).
+- **Numeric settings clamped** — `duration` and `delay` clamped to `[0, 10]`; `distance` to `[-500, 500]`; `scale` to `[0, 3]`; `typingSpeed` to `[10, 500]`. Rejects non-numeric input.
+- **CSS class injection hardened** — Module IDs in `get_editor_css()` now validated with `[a-z0-9-]+` regex before being interpolated into CSS selectors.
+- **`margin` whitelist** — `rootMargin` values validated against CSS shorthand pattern (1–4 values, valid units only); falls back to module default on invalid input.
+- **Supabase anon key removed from source** (Pro) — Key is now injected at build time via `ANIMICRO_SUPABASE_ANON_KEY` env var / `.env.build`. Placeholder `__ANIMICRO_SUPABASE_ANON_KEY__` ships in source.
+- **License key encrypted at rest** (Pro) — AES-256-CBC encryption using `AUTH_KEY` + `SECURE_AUTH_KEY` from `wp-config.php`. Legacy plaintext keys auto-migrated on next save.
+- **License cache invalidated on domain change** (Pro) — Hooks `update_option_siteurl` and `update_option_home` clear license transients immediately on URL change.
+- **Uninstall cleanup** — `uninstall.php` now removes all plugin data: `animicro_license_key`, `animicro_license_data`, `animicro_premium_active`, and both license transients.
+
+### Performance
+
+- **`animicro_settings` autoload disabled** — Option stored with `autoload=false`; existing installs migrated on next activation.
+- **Admin menu icon pre-encoded** — SVG base64 string stored as class constant; eliminates `base64_encode()` call on every `admin_menu` hook.
+
+### Developer
+
+- **`animicro_upgrade_url` filter** — Upgrade link URL is now filterable for white-label or partner deployments.
+- **Manifest error logging** — Failed manifest reads in admin and frontend now emit `error_log` entries when `WP_DEBUG` is enabled.
+
 ## [1.3.0] - 2026-04-16
 
 ### Changed (WordPress.org directory compliance)

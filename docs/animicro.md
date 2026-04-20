@@ -1,6 +1,6 @@
 # Animicro — Development Reference
 
-**Release:** 1.3.0 (2026-04-16). See CHANGELOG for history.
+**Release:** 1.6.0 (2026-04-20). See CHANGELOG for history.
 
 Utility-first micro-animations for WordPress powered by [Motion One](https://motion.dev/). This document describes the architecture and conventions for developers and AI assistants.
 
@@ -115,11 +115,12 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 | `data-am-stagger` | float (s) | 0.05–0.1 | stagger, split, text-reveal, grid-reveal |
 | `data-am-speed` | float | 0.5 | parallax |
 | `data-am-typing-speed` | float (s) | 0.06 | typewriter |
+| `data-am-cursor` | string | `\|` | typewriter — custom cursor char, e.g. `▍` or `_` |
 | `data-am-origin` | string | center | grid-reveal only — `center`, corners, `top`/`right`/`bottom`/`left`, or `random` (on container) |
-| `data-am-highlight-color` | string (hex) | #fde68a | highlight |
+| `data-am-highlight-color` | hex / rgba / var(--…) | #fde68a | highlight |
 | `data-am-highlight-direction` | string | left | highlight — `left`, `right`, `center` |
-| `data-am-color-base` | string (hex) | #cccccc | text-fill-scroll |
-| `data-am-color-fill` | string (hex) | #000000 | text-fill-scroll |
+| `data-am-color-base` | hex / rgba / var(--…) | #cccccc | text-fill-scroll |
+| `data-am-color-fill` | hex / rgba / var(--…) | #000000 | text-fill-scroll |
 | `data-am-scroll-start` | int (%) | 62 | text-fill-scroll — scroll offset start |
 | `data-am-scroll-end` | int (%) | 60 | text-fill-scroll — scroll offset end |
 
@@ -130,8 +131,21 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 
 ## Highlight (typography)
 
-- **Class**: `.am-highlight` on a text element. The script wraps content in `.am-highlight-inner`; a `::after` pseudo-element animates `scaleX` via CSS transition when the element enters the viewport (`inView`).
-- **Config**: `highlightColor`, `highlightDirection` (maps to `transform-origin`); `data-am-highlight-color` and `data-am-highlight-direction` on the same element as the class.
+- **Class**: `.am-highlight` on a text element. The script wraps content in `.am-highlight-inner`; a `::before` pseudo-element animates `scaleX` via CSS transition when the element enters the viewport (`inView`).
+- **Config**: `highlightColor` (accepts hex, `rgba()`, `hsla()`, `var(--token)`), `highlightDirection` (`left` / `right` / `center`, maps to `transform-origin`); `data-am-highlight-color` and `data-am-highlight-direction` per-element overrides.
+- **Alpha support**: the admin color picker accepts 8-char hex (`#fde68a80`), `rgba(…)`, and CSS variable tokens. The opacity slider is active for hex values; for `rgba()` or `var()` it is disabled because those carry their own alpha.
+- **Double-init guard**: `data-am-highlight-ready="1"` prevents re-wrapping on HMR or repeated `init()` calls.
+- **Note**: values of `duration` and `delay` coming from `data-am-*` attributes are clamped to `[0, 10]` at JS level, matching the PHP sanitizer.
+
+## Typewriter (text)
+
+- **Class**: `.am-typewriter` on any text element. The script reads `textContent`, clears the element, then types characters back one-by-one via a single updating text node followed by a blinking cursor span.
+- **Config**: `typingSpeed` (seconds per character, default `0.06`), `delay` (start delay in seconds), `margin` (IntersectionObserver root margin).
+- **Custom cursor**: add `data-am-cursor="▍"` to change the cursor character. Default: `|`.
+- **Reduced motion**: when `prefers-reduced-motion: reduce` is set, the full text is shown immediately with no cursor and no animation.
+- **Accessibility**: `aria-label` is set to the full text before the element is emptied, so screen readers announce the complete string.
+- **Double-init guard**: `data-am-typewriter-ready="1"` prevents re-running on HMR or repeated calls.
+- **Note**: `typingSpeed` and `delay` from `data-am-*` are clamped to their safe ranges at the JS layer.
 
 ## Grid Reveal (spatial group)
 

@@ -23,12 +23,80 @@ export const DEFAULT_SLIDE_DOWN_CONFIG: ModuleConfig = {
   distance: 30,
 };
 
+export const DEFAULT_SLIDE_RIGHT_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  distance: 30,
+};
+
+export const DEFAULT_SLIDE_LEFT_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  distance: 30,
+};
+
 export const DEFAULT_SCALE_CONFIG: ModuleConfig = {
   duration: 0.6,
   easing: 'ease-out',
   delay: 0,
   margin: '-50px 0px',
   scale: 0.95,
+};
+
+export const DEFAULT_BLUR_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  blur: 4,
+};
+
+export const DEFAULT_SPLIT_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  staggerDelay: 0.05,
+  distance: 15,
+};
+
+export const DEFAULT_TEXT_REVEAL_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  staggerDelay: 0.12,
+};
+
+export const DEFAULT_TYPEWRITER_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  typingSpeed: 0.06,
+};
+
+export const DEFAULT_STAGGER_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  staggerDelay: 0.1,
+  distance: 20,
+};
+
+export const DEFAULT_GRID_REVEAL_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  staggerDelay: 0.08,
+  distance: 20,
+  origin: 'center',
 };
 
 export const DEFAULT_HIGHLIGHT_CONFIG: ModuleConfig = {
@@ -40,36 +108,66 @@ export const DEFAULT_HIGHLIGHT_CONFIG: ModuleConfig = {
   highlightDirection: 'left',
 };
 
-export const DEFAULT_TYPEWRITER_CONFIG: ModuleConfig = {
+export const DEFAULT_TEXT_FILL_SCROLL_CONFIG: ModuleConfig = {
   duration: 0.6,
-  easing: 'ease-out',
+  easing: 'linear',
   delay: 0,
   margin: '-50px 0px',
-  typingSpeed: 0.06,
+  colorBase: '#cccccc',
+  colorFill: '#000000',
+  scrollStart: 62,
+  scrollEnd: 60,
 };
 
-export type ModuleCategory = 'entry' | 'text';
+export const DEFAULT_PARALLAX_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'linear',
+  delay: 0,
+  margin: '-50px 0px',
+  speed: 0.5,
+};
+
+export type ModuleCategory = 'entry' | 'text' | 'group' | 'scroll';
 
 export interface ModuleInfo {
   id: string;
   name: string;
   description: string;
   cssClass: string;
+  isPro: boolean;
   category: ModuleCategory;
 }
 
 export const MODULE_CATEGORIES: { id: ModuleCategory; label: string; description: string }[] = [
   { id: 'entry',  label: 'Entry Animations',   description: 'Triggered once when the element enters the viewport' },
   { id: 'text',   label: 'Text',               description: 'Typography-specific animations' },
+  { id: 'group',  label: 'Groups & Layouts',   description: 'Animate containers and their children' },
+  { id: 'scroll', label: 'Scroll & Continuous', description: 'Scroll-linked animations' },
 ];
 
 export const MODULE_INFO: ModuleInfo[] = [
-  { id: 'fade',       name: 'Fade',       description: 'Smooth appearance with opacity',                            cssClass: '.am-fade',       category: 'entry' },
-  { id: 'scale',      name: 'Scale',      description: 'Scales from small to full size',                            cssClass: '.am-scale',      category: 'entry' },
-  { id: 'slide-up',   name: 'Slide Up',   description: 'Slides up when appearing',                                  cssClass: '.am-slide-up',   category: 'entry' },
-  { id: 'slide-down', name: 'Slide Down', description: 'Slides down when appearing',                                cssClass: '.am-slide-down', category: 'entry' },
-  { id: 'highlight',  name: 'Highlight',  description: 'Animated marker highlight behind text',                     cssClass: '.am-highlight',  category: 'text' },
-  { id: 'typewriter', name: 'Typewriter', description: 'Types text character by character with a blinking cursor',  cssClass: '.am-typewriter', category: 'text' },
+  // Entry Animations
+  { id: 'fade',        name: 'Fade',        description: 'Smooth appearance with opacity',            cssClass: '.am-fade',        isPro: false, category: 'entry' },
+  { id: 'scale',       name: 'Scale',       description: 'Scales from small to full size',            cssClass: '.am-scale',       isPro: false, category: 'entry' },
+  { id: 'slide-up',    name: 'Slide Up',    description: 'Slides up when appearing',                  cssClass: '.am-slide-up',    isPro: false, category: 'entry' },
+  { id: 'slide-down',  name: 'Slide Down',  description: 'Slides down when appearing',                cssClass: '.am-slide-down',  isPro: false, category: 'entry' },
+  { id: 'slide-right', name: 'Slide Right', description: 'Slides in from the left',                   cssClass: '.am-slide-right', isPro: true,  category: 'entry' },
+  { id: 'slide-left',  name: 'Slide Left',  description: 'Slides in from the right',                  cssClass: '.am-slide-left',  isPro: true,  category: 'entry' },
+  { id: 'blur',        name: 'Blur',        description: 'Blur that clears as it appears',            cssClass: '.am-blur',        isPro: true,  category: 'entry' },
+
+  // Text
+  { id: 'split',        name: 'Split Text',   description: 'Splits and animates text by letters/words', cssClass: '.am-split-chars .am-split-words', isPro: true, category: 'text' },
+  { id: 'text-reveal',  name: 'Text Reveal',  description: 'Reveals text line by line with a sliding mask', cssClass: '.am-text-reveal',  isPro: true, category: 'text' },
+  { id: 'highlight',    name: 'Highlight',    description: 'Animated marker highlight behind text',                    cssClass: '.am-highlight',  isPro: false, category: 'text' },
+  { id: 'typewriter',   name: 'Typewriter',   description: 'Types text character by character with a blinking cursor', cssClass: '.am-typewriter', isPro: false, category: 'text' },
+
+  // Groups & Layouts
+  { id: 'stagger',      name: 'Stagger',      description: 'Animates container children in sequence',   cssClass: '.am-stagger',      isPro: true, category: 'group' },
+  { id: 'grid-reveal',  name: 'Grid Reveal',  description: 'Spatial animation that reveals grid items from a focal point', cssClass: '.am-grid-reveal', isPro: true, category: 'group' },
+
+  // Scroll & Continuous
+  { id: 'text-fill-scroll', name: 'Text Fill on Scroll', description: 'Fills text word by word as user scrolls', cssClass: '.am-text-fill-scroll', isPro: true, category: 'scroll' },
+  { id: 'parallax',         name: 'Parallax',            description: 'Scroll-linked parallax movement',         cssClass: '.am-parallax',         isPro: true, category: 'scroll' },
 ];
 
 export interface DataAttribute {
@@ -80,15 +178,24 @@ export interface DataAttribute {
 }
 
 export const DATA_ATTRIBUTES: DataAttribute[] = [
-  { attribute: 'data-am-duration',            type: 'float (s)',        defaultValue: '0.6',       usedBy: 'All' },
-  { attribute: 'data-am-delay',               type: 'float (s)',        defaultValue: '0',         usedBy: 'All' },
-  { attribute: 'data-am-easing',              type: 'string',           defaultValue: 'ease-out',  usedBy: 'All' },
-  { attribute: 'data-am-margin',              type: 'string',           defaultValue: '-50px 0px', usedBy: 'All' },
-  { attribute: 'data-am-distance',            type: 'float (px)',       defaultValue: '30',        usedBy: 'slide-up, slide-down' },
-  { attribute: 'data-am-scale',               type: 'float',            defaultValue: '0.95',      usedBy: 'scale' },
-  { attribute: 'data-am-typing-speed',        type: 'float (s)',        defaultValue: '0.06',      usedBy: 'typewriter' },
-  { attribute: 'data-am-highlight-color',     type: 'string (hex)',     defaultValue: '#fde68a',   usedBy: 'highlight' },
-  { attribute: 'data-am-highlight-direction', type: 'string',           defaultValue: 'left',      usedBy: 'highlight' },
+  { attribute: 'data-am-duration',  type: 'float (s)',     defaultValue: '0.6',       usedBy: 'All' },
+  { attribute: 'data-am-delay',     type: 'float (s)',     defaultValue: '0',         usedBy: 'All' },
+  { attribute: 'data-am-easing',    type: 'string',        defaultValue: 'ease-out',  usedBy: 'All' },
+  { attribute: 'data-am-margin',    type: 'string',        defaultValue: '-50px 0px', usedBy: 'All' },
+  { attribute: 'data-am-distance',  type: 'float (px)',    defaultValue: '30',        usedBy: 'slide-up, slide-down, slide-right, slide-left, split, stagger, grid-reveal' },
+  { attribute: 'data-am-scale',     type: 'float',         defaultValue: '0.95',      usedBy: 'scale' },
+  { attribute: 'data-am-blur',      type: 'float (px)',    defaultValue: '4',         usedBy: 'blur' },
+  { attribute: 'data-am-stagger',   type: 'float (s)',     defaultValue: '0.05',      usedBy: 'stagger, split, text-reveal, grid-reveal' },
+  { attribute: 'data-am-speed',     type: 'float',         defaultValue: '0.5',       usedBy: 'parallax' },
+  { attribute: 'data-am-typing-speed', type: 'float (s)',  defaultValue: '0.06',      usedBy: 'typewriter' },
+  { attribute: 'data-am-cursor',       type: 'string',      defaultValue: '|',         usedBy: 'typewriter' },
+  { attribute: 'data-am-origin',       type: 'string',      defaultValue: 'center',    usedBy: 'grid-reveal' },
+  { attribute: 'data-am-highlight-color',     type: 'hex / rgba / var(--…)', defaultValue: '#fde68a', usedBy: 'highlight' },
+  { attribute: 'data-am-highlight-direction', type: 'string',                defaultValue: 'left',    usedBy: 'highlight' },
+  { attribute: 'data-am-color-base',         type: 'hex / rgba / var(--…)', defaultValue: '#cccccc', usedBy: 'text-fill-scroll' },
+  { attribute: 'data-am-color-fill',         type: 'hex / rgba / var(--…)', defaultValue: '#000000', usedBy: 'text-fill-scroll' },
+  { attribute: 'data-am-scroll-start',       type: 'int (%)',      defaultValue: '62',      usedBy: 'text-fill-scroll' },
+  { attribute: 'data-am-scroll-end',         type: 'int (%)',      defaultValue: '60',      usedBy: 'text-fill-scroll' },
 ];
 
 export interface EasingOption {
@@ -100,7 +207,7 @@ export interface EasingOption {
 export const EASING_OPTIONS: EasingOption[] = [
   { value: 'ease-out',                       label: 'Ease Out',        description: 'Fast at start, slows at end — Recommended' },
   { value: 'ease-in-out',                    label: 'Ease In Out',     description: 'Smooth start and stop' },
-  { value: 'linear',                         label: 'Linear',          description: 'Constant speed' },
+  { value: 'linear',                         label: 'Linear',          description: 'Constant, ideal for parallax' },
   { value: 'cubic-bezier(0.25, 0.4, 0.25, 1)', label: 'Premium (Apple-like)', description: 'Smooth Apple-style curve' },
 ];
 

@@ -75,7 +75,10 @@ class Animicro_Compatibility {
 		$rules  = [];
 
 		foreach ( $active_modules as $module ) {
-			$module = sanitize_text_field( $module );
+			$module = is_string( $module ) ? strtolower( $module ) : '';
+			if ( ! preg_match( '/^[a-z0-9-]+$/', $module ) ) {
+				continue;
+			}
 
 			if ( 'stagger' === $module ) {
 				$stagger_css = self::MODULE_INITIAL_CSS['stagger'] ?? '';
