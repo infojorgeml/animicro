@@ -5,6 +5,21 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-04-23
+
+### Added
+
+- **New Free module: Skew Up (`.am-skew-up`)** — Entry animation that slides up (`y: [40, 0]`) combined with a starting vertical skew (`skewY: [5, 0]`) that straightens as the element settles. Stripe / Vercel-style. Supports the standard duration/delay/easing/margin/loop attributes plus new `data-am-distance` (default 40) and `data-am-skew` (default 5°, clamp -45..45).
+- **New admin category: Continuous (Infinite)** — Separates entry animations (one-shot on viewport-enter) from infinite loops. Added to `MODULE_CATEGORIES` between `entry` and `text`.
+- **New Free module: Float (`.am-float`)** — Infinite soft up/down floating motion driven by Motion One's `repeat: Infinity`. For 3D illustrations, icons, hero art. Attributes: `data-am-amplitude` (default 12 px, clamp 1..100) and `data-am-duration` (cycle length, default 3 s).
+- **New Free module: Pulse (`.am-pulse`)** — Infinite gentle scale pulse (`1 ↔ 1.05`). For badges, CTAs, WhatsApp-style buttons. Attributes: `data-am-scale-max` (default 1.05, clamp 1..2) and `data-am-duration` (cycle length, default 1.5 s).
+
+### Notes
+
+- Float and Pulse short-circuit under `prefers-reduced-motion: reduce` — they do not animate at all for visitors who opt out of motion. Skew Up inherits the global reduced-motion gate applied to entry animations.
+- Float and Pulse do not wrap in `inView()` — they begin animating on module init and continue until the page is unloaded.
+- PHP gating unchanged except for `FREE_MODULES` addition of `float`, `pulse`, `skew-up` and `available_modules` list in `class-animicro.php`. `PRO_MODULES` is unchanged.
+
 ## [1.9.0] - 2026-04-24
 
 ### Added

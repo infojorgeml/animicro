@@ -370,6 +370,15 @@ class Animicro_Admin {
 			if ( isset( $module_defaults['scrollEnd'] ) ) {
 				$entry['scrollEnd'] = (int) $this->clamp_float( $raw_mod['scrollEnd'] ?? null, 0, 100, (float) $module_defaults['scrollEnd'] );
 			}
+			if ( isset( $module_defaults['amplitude'] ) ) {
+				$entry['amplitude'] = $this->clamp_float( $raw_mod['amplitude'] ?? null, 1, 100, (float) $module_defaults['amplitude'] );
+			}
+			if ( isset( $module_defaults['scaleMax'] ) ) {
+				$entry['scaleMax'] = $this->clamp_float( $raw_mod['scaleMax'] ?? null, 1, 2, (float) $module_defaults['scaleMax'] );
+			}
+			if ( isset( $module_defaults['skew'] ) ) {
+				$entry['skew'] = $this->clamp_float( $raw_mod['skew'] ?? null, -45, 45, (float) $module_defaults['skew'] );
+			}
 
 			$clean_module_settings[ $module_id ] = $entry;
 		}

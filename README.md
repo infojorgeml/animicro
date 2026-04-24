@@ -4,7 +4,7 @@
 **Tags:** animation, motion, css, performance, page-builder
 **Requires at least:** 6.0
 **Tested up to:** 6.9
-**Stable tag:** 1.9.0
+**Stable tag:** 1.10.0
 **Requires PHP:** 7.4
 **License:** GPLv2 or later
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
@@ -41,6 +41,9 @@ Under **Animicro → Advanced** you can enable **Respect Reduced Motion** (skips
 | Slide Down | `.am-slide-down` | Slides down when appearing |
 | Slide Left | `.am-slide-left` | Slides in from the right |
 | Slide Right | `.am-slide-right` | Slides in from the left |
+| Skew Up | `.am-skew-up` | Slides up with a slight skew that straightens as it stops |
+| Float | `.am-float` | Infinite soft up/down floating motion (continuous) |
+| Pulse | `.am-pulse` | Infinite gentle scale pulse — breathing-like (continuous) |
 | Highlight | `.am-highlight` | Marker-style highlight behind text on entry |
 | Typewriter | `.am-typewriter` | Types text character by character with blinking cursor |
 
@@ -70,6 +73,9 @@ Use only one animation class per element. Do not combine `.am-fade` with `.am-sl
 | `data-am-margin` | string | -50px 0px | Activation margin (inView) |
 | `data-am-distance` | number (px) | 30 | Slide distance (slide-up, slide-down) |
 | `data-am-scale` | float | 0.95 | Starting scale (scale module) |
+| `data-am-amplitude` | float (px) | 12 | Peak vertical travel (float module) |
+| `data-am-scale-max` | float | 1.05 | Peak scale (pulse module) |
+| `data-am-skew` | float (deg) | 5 | Starting skew angle (skew-up module) |
 | `data-am-highlight-color` | string (hex) | #fde68a | Marker color (highlight module) |
 | `data-am-highlight-direction` | string | left | Sweep direction: `left`, `right`, or `center` (highlight module) |
 | `data-am-typing-speed` | float (s) | 0.06 | Delay per character (typewriter module) |

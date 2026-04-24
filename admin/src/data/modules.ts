@@ -133,7 +133,32 @@ export const DEFAULT_PARALLAX_CONFIG: ModuleConfig = {
   speed: 0.5,
 };
 
-export type ModuleCategory = 'entry' | 'text' | 'group' | 'scroll';
+export const DEFAULT_FLOAT_CONFIG: ModuleConfig = {
+  duration: 3,
+  easing: 'ease-in-out',
+  delay: 0,
+  margin: '-50px 0px',
+  amplitude: 12,
+};
+
+export const DEFAULT_PULSE_CONFIG: ModuleConfig = {
+  duration: 1.5,
+  easing: 'ease-in-out',
+  delay: 0,
+  margin: '-50px 0px',
+  scaleMax: 1.05,
+};
+
+export const DEFAULT_SKEW_UP_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  distance: 40,
+  skew: 5,
+};
+
+export type ModuleCategory = 'entry' | 'text' | 'group' | 'scroll' | 'continuous';
 
 export interface ModuleInfo {
   id: string;
@@ -145,10 +170,11 @@ export interface ModuleInfo {
 }
 
 export const MODULE_CATEGORIES: { id: ModuleCategory; label: string; description: string }[] = [
-  { id: 'entry',  label: 'Entry Animations',   description: 'Triggered once when the element enters the viewport' },
-  { id: 'text',   label: 'Text',               description: 'Typography-specific animations' },
-  { id: 'group',  label: 'Groups & Layouts',   description: 'Animate containers and their children' },
-  { id: 'scroll', label: 'Scroll & Continuous', description: 'Scroll-linked animations' },
+  { id: 'entry',      label: 'Entry Animations',     description: 'Triggered once when the element enters the viewport' },
+  { id: 'continuous', label: 'Continuous (Infinite)', description: 'Infinite looping animations that play constantly, no scroll trigger' },
+  { id: 'text',       label: 'Text',                 description: 'Typography-specific animations' },
+  { id: 'group',      label: 'Groups & Layouts',     description: 'Animate containers and their children' },
+  { id: 'scroll',     label: 'Scroll & Continuous',   description: 'Scroll-linked animations' },
 ];
 
 export const MODULE_INFO: ModuleInfo[] = [
@@ -159,7 +185,12 @@ export const MODULE_INFO: ModuleInfo[] = [
   { id: 'slide-down',  name: 'Slide Down',  description: 'Slides down when appearing',                cssClass: '.am-slide-down',  isPro: false, category: 'entry' },
   { id: 'slide-right', name: 'Slide Right', description: 'Slides in from the left',                   cssClass: '.am-slide-right', isPro: false, category: 'entry' },
   { id: 'slide-left',  name: 'Slide Left',  description: 'Slides in from the right',                  cssClass: '.am-slide-left',  isPro: false, category: 'entry' },
+  { id: 'skew-up',     name: 'Skew Up',     description: 'Slides up with a slight skew that straightens as it stops', cssClass: '.am-skew-up', isPro: false, category: 'entry' },
   { id: 'blur',        name: 'Blur',        description: 'Blur that clears as it appears',            cssClass: '.am-blur',        isPro: true,  category: 'entry' },
+
+  // Continuous (Infinite)
+  { id: 'float',       name: 'Float',       description: 'Infinite soft up/down floating motion',     cssClass: '.am-float',       isPro: false, category: 'continuous' },
+  { id: 'pulse',       name: 'Pulse',       description: 'Infinite gentle scale pulse — breathing-like', cssClass: '.am-pulse',    isPro: false, category: 'continuous' },
 
   // Text
   { id: 'split',        name: 'Split Text',   description: 'Splits and animates text by letters/words', cssClass: '.am-split-chars .am-split-words', isPro: true, category: 'text' },
@@ -213,6 +244,9 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-color-fill',         type: 'hex / rgba / var(--…)', defaultValue: '#000000', usedBy: 'text-fill-scroll' },
   { attribute: 'data-am-scroll-start',       type: 'int (%)',      defaultValue: '62',      usedBy: 'text-fill-scroll' },
   { attribute: 'data-am-scroll-end',         type: 'int (%)',      defaultValue: '60',      usedBy: 'text-fill-scroll' },
+  { attribute: 'data-am-amplitude',          type: 'float (px)',   defaultValue: '12',      usedBy: 'float' },
+  { attribute: 'data-am-scale-max',          type: 'float',        defaultValue: '1.05',    usedBy: 'pulse' },
+  { attribute: 'data-am-skew',               type: 'float (deg)',  defaultValue: '5',       usedBy: 'skew-up' },
 ];
 
 export interface EasingOption {

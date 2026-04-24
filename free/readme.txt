@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.9.0
+Stable tag: 1.10.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -24,6 +24,9 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 * **Slide Down** (`.am-slide-down`) — Slides down when appearing
 * **Slide Left** (`.am-slide-left`) — Slides in from the right
 * **Slide Right** (`.am-slide-right`) — Slides in from the left
+* **Skew Up** (`.am-skew-up`) — Slides up with a slight skew that straightens as it stops (Stripe / Vercel-style)
+* **Float** (`.am-float`) — Infinite soft up/down floating motion (continuous)
+* **Pulse** (`.am-pulse`) — Infinite gentle scale pulse — breathing-like (continuous)
 * **Highlight** (`.am-highlight`) — Animated marker highlight behind text on entry
 * **Typewriter** (`.am-typewriter`) — Types text character by character with a blinking cursor
 
@@ -82,6 +85,13 @@ https://github.com/infojorgeml/animicro
 
 == Changelog ==
 
+= 1.10.0 =
+* New Free module: **Skew Up** (`.am-skew-up`) — entry animation that slides up with a slight skew and straightens as it stops (Stripe / Vercel-style).
+* New Free category: **Continuous (Infinite)** — animations that loop forever with no viewport trigger.
+* New Free module: **Float** (`.am-float`) — infinite soft up/down floating motion. Perfect for 3D illustrations, icons, and hero art. Tunable via `data-am-amplitude` and `data-am-duration` (cycle length).
+* New Free module: **Pulse** (`.am-pulse`) — infinite gentle scale pulse, breathing-like. Great for badges, CTAs, and call-to-action buttons. Tunable via `data-am-scale-max` and `data-am-duration` (cycle length).
+* Float and Pulse respect `prefers-reduced-motion: reduce` and skip the animation entirely for visitors who opt out of motion.
+
 = 1.9.0 =
 * Slide Left (`.am-slide-left`) and Slide Right (`.am-slide-right`) are now part of the Free tier. Free users get four slide directions (up, down, left, right) out of the box. No configuration change needed if you're upgrading — just enable them from the Animicro → Modules panel.
 
@@ -138,6 +148,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.10.0 =
+Three new Free animations: Skew Up (entry), Float and Pulse (new Continuous category). No breaking changes.
 
 = 1.9.0 =
 Slide Left and Slide Right are now Free. No breaking changes.

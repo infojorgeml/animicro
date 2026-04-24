@@ -27,6 +27,9 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
   const isHighlight = moduleId === 'highlight';
   const isTextFillScroll = moduleId === 'text-fill-scroll';
   const isParallax = moduleId === 'parallax';
+  const isFloat = moduleId === 'float';
+  const isPulse = moduleId === 'pulse';
+  const isSkewUp = moduleId === 'skew-up';
 
   const play = useCallback(() => {
     const el = ref.current;
@@ -242,6 +245,52 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
       return;
     }
 
+    if (isFloat) {
+      const amp = config.amplitude ?? 12;
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+      requestAnimationFrame(() => {
+        controlsRef.current = animate(
+          el,
+          { y: [0, -amp, 0] },
+          { duration: config.duration, delay: config.delay, easing: config.easing as any, repeat: Infinity },
+        );
+        controlsRef.current.finished.catch(() => {});
+      });
+      return;
+    }
+
+    if (isPulse) {
+      const peak = config.scaleMax ?? 1.05;
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+      requestAnimationFrame(() => {
+        controlsRef.current = animate(
+          el,
+          { scale: [1, peak, 1] },
+          { duration: config.duration, delay: config.delay, easing: config.easing as any, repeat: Infinity },
+        );
+        controlsRef.current.finished.catch(() => {});
+      });
+      return;
+    }
+
+    if (isSkewUp) {
+      const dist = config.distance ?? 40;
+      const skew = config.skew ?? 5;
+      el.style.opacity = '0';
+      el.style.transform = `translateY(${dist}px) skewY(${skew}deg)`;
+      requestAnimationFrame(() => {
+        controlsRef.current = animate(
+          el,
+          { opacity: [0, 1], y: [dist, 0], skewY: [skew, 0] },
+          { duration: config.duration, delay: config.delay, easing: config.easing as any },
+        );
+        controlsRef.current.finished.catch(() => {});
+      });
+      return;
+    }
+
     if (isParallax) {
       const square = el.querySelector<HTMLDivElement>('[data-parallax-item]');
       if (!square) return;
@@ -350,7 +399,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
       controlsRef.current.finished.catch(() => {});
     });
-  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, config.backSpeed, config.backDelay, config.loop, config.shuffle, config.cursorChar, config.cursorPersist, config.speed, config.origin, config.highlightColor, config.highlightDirection, config.colorBase, config.colorFill, config.scrollStart, config.scrollEnd, moduleId, isSplit, isTextReveal, isTypewriter, isHighlight, isTextFillScroll, isStagger, isGridReveal, isParallax]);
+  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, config.backSpeed, config.backDelay, config.loop, config.shuffle, config.cursorChar, config.cursorPersist, config.speed, config.origin, config.highlightColor, config.highlightDirection, config.colorBase, config.colorFill, config.scrollStart, config.scrollEnd, config.amplitude, config.scaleMax, config.skew, moduleId, isSplit, isTextReveal, isTypewriter, isHighlight, isTextFillScroll, isStagger, isGridReveal, isParallax, isFloat, isPulse, isSkewUp]);
 
   useEffect(() => {
     play();
@@ -587,6 +636,9 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
                 {moduleId.startsWith('slide') && config.distance != null && ` · ${config.distance}px`}
                 {moduleId === 'scale' && config.scale != null && ` · scale ${config.scale}`}
                 {moduleId === 'blur' && config.blur != null && ` · blur ${config.blur}px`}
+                {isFloat && ` · ±${config.amplitude ?? 12}px`}
+                {isPulse && ` · peak ${config.scaleMax ?? 1.05}`}
+                {isSkewUp && ` · ${config.distance ?? 40}px · ${config.skew ?? 5}°`}
                 {isSplit && ` · stagger ${config.staggerDelay ?? 0.05}s · ${config.distance ?? 15}px`}
                 {isTextReveal && ` · stagger ${config.staggerDelay ?? 0.12}s`}
                 {isStagger && ` · stagger ${config.staggerDelay ?? 0.1}s · ${config.distance ?? 20}px`}

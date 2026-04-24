@@ -55,7 +55,7 @@ class Animicro {
 	public static function get_default_settings(): array {
 		return [
 			'active_modules'    => [],
-			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'split', 'text-reveal', 'typewriter' ],
+			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'float', 'pulse', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'split', 'text-reveal', 'typewriter' ],
 			'active_builders'   => [ 'none' ],
 			'module_settings'   => [
 				'fade' => [
@@ -175,6 +175,28 @@ class Animicro {
 					'delay'    => 0.0,
 					'margin'   => '-50px 0px',
 					'speed'    => 0.5,
+				],
+				'float' => [
+					'duration'  => 3.0,
+					'easing'    => 'ease-in-out',
+					'delay'     => 0.0,
+					'margin'    => '-50px 0px',
+					'amplitude' => 12,
+				],
+				'pulse' => [
+					'duration' => 1.5,
+					'easing'   => 'ease-in-out',
+					'delay'    => 0.0,
+					'margin'   => '-50px 0px',
+					'scaleMax' => 1.05,
+				],
+				'skew-up' => [
+					'duration' => 0.6,
+					'easing'   => 'ease-out',
+					'delay'    => 0.0,
+					'margin'   => '-50px 0px',
+					'distance' => 40,
+					'skew'     => 5,
 				],
 			],
 			'smooth_scroll' => [

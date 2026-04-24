@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 import ColorField from './ColorField';
@@ -28,9 +28,12 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   highlight: DEFAULT_HIGHLIGHT_CONFIG,
   'text-fill-scroll': DEFAULT_TEXT_FILL_SCROLL_CONFIG,
   parallax: DEFAULT_PARALLAX_CONFIG,
+  float: DEFAULT_FLOAT_CONFIG,
+  pulse: DEFAULT_PULSE_CONFIG,
+  'skew-up': DEFAULT_SKEW_UP_CONFIG,
 };
 
-const hasDistance = (id: string) => id.startsWith('slide-') || id === 'split' || id === 'stagger' || id === 'grid-reveal';
+const hasDistance = (id: string) => id.startsWith('slide-') || id === 'skew-up' || id === 'split' || id === 'stagger' || id === 'grid-reveal';
 
 const ORIGIN_OPTIONS: { value: string; label: string; row: number; col: number }[] = [
   { value: 'top-left',     label: '\u2196', row: 0, col: 0 },
@@ -254,8 +257,112 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </>
         )}
 
-        {/* Duration (hidden for typewriter, parallax, text-fill-scroll) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && (
+        {/* Cycle duration (float, pulse — continuous loops) */}
+        {(moduleId === 'float' || moduleId === 'pulse') && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Cycle duration
+              <span className="font-mono text-brand-500">{config.duration}s</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Length of one full loop ({moduleId === 'float' ? 'up then back down' : 'grow then shrink'}). Longer values feel calmer; shorter values feel more urgent.
+            </p>
+            <input
+              type="range"
+              min="0.3"
+              max="10"
+              step="0.1"
+              value={config.duration}
+              onChange={e => onUpdate({ duration: parseFloat(e.target.value) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0.3s — Urgent</span>
+              <span>10s — Calm</span>
+            </div>
+          </div>
+        )}
+
+        {/* Amplitude (float only) */}
+        {moduleId === 'float' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Amplitude
+              <span className="font-mono text-brand-500">{config.amplitude ?? 12}px</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              How far the element drifts up at the peak of each cycle.
+            </p>
+            <input
+              type="range"
+              min="2"
+              max="50"
+              step="1"
+              value={config.amplitude ?? 12}
+              onChange={e => onUpdate({ amplitude: parseInt(e.target.value, 10) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>2px — Subtle</span>
+              <span>50px — Dramatic</span>
+            </div>
+          </div>
+        )}
+
+        {/* Scale max (pulse only) */}
+        {moduleId === 'pulse' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Peak scale
+              <span className="font-mono text-brand-500">{config.scaleMax ?? 1.05}</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Maximum size at the top of each pulse. Values close to 1.00 feel like a gentle breath; higher values feel attention-grabbing.
+            </p>
+            <input
+              type="range"
+              min="1.01"
+              max="1.5"
+              step="0.01"
+              value={config.scaleMax ?? 1.05}
+              onChange={e => onUpdate({ scaleMax: parseFloat(e.target.value) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>1.01 — Breath</span>
+              <span>1.5 — Heartbeat</span>
+            </div>
+          </div>
+        )}
+
+        {/* Skew angle (skew-up only) */}
+        {moduleId === 'skew-up' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Skew angle
+              <span className="font-mono text-brand-500">{config.skew ?? 5}°</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Starting vertical skew. Straightens to 0° as the element settles. Stripe / Vercel-style default is a subtle 5°.
+            </p>
+            <input
+              type="range"
+              min="-20"
+              max="20"
+              step="1"
+              value={config.skew ?? 5}
+              onChange={e => onUpdate({ skew: parseInt(e.target.value, 10) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>-20° — Left lean</span>
+              <span>20° — Right lean</span>
+            </div>
+          </div>
+        )}
+
+        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Duration
@@ -395,7 +502,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
               Distance
-              <span className="font-mono text-brand-500">{config.distance ?? (moduleId === 'split' ? 15 : moduleId === 'stagger' ? 20 : 30)}px</span>
+              <span className="font-mono text-brand-500">{config.distance ?? (moduleId === 'split' ? 15 : moduleId === 'stagger' ? 20 : moduleId === 'skew-up' ? 40 : 30)}px</span>
             </label>
             <p className="text-xs text-gray-400 mb-2">
               {moduleId === 'split'
@@ -409,7 +516,7 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
               min={moduleId === 'split' ? '5' : '10'}
               max={moduleId === 'split' ? '50' : '100'}
               step="5"
-              value={config.distance ?? (moduleId === 'split' ? 15 : moduleId === 'stagger' ? 20 : 30)}
+              value={config.distance ?? (moduleId === 'split' ? 15 : moduleId === 'stagger' ? 20 : moduleId === 'skew-up' ? 40 : 30)}
               onChange={e => onUpdate({ distance: parseInt(e.target.value, 10) })}
               className="w-full accent-brand-500"
             />

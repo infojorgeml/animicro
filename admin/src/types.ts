@@ -22,6 +22,9 @@ export interface ModuleConfig {
   colorFill?: string;
   scrollStart?: number;
   scrollEnd?: number;
+  amplitude?: number;
+  scaleMax?: number;
+  skew?: number;
 }
 
 export interface SmoothScrollConfig {

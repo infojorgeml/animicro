@@ -1,6 +1,6 @@
 # Animicro — Development Reference
 
-**Release:** 1.9.0 (2026-04-24). See CHANGELOG for history.
+**Release:** 1.10.0 (2026-04-23). See CHANGELOG for history.
 
 Utility-first micro-animations for WordPress powered by [Motion One](https://motion.dev/). This document describes the architecture and conventions for developers and AI assistants.
 
@@ -46,7 +46,7 @@ animicro/
 ## Frontend Modules
 
 - **Entry**: `frontend/src/main.js` → `loadModules(activeModules)` from `core/registry.js`.
-- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `scale`, `blur`, `stagger`, `grid-reveal`, `highlight`, `text-fill-scroll`, `parallax`, `split`, `text-reveal`, `typewriter`. Each exports `init()`.
+- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `skew-up`, `scale`, `blur`, `float`, `pulse`, `stagger`, `grid-reveal`, `highlight`, `text-fill-scroll`, `parallax`, `split`, `text-reveal`, `typewriter`. Each exports `init()`.
 - **Config**: `getElementConfig(el, moduleId)` merges `el.dataset.am*` with `moduleSettings[moduleId]` and fallbacks.
 - **Code splitting**: Dynamic `import()` per module; only active modules load. **Smooth scroll** (`frontend/src/smooth-scroll.js`) is loaded only when `animicroFrontData.smoothScroll` is present (Pro + enabled in settings).
 
@@ -73,7 +73,7 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 
 ## Pro License
 
-- **Free modules**: fade, scale, slide-up, slide-down, slide-left, slide-right, highlight, typewriter.
+- **Free modules**: fade, scale, slide-up, slide-down, slide-left, slide-right, skew-up, float, pulse, highlight, typewriter.
 - **Pro modules**: blur, stagger, grid-reveal, text-fill-scroll, parallax, split, text-reveal. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
 - **Cheat Sheet** and **Smooth Scroll** tabs are Pro-only.
 - License validation via Supabase; product slug `animicro`.
@@ -172,7 +172,7 @@ Example — rotating strings:
 
 ## Loop (per-element, opt-in)
 
-Entry modules `fade`, `scale`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, and `blur` accept three `data-am-*` attributes that hand Motion One's `repeat` options directly to `animate()`:
+Entry modules `fade`, `scale`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `skew-up`, and `blur` accept three `data-am-*` attributes that hand Motion One's `repeat` options directly to `animate()`:
 
 - `data-am-loop="true"` — enables infinite repeat.
 - `data-am-loop-mode="pingpong"` (default) — Motion's `repeatType: 'reverse'`; the animation plays A→B→A→B. Use `"restart"` for `repeatType: 'loop'` (A→B, snap back to A, A→B…).
@@ -186,7 +186,21 @@ animate(el, keyframes, { duration, delay, easing, ...getLoopOptions(el) });
 
 Opt-in only: default entry-animation semantics (one-shot on scroll-in) are unchanged. Loop is automatically ignored under `prefers-reduced-motion: reduce` because the whole module runtime is skipped via `main.js`.
 
-Not yet wired into: `highlight` (CSS transition), `stagger`, `grid-reveal`, `split`, `text-reveal`, `parallax`, `text-fill-scroll`, `typewriter` (typewriter already has its own richer loop system).
+Not yet wired into: `highlight` (CSS transition), `stagger`, `grid-reveal`, `split`, `text-reveal`, `parallax`, `text-fill-scroll`, `typewriter` (typewriter already has its own richer loop system), `float`, `pulse` (already infinite by design).
+
+## Continuous (Infinite) modules — `float`, `pulse`
+
+Unlike entry modules, `float` and `pulse` start animating on `init()` without any viewport gating and run forever via Motion One's `repeat: Infinity`. They're meant for UI flourishes that should always be visible in motion (hero illustrations, CTA buttons, badges).
+
+- **Float** (`.am-float`): `animate(el, { y: [0, -amplitude, 0] }, { duration, delay, easing, repeat: Infinity })`. Attributes: `data-am-amplitude` (px, default 12, clamp 1..100), `data-am-duration` (cycle length, default 3 s), `data-am-easing` (default `ease-in-out`), `data-am-delay` (initial delay, default 0).
+- **Pulse** (`.am-pulse`): `animate(el, { scale: [1, scaleMax, 1] }, { duration, delay, easing, repeat: Infinity })`. Attributes: `data-am-scale-max` (default 1.05, clamp 1..2), `data-am-duration` (cycle length, default 1.5 s), `data-am-easing`, `data-am-delay`.
+- **Reduced motion**: both modules short-circuit at init when `matchMedia('(prefers-reduced-motion: reduce)').matches`, so these animations never run for visitors who opt out of motion.
+- **No initial-state CSS**: Float and Pulse map to empty strings in `MODULE_INITIAL_CSS` — the element stays visible, since there's no "hidden" state to animate from.
+- **Double-init guard**: `data-am-float-init="1"` / `data-am-pulse-init="1"` prevents re-running on HMR.
+
+## Skew Up (entry)
+
+Entry animation in the Stripe / Vercel aesthetic: `animate(el, { opacity: [0, 1], y: [distance, 0], skewY: [skew, 0] })`. Wrapped in `inView()` like the other entry modules. Accepts standard `duration`, `delay`, `easing`, `margin`, plus `data-am-distance` (default 40) and `data-am-skew` (default 5°, clamp -45..45). Loop attributes (`data-am-loop…`) are honored via `getLoopOptions(el)`.
 
 ## Grid Reveal (spatial group)
 

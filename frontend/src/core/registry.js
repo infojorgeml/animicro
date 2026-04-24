@@ -19,6 +19,9 @@ const MODULES = {
   'split':       () => import('../modules/split-text.js'),
   'text-reveal': () => import('../modules/text-reveal.js'),
   'typewriter':  () => import('../modules/typewriter.js'),
+  'float':       () => import('../modules/float.js'),
+  'pulse':       () => import('../modules/pulse.js'),
+  'skew-up':     () => import('../modules/skew-up.js'),
 };
 
 export async function loadModules(activeModules) {
