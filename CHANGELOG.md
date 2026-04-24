@@ -5,6 +5,16 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.2] - 2026-04-24
+
+### Fixed
+
+- **Text Reveal (Pro) — web-font cold-load correctness.** `frontend/src/modules/text-reveal.js` relied on `offsetTop` to split text into lines, but `main.js` runs at `DOMContentLoaded`, which fires before custom web fonts finish loading. On cold loads with Google Fonts / self-hosted fonts, the fallback-font metrics made every word collapse onto a single line, breaking the reveal. The module now waits for `document.fonts.ready` before splitting (with a direct fallback when the Font Loading API is unavailable). No API change.
+
+### Security
+
+- **Text Fill on Scroll (Pro) — XSS hardening.** `frontend/src/modules/text-fill-scroll.js` previously built its per-word wrappers by interpolating the element's `innerText` directly into an `innerHTML` template. Although `innerText` returns rendered plain text (not raw HTML), any visible text containing HTML-like characters — potentially introduced by bypassed-sanitization plugins, custom shortcodes, or meta fields — would be re-parsed as markup on injection. The module now constructs the wrapper/base/fill spans via `document.createElement` + `textContent`, eliminating the injection path entirely. No DOM shape change, no behavior change for well-formed content.
+
 ## [1.10.1] - 2026-04-24
 
 ### Fixed

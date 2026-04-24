@@ -71,24 +71,36 @@ function splitIntoLines(el) {
 
 export function init() {
   const els = document.querySelectorAll('.am-text-reveal');
+  if (!els.length) return;
 
-  els.forEach((el) => {
-    const cfg = getElementConfig(el, 'text-reveal');
-    const innerSpans = splitIntoLines(el);
-    if (!innerSpans.length) return;
+  // Line splitting depends on offsetTop, which is only accurate once custom
+  // web fonts are loaded. Wait for document.fonts.ready so cold loads with
+  // Google Fonts / self-hosted fonts don't collapse all words into one line.
+  const run = () => {
+    els.forEach((el) => {
+      const cfg = getElementConfig(el, 'text-reveal');
+      const innerSpans = splitIntoLines(el);
+      if (!innerSpans.length) return;
 
-    inView(el, () => {
-      animate(
-        innerSpans,
-        { y: ['100%', '0%'] },
-        {
-          duration: cfg.duration,
-          delay: stagger(cfg.staggerDelay, { start: cfg.delay }),
-          easing: cfg.easing,
-        }
-      );
-    }, { margin: cfg.margin });
+      inView(el, () => {
+        animate(
+          innerSpans,
+          { y: ['100%', '0%'] },
+          {
+            duration: cfg.duration,
+            delay: stagger(cfg.staggerDelay, { start: cfg.delay }),
+            easing: cfg.easing,
+          }
+        );
+      }, { margin: cfg.margin });
 
-    el.classList.add('am-animated');
-  });
+      el.classList.add('am-animated');
+    });
+  };
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(run);
+  } else {
+    run();
+  }
 }

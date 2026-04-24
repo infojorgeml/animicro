@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.10.1
+Stable tag: 1.10.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,9 @@ https://github.com/infojorgeml/animicro
 
 == Changelog ==
 
+= 1.10.2 =
+* No user-facing changes in the free tier. Internal hardening and reliability improvements for Pro-only modules (Text Reveal, Text Fill on Scroll).
+
 = 1.10.1 =
 * Accessibility: entry animations no longer stay hidden when the admin enables **Respect Reduced Motion** and the visitor prefers reduced motion. The CSS safety net now forces the final visible state (matching the no-JS behaviour).
 * Docs: Slide Left / Slide Right descriptions rephrased for clarity.
@@ -153,6 +156,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.10.2 =
+No user-facing changes in the free tier. Internal hardening for Pro modules.
 
 = 1.10.1 =
 Accessibility fix: entry animations no longer stay hidden when Respect Reduced Motion is enabled. Recommended update.

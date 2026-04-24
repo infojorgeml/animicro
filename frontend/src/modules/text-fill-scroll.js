@@ -14,12 +14,29 @@ export function init() {
     el.setAttribute('aria-label', originalText);
 
     const words = originalText.split(' ');
-    el.innerHTML = words.map(w =>
-      `<span class="am-tfs-wrapper" aria-hidden="true">` +
-        `<span class="am-tfs-base">${w}</span>` +
-        `<span class="am-tfs-fill" style="opacity:0">${w}</span>` +
-      `</span>`
-    ).join(' ');
+    // Build the word wrappers via DOM APIs (not innerHTML) so any user-visible
+    // text containing HTML-like characters cannot be re-parsed as markup.
+    el.innerHTML = '';
+    words.forEach((w, i) => {
+      if (i > 0) el.appendChild(document.createTextNode(' '));
+
+      const wrapper = document.createElement('span');
+      wrapper.className = 'am-tfs-wrapper';
+      wrapper.setAttribute('aria-hidden', 'true');
+
+      const base = document.createElement('span');
+      base.className = 'am-tfs-base';
+      base.textContent = w;
+
+      const fill = document.createElement('span');
+      fill.className = 'am-tfs-fill';
+      fill.style.opacity = '0';
+      fill.textContent = w;
+
+      wrapper.appendChild(base);
+      wrapper.appendChild(fill);
+      el.appendChild(wrapper);
+    });
 
     el.classList.add('is-ready');
 
