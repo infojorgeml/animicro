@@ -25,20 +25,14 @@ const MODULES = {
 };
 
 export async function loadModules(activeModules) {
-  const loaded = new Set();
-
+  // Note: the browser caches resolved dynamic imports, so calling the same
+  // loader twice (e.g. for slide-up + slide-down which share slide.js) is
+  // a no-op on the second fetch. No manual dedup needed.
   for (const name of activeModules) {
     const loader = MODULES[name];
     if (!loader) continue;
 
-    const key = loader.toString();
     const mod = await loader();
-
-    if (loaded.has(key)) {
-      mod.init(name);
-    } else {
-      loaded.add(key);
-      mod.init(name);
-    }
+    mod.init(name);
   }
 }

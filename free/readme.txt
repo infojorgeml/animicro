@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.10.2
+Stable tag: 1.10.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,9 @@ https://github.com/infojorgeml/animicro
 
 == Changelog ==
 
+= 1.10.3 =
+* No user-facing changes in the free tier. Internal consistency pass: deduplicated the `data-am-loop` row in the Pro Cheat Sheet, simplified the frontend module loader, and added `.am-parallax` to the base visibility selector for consistency.
+
 = 1.10.2 =
 * No user-facing changes in the free tier. Internal hardening and reliability improvements for Pro-only modules (Text Reveal, Text Fill on Scroll).
 
@@ -156,6 +159,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.10.3 =
+Internal consistency pass. No user-facing changes in the free tier.
 
 = 1.10.2 =
 No user-facing changes in the free tier. Internal hardening for Pro modules.

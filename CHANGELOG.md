@@ -5,6 +5,20 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.3] - 2026-04-24
+
+### Changed
+
+- **Pro Cheat Sheet — deduplicated `data-am-loop` row.** `admin/src/data/modules.ts::DATA_ATTRIBUTES` previously had two entries for `data-am-loop` with different defaults (`false` for fade/scale/slide-*/blur, `true` for typewriter), which rendered as two contradictory rows in the Pro Cheat Sheet table. Merged into a single row with `defaultValue: 'false (true for typewriter)'` and a disambiguated `usedBy` string.
+
+### Removed
+
+- **Vestigial dedup Set in `frontend/src/core/registry.js`.** The `loaded` Set and surrounding `if (loaded.has(key)) ... else ...` branches both called `mod.init(name)` identically — browsers already cache resolved dynamic imports, so the manual dedup was a no-op. Simplified to a plain `await loader(); mod.init(name)` loop. Net effect: entry bundle `main.js` shrunk from 4.84 kB to 4.78 kB.
+
+### Fixed
+
+- **Consistency — `.am-parallax` added to the base visibility selector in `frontend/src/style.css`.** The "make visible in editors / no-JS fallback" block listed every module class except `.am-parallax`. No visual impact (parallax never gets `opacity: 0` injected via `MODULE_INITIAL_CSS`), but the omission was inconsistent with the other 17 modules.
+
 ## [1.10.2] - 2026-04-24
 
 ### Fixed
