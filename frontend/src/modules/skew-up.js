@@ -25,7 +25,7 @@ export function init() {
     const cfg  = getElementConfig(el, 'skew-up');
     const loop = getLoopOptions(el);
 
-    const distance = cfg.distance != null ? cfg.distance : 40;
+    const distance = cfg.distance;
     const rawSkew = parseFloat(el.dataset.amSkew);
     const skew = clamp(Number.isFinite(rawSkew) ? rawSkew : defSkew, -45, 45);
 

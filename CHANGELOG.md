@@ -5,6 +5,20 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.1] - 2026-04-24
+
+### Fixed
+
+- **Accessibility — reduced-motion visibility regression.** When the admin enabled **Advanced → Respect Reduced Motion** and the visitor preferred reduced motion, `frontend/src/main.js` short-circuited the module pipeline but the inline PHP CSS from `class-compatibility.php::MODULE_INITIAL_CSS` kept `.am-fade`, `.am-slide-*`, `.am-skew-up`, `.am-scale`, `.am-blur` at `opacity:0` / translated. Result: elements stayed invisible forever for those visitors. The `@media (prefers-reduced-motion: reduce)` block in `frontend/src/style.css` now forces `opacity: 1 !important; transform: none !important; filter: none !important;` on the same selector list — mirroring the already-correct `@media (scripting: none)` block. Motion One's JS-driven animations are still the active path when the admin toggle is off, so this fix is scoped to the opt-in reduced-motion short-circuit.
+
+### Changed
+
+- **Copy** — Slide Left / Slide Right descriptions rephrased from "Slides in from the right/left" to "Slides in toward the left/right (from the right/left edge)" across `admin/src/data/modules.ts`, `README.md`, `free/readme.txt`. Class names unchanged; no API change.
+
+### Removed
+
+- **Dead code in `frontend/src/modules/skew-up.js`** — replaced `const distance = cfg.distance != null ? cfg.distance : 40;` with `const distance = cfg.distance;`. `getElementConfig` always returns a number, so the fallback branch never fired. Runtime defaults remain server-driven via `window.animicroFrontData.moduleSettings['skew-up'].distance`.
+
 ## [1.10.0] - 2026-04-23
 
 ### Added

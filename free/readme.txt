@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.10.0
+Stable tag: 1.10.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -22,8 +22,8 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 * **Scale** (`.am-scale`) — Scales from small to full size
 * **Slide Up** (`.am-slide-up`) — Slides up when appearing
 * **Slide Down** (`.am-slide-down`) — Slides down when appearing
-* **Slide Left** (`.am-slide-left`) — Slides in from the right
-* **Slide Right** (`.am-slide-right`) — Slides in from the left
+* **Slide Left** (`.am-slide-left`) — Slides in toward the left (from the right edge)
+* **Slide Right** (`.am-slide-right`) — Slides in toward the right (from the left edge)
 * **Skew Up** (`.am-skew-up`) — Slides up with a slight skew that straightens as it stops (Stripe / Vercel-style)
 * **Float** (`.am-float`) — Infinite soft up/down floating motion (continuous)
 * **Pulse** (`.am-pulse`) — Infinite gentle scale pulse — breathing-like (continuous)
@@ -84,6 +84,11 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.10.1 =
+* Accessibility: entry animations no longer stay hidden when the admin enables **Respect Reduced Motion** and the visitor prefers reduced motion. The CSS safety net now forces the final visible state (matching the no-JS behaviour).
+* Docs: Slide Left / Slide Right descriptions rephrased for clarity.
+* Internal: removed a dead fallback branch in skew-up.js.
 
 = 1.10.0 =
 * New Free module: **Skew Up** (`.am-skew-up`) — entry animation that slides up with a slight skew and straightens as it stops (Stripe / Vercel-style).
@@ -148,6 +153,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.10.1 =
+Accessibility fix: entry animations no longer stay hidden when Respect Reduced Motion is enabled. Recommended update.
 
 = 1.10.0 =
 Three new Free animations: Skew Up (entry), Float and Pulse (new Continuous category). No breaking changes.

@@ -183,8 +183,8 @@ export const MODULE_INFO: ModuleInfo[] = [
   { id: 'scale',       name: 'Scale',       description: 'Scales from small to full size',            cssClass: '.am-scale',       isPro: false, category: 'entry' },
   { id: 'slide-up',    name: 'Slide Up',    description: 'Slides up when appearing',                  cssClass: '.am-slide-up',    isPro: false, category: 'entry' },
   { id: 'slide-down',  name: 'Slide Down',  description: 'Slides down when appearing',                cssClass: '.am-slide-down',  isPro: false, category: 'entry' },
-  { id: 'slide-right', name: 'Slide Right', description: 'Slides in from the left',                   cssClass: '.am-slide-right', isPro: false, category: 'entry' },
-  { id: 'slide-left',  name: 'Slide Left',  description: 'Slides in from the right',                  cssClass: '.am-slide-left',  isPro: false, category: 'entry' },
+  { id: 'slide-right', name: 'Slide Right', description: 'Slides in toward the right (from the left edge)',  cssClass: '.am-slide-right', isPro: false, category: 'entry' },
+  { id: 'slide-left',  name: 'Slide Left',  description: 'Slides in toward the left (from the right edge)',  cssClass: '.am-slide-left',  isPro: false, category: 'entry' },
   { id: 'skew-up',     name: 'Skew Up',     description: 'Slides up with a slight skew that straightens as it stops', cssClass: '.am-skew-up', isPro: false, category: 'entry' },
   { id: 'blur',        name: 'Blur',        description: 'Blur that clears as it appears',            cssClass: '.am-blur',        isPro: true,  category: 'entry' },
 

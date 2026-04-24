@@ -123,6 +123,9 @@
   .am-grid-reveal > * {
     transition: none !important;
     animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
   }
 }
 
