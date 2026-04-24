@@ -5,6 +5,43 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-04-24
+
+### Added
+
+- **Slide Left and Slide Right promoted to the Free tier** — `.am-slide-left` and `.am-slide-right` are no longer gated behind Animicro Pro. Free users now get the full set of four entry directions (up / down / left / right) out of the box. Removed from `Animicro_License_Manager::PRO_MODULES` and `Animicro::PRO_MODULES`; added to `FREE_MODULES`. Admin `MODULE_INFO` flips `isPro: false` for both entries. No runtime changes — module code is unchanged.
+
+## [1.8.0] - 2026-04-23
+
+### Added
+
+- **Loop on entry animations (opt-in)** — `fade`, `scale`, `slide-up`, `slide-down`, `slide-left`, `slide-right` and `blur` now support three new per-element attributes: `data-am-loop="true"` to enable, `data-am-loop-mode="pingpong"` (default, plays A→B→A→B) or `"restart"` (A→B, snap, A→B…), and `data-am-loop-delay` (0–10 s, pause between iterations). Powered by Motion One's native `repeat` / `repeatType` / `repeatDelay` options — zero runtime cost when disabled.
+- **`getLoopOptions(el)` helper** in `frontend/src/core/config.js` — returns `{ repeat, repeatType, repeatDelay }` or an empty object when loop is off, so modules can spread it unconditionally into the `animate()` options.
+
+### Notes
+
+- Opt-in only: default entry-animation semantics (one-shot on scroll-in) are unchanged.
+- Automatically skipped under `prefers-reduced-motion: reduce` (the entire runtime is already guarded upstream in `main.js`).
+- Not wired into `highlight` (CSS transition), `stagger`, `grid-reveal`, `split`, `text-reveal`, `parallax`, or `text-fill-scroll` in this release — each has a different animation pattern and will be evaluated module-by-module. `typewriter` already has its own richer loop system (1.7).
+
+## [1.7.0] - 2026-04-20
+
+### Added
+
+- **Typewriter rotating strings** — New `data-am-strings` attribute accepts either a pipe-separated list (`"design|code|launch"`) or a JSON array (`'["design","code","launch"]'`, for strings that contain a literal `|`). The module types each string, holds, deletes, and moves on to the next — the classic "We're good at: design / code / launch" landing-page pattern. `data-am-prefix` and `data-am-suffix` wrap static text around the rotating word.
+- **Typewriter controls** — New module settings and `data-am-*` attributes: `backSpeed` / `data-am-back-speed` (deletion speed), `backDelay` / `data-am-back-delay` (hold before deleting), `loop` / `data-am-loop`, `shuffle` / `data-am-shuffle`, `cursorChar` (admin-wide default for the cursor character), `cursorPersist` / `data-am-cursor-persist`. All clamped and sanitised at the JS and PHP layers.
+- **Typewriter admin panel** — 4 sliders (type speed, back speed, start delay, back delay), 3 toggles (loop, shuffle, cursor persist), a cursor-character text input, and a copy-paste HTML callout with example attributes. Live preview demos the rotating "We design / code / launch for you!" pattern as sliders move.
+
+### Changed
+
+- **Breaking: Typewriter cursor persists by default** — Previously the cursor faded out ~600 ms after the last character. It now stays blinking indefinitely (the signature typewriter look). To restore the 1.6 fade-out behaviour, add `data-am-cursor-persist="false"` on the element, or disable the "Cursor stays after typing" toggle in the admin panel.
+- **Typewriter accessibility** — `aria-label` now exposes the full phrase `prefix + strings.join(", ") + suffix`, so assistive tech reads the stable meaning once instead of streaming character-by-character. The cursor span remains `aria-hidden="true"`.
+- **Typewriter DOM structure** — The runtime now builds four spans inside the host element (`.am-tw-prefix`, `.am-tw-text`, `.am-tw-suffix`, `.am-tw-cursor`). Single-string usage without `data-am-strings`/`prefix`/`suffix` continues to work: the module falls back to `textContent` as a single string.
+
+### Fixed
+
+- Typewriter `typingSpeed` lower bound relaxed from `0.01` to `0.005` at JS + PHP layers for users who want near-instant typing.
+
 ## [1.6.0] - 2026-04-20
 
 ### Improved

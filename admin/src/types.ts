@@ -8,6 +8,12 @@ export interface ModuleConfig {
   blur?: number;
   staggerDelay?: number;
   typingSpeed?: number;
+  backSpeed?: number;
+  backDelay?: number;
+  loop?: boolean;
+  shuffle?: boolean;
+  cursorChar?: string;
+  cursorPersist?: boolean;
   speed?: number;
   origin?: string;
   highlightColor?: string;

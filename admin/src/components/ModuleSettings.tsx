@@ -3,6 +3,7 @@ import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 import ColorField from './ColorField';
 import CopyClassButton from './CopyClassButton';
+import Toggle from './Toggle';
 
 interface ModuleSettingsProps {
   moduleId: string;
@@ -100,30 +101,157 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Typing speed (typewriter only) */}
+        {/* Typewriter controls: typing + back speed, back delay, cursor char, loop/shuffle/persist */}
         {moduleId === 'typewriter' && (
-          <div>
-            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
-              Typing speed
-              <span className="font-mono text-brand-500">{config.typingSpeed ?? 0.06}s</span>
-            </label>
-            <p className="text-xs text-gray-400 mb-2">
-              Delay between each character. Lower values type faster.
-            </p>
-            <input
-              type="range"
-              min="0.02"
-              max="0.15"
-              step="0.01"
-              value={config.typingSpeed ?? 0.06}
-              onChange={e => onUpdate({ typingSpeed: parseFloat(e.target.value) })}
-              className="w-full accent-brand-500"
-            />
-            <div className="flex justify-between text-xs text-gray-400 mt-1">
-              <span>0.02s — Very fast</span>
-              <span>0.15s — Slow, dramatic</span>
+          <>
+            <div>
+              <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+                Typing speed
+                <span className="font-mono text-brand-500">{config.typingSpeed ?? 0.06}s</span>
+              </label>
+              <p className="text-xs text-gray-400 mb-2">
+                Delay between each character when typing forward. Lower values type faster.
+              </p>
+              <input
+                type="range"
+                min="0.02"
+                max="0.15"
+                step="0.01"
+                value={config.typingSpeed ?? 0.06}
+                onChange={e => onUpdate({ typingSpeed: parseFloat(e.target.value) })}
+                className="w-full accent-brand-500"
+              />
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
+                <span>0.02s — Very fast</span>
+                <span>0.15s — Slow, dramatic</span>
+              </div>
             </div>
-          </div>
+
+            <div>
+              <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+                Back speed
+                <span className="font-mono text-brand-500">{config.backSpeed ?? 0.03}s</span>
+              </label>
+              <p className="text-xs text-gray-400 mb-2">
+                Delay between each character when deleting. Typically faster than typing.
+              </p>
+              <input
+                type="range"
+                min="0.01"
+                max="0.15"
+                step="0.01"
+                value={config.backSpeed ?? 0.03}
+                onChange={e => onUpdate({ backSpeed: parseFloat(e.target.value) })}
+                className="w-full accent-brand-500"
+              />
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
+                <span>0.01s — Instant</span>
+                <span>0.15s — Deliberate</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+                Back delay
+                <span className="font-mono text-brand-500">{config.backDelay ?? 1.5}s</span>
+              </label>
+              <p className="text-xs text-gray-400 mb-2">
+                Hold time after a word finishes typing, before it starts deleting.
+              </p>
+              <input
+                type="range"
+                min="0"
+                max="5"
+                step="0.1"
+                value={config.backDelay ?? 1.5}
+                onChange={e => onUpdate({ backDelay: parseFloat(e.target.value) })}
+                className="w-full accent-brand-500"
+              />
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
+                <span>0s — No hold</span>
+                <span>5s — Long pause</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Cursor character
+              </label>
+              <p className="text-xs text-gray-400 mb-2">
+                The blinking cursor character. Override per-element with <code className="rounded bg-gray-100 px-1 py-0.5 text-[11px]">data-am-cursor</code>.
+              </p>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  maxLength={3}
+                  value={config.cursorChar ?? '|'}
+                  onChange={e => onUpdate({ cursorChar: e.target.value.slice(0, 3) })}
+                  className="w-20 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-mono
+                             focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  placeholder="|"
+                />
+                <span className="inline-flex items-center gap-1 text-sm text-gray-500">
+                  Preview:
+                  <span className="font-mono text-gray-900">Type</span>
+                  <span className="font-mono text-brand-500 animate-pulse">{config.cursorChar || '|'}</span>
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-2">
+                <span>Loop through strings</span>
+                <Toggle
+                  checked={config.loop ?? true}
+                  onChange={next => onUpdate({ loop: next })}
+                  label="Loop"
+                />
+              </label>
+              <p className="text-xs text-gray-400">
+                When multiple <code className="rounded bg-gray-100 px-1 py-0.5 text-[11px]">data-am-strings</code> are set, cycle through them forever. Off: run once and stop on the last string (without deleting it).
+              </p>
+            </div>
+
+            <div>
+              <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-2">
+                <span>Shuffle order</span>
+                <Toggle
+                  checked={config.shuffle ?? false}
+                  onChange={next => onUpdate({ shuffle: next })}
+                  label="Shuffle"
+                />
+              </label>
+              <p className="text-xs text-gray-400">
+                Randomize the order each cycle. No back-to-back repeats.
+              </p>
+            </div>
+
+            <div>
+              <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-2">
+                <span>Cursor stays after typing</span>
+                <Toggle
+                  checked={config.cursorPersist ?? true}
+                  onChange={next => onUpdate({ cursorPersist: next })}
+                  label="Cursor persist"
+                />
+              </label>
+              <p className="text-xs text-gray-400">
+                Keep the blinking cursor visible once the animation finishes (the classic typewriter look). Turn off to fade it out.
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+              <p className="text-xs font-medium text-gray-700 mb-2">Example — rotating strings</p>
+              <pre className="overflow-x-auto text-[11px] leading-relaxed text-gray-700 font-mono">{`<h1 class="am-typewriter"
+  data-am-prefix="We "
+  data-am-strings="design|code|launch"
+  data-am-suffix=" for you!">
+</h1>`}</pre>
+              <p className="mt-2 text-[11px] text-gray-500">
+                Separate strings with <code className="rounded bg-white px-1 py-0.5">|</code>. For strings that contain a <code>|</code>, pass a JSON array: <code className="rounded bg-white px-1 py-0.5">data-am-strings='["copy", "paste"]'</code>.
+              </p>
+            </div>
+          </>
         )}
 
         {/* Duration (hidden for typewriter, parallax, text-fill-scroll) */}

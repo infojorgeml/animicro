@@ -21,6 +21,36 @@ function safeInt(raw, fallback) {
   return isNaN(v) ? fallback : v;
 }
 
+/**
+ * Reads loop-related `data-am-*` attributes and returns Motion One-compatible
+ * options ({ repeat, repeatType, repeatDelay }). Returns an empty object when
+ * loop is disabled, so callers can spread it unconditionally:
+ *
+ *   animate(el, kf, { duration, delay, easing, ...getLoopOptions(el) });
+ *
+ * Recognised attributes:
+ *   - `data-am-loop`       "true" | "false" (default: false)
+ *   - `data-am-loop-mode`  "pingpong" | "restart" (default: "pingpong")
+ *   - `data-am-loop-delay` seconds, clamped to [0, 10] (default: 0)
+ */
+export function getLoopOptions(el) {
+  const d = el.dataset;
+  const raw = d.amLoop;
+  if (raw === undefined || raw === null || raw === '') return {};
+  const s = String(raw).toLowerCase().trim();
+  if (s !== 'true' && s !== '1' && s !== 'yes' && s !== 'on') return {};
+
+  const mode = (d.amLoopMode || 'pingpong').toLowerCase();
+  // Motion One: 'loop' = restart, 'reverse' = pingpong, 'mirror' = pingpong with reversed easing.
+  const repeatType = mode === 'restart' ? 'loop' : 'reverse';
+
+  let repeatDelay = parseFloat(d.amLoopDelay);
+  if (!Number.isFinite(repeatDelay) || repeatDelay < 0) repeatDelay = 0;
+  if (repeatDelay > 10) repeatDelay = 10;
+
+  return { repeat: Infinity, repeatType, repeatDelay };
+}
+
 export function getElementConfig(el, moduleId = '') {
   const d    = el.dataset;
   const mod  = (globals.moduleSettings && moduleId) ? (globals.moduleSettings[moduleId] || {}) : {};

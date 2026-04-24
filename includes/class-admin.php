@@ -320,7 +320,31 @@ class Animicro_Admin {
 				$entry['staggerDelay'] = $this->clamp_float( $raw_mod['staggerDelay'] ?? null, 0, 5, (float) $module_defaults['staggerDelay'] );
 			}
 			if ( isset( $module_defaults['typingSpeed'] ) ) {
-				$entry['typingSpeed'] = $this->clamp_float( $raw_mod['typingSpeed'] ?? null, 0.01, 2, (float) $module_defaults['typingSpeed'] );
+				$entry['typingSpeed'] = $this->clamp_float( $raw_mod['typingSpeed'] ?? null, 0.005, 2, (float) $module_defaults['typingSpeed'] );
+			}
+			if ( isset( $module_defaults['backSpeed'] ) ) {
+				$entry['backSpeed'] = $this->clamp_float( $raw_mod['backSpeed'] ?? null, 0.005, 2, (float) $module_defaults['backSpeed'] );
+			}
+			if ( isset( $module_defaults['backDelay'] ) ) {
+				$entry['backDelay'] = $this->clamp_float( $raw_mod['backDelay'] ?? null, 0, 10, (float) $module_defaults['backDelay'] );
+			}
+			if ( array_key_exists( 'loop', $module_defaults ) ) {
+				$entry['loop'] = isset( $raw_mod['loop'] ) ? (bool) $raw_mod['loop'] : (bool) $module_defaults['loop'];
+			}
+			if ( array_key_exists( 'shuffle', $module_defaults ) ) {
+				$entry['shuffle'] = isset( $raw_mod['shuffle'] ) ? (bool) $raw_mod['shuffle'] : (bool) $module_defaults['shuffle'];
+			}
+			if ( isset( $module_defaults['cursorChar'] ) ) {
+				$raw_cursor = isset( $raw_mod['cursorChar'] ) ? sanitize_text_field( (string) $raw_mod['cursorChar'] ) : '';
+				if ( '' === $raw_cursor ) {
+					$raw_cursor = (string) $module_defaults['cursorChar'];
+				}
+				// Limit to 3 characters; fall back to default on empty/all-whitespace post-trim.
+				$raw_cursor = function_exists( 'mb_substr' ) ? mb_substr( $raw_cursor, 0, 3 ) : substr( $raw_cursor, 0, 3 );
+				$entry['cursorChar'] = '' === $raw_cursor ? (string) $module_defaults['cursorChar'] : $raw_cursor;
+			}
+			if ( array_key_exists( 'cursorPersist', $module_defaults ) ) {
+				$entry['cursorPersist'] = isset( $raw_mod['cursorPersist'] ) ? (bool) $raw_mod['cursorPersist'] : (bool) $module_defaults['cursorPersist'];
 			}
 			if ( isset( $module_defaults['speed'] ) ) {
 				$entry['speed'] = $this->clamp_float( $raw_mod['speed'] ?? null, -5, 5, (float) $module_defaults['speed'] );

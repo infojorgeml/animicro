@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.6.0
+Stable tag: 1.9.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -22,6 +22,8 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 * **Scale** (`.am-scale`) — Scales from small to full size
 * **Slide Up** (`.am-slide-up`) — Slides up when appearing
 * **Slide Down** (`.am-slide-down`) — Slides down when appearing
+* **Slide Left** (`.am-slide-left`) — Slides in from the right
+* **Slide Right** (`.am-slide-right`) — Slides in from the left
 * **Highlight** (`.am-highlight`) — Animated marker highlight behind text on entry
 * **Typewriter** (`.am-typewriter`) — Types text character by character with a blinking cursor
 
@@ -29,7 +31,7 @@ Each module has its own settings panel with live preview so you can tune duratio
 
 = Pro modules (available with Animicro Pro) =
 
-Blur, Stagger, Grid Reveal, Text Fill on Scroll, Parallax, Split Text, Text Reveal, Slide Right, and Slide Left. Plus Smooth Scroll and a Cheat Sheet reference panel. Learn more at [animicro.com](https://animicro.com).
+Blur, Stagger, Grid Reveal, Text Fill on Scroll, Parallax, Split Text, and Text Reveal. Plus Smooth Scroll and a Cheat Sheet reference panel. Learn more at [animicro.com](https://animicro.com).
 
 = Builder compatibility =
 
@@ -80,6 +82,18 @@ https://github.com/infojorgeml/animicro
 
 == Changelog ==
 
+= 1.9.0 =
+* Slide Left (`.am-slide-left`) and Slide Right (`.am-slide-right`) are now part of the Free tier. Free users get four slide directions (up, down, left, right) out of the box. No configuration change needed if you're upgrading — just enable them from the Animicro → Modules panel.
+
+= 1.8.0 =
+* Loop support on entry animations — `fade`, `scale`, `slide-up`, `slide-down`, `slide-left`, `slide-right` and `blur` now accept `data-am-loop="true"` to repeat forever. Use `data-am-loop-mode` (`pingpong` default, or `restart`) and `data-am-loop-delay` to fine-tune. Loop is opt-in per element and automatically skipped under `prefers-reduced-motion: reduce`.
+
+= 1.7.0 =
+* Typewriter: major upgrade — rotating strings via `data-am-strings` (pipe- or JSON-separated), with `data-am-prefix` / `data-am-suffix` wrapping the rotating word. State machine types forward, holds, deletes, and cycles through the list. New controls: Back speed, Back delay, Loop, Shuffle, Cursor character, Cursor persist.
+* Typewriter: **breaking change** — the cursor now stays blinking after typing ends by default (classic typewriter look). Set `data-am-cursor-persist="false"` (or disable the admin toggle) to restore the 1.6 fade-out behaviour.
+* Typewriter: accessibility improved — `aria-label` exposes the full `prefix + strings.join(", ") + suffix` so screen readers announce the complete phrase once instead of per-character.
+* Admin: the Typewriter settings panel now exposes Typing speed, Back speed, Back delay, Cursor character, Loop, Shuffle and Cursor persist toggles, with a live rotating preview.
+
 = 1.6.0 =
 * Highlight: fixed delay bug where a stray `data-am-delay` attribute on the page could produce absurdly long delays (e.g. 20 s). Delay and duration are now clamped in JS. Marker moved from `::after` to `::before` with `display: inline-block` for accurate width tracking inside all builders. Double-init guard added.
 * Typewriter: now respects `prefers-reduced-motion` (shows full text immediately with no animation). Cursor CSS moved out of runtime style injection into the stylesheet. New `data-am-cursor` attribute for a custom cursor character. Double-init guard added.
@@ -124,6 +138,15 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.9.0 =
+Slide Left and Slide Right are now Free. No breaking changes.
+
+= 1.8.0 =
+New opt-in loop support on fade, scale, slide-* and blur. No breaking changes.
+
+= 1.7.0 =
+Typewriter gains rotating strings (prefix + strings + suffix), back-speed, back-delay, loop, shuffle and a persistent cursor by default. Breaking: cursor no longer fades out — set data-am-cursor-persist="false" to restore the old behaviour.
 
 = 1.6.0 =
 Bug fix for Highlight delay and Typewriter reduced-motion support. Recommended update.

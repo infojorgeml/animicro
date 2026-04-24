@@ -7,8 +7,8 @@ class Animicro_License_Manager {
 
 	const OPTION_NAME = 'animicro_premium_active';
 
-	const PRO_MODULES  = [ 'blur', 'stagger', 'grid-reveal', 'text-fill-scroll', 'parallax', 'split', 'slide-right', 'slide-left', 'text-reveal' ];
-	const FREE_MODULES = [ 'fade', 'slide-up', 'slide-down', 'scale', 'highlight', 'typewriter' ];
+	const PRO_MODULES  = [ 'blur', 'stagger', 'grid-reveal', 'text-fill-scroll', 'parallax', 'split', 'text-reveal' ];
+	const FREE_MODULES = [ 'fade', 'slide-up', 'slide-down', 'slide-left', 'slide-right', 'scale', 'highlight', 'typewriter' ];
 
 	private string $api_url = 'https://uhnaedqfygrqdptjngqb.supabase.co/functions/v1/license-check';
 

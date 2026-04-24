@@ -4,7 +4,7 @@
 **Tags:** animation, motion, css, performance, page-builder
 **Requires at least:** 6.0
 **Tested up to:** 6.9
-**Stable tag:** 1.6.0
+**Stable tag:** 1.9.0
 **Requires PHP:** 7.4
 **License:** GPLv2 or later
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
@@ -39,6 +39,8 @@ Under **Animicro → Advanced** you can enable **Respect Reduced Motion** (skips
 | Scale | `.am-scale` | Scales from small to full size |
 | Slide Up | `.am-slide-up` | Slides up when appearing |
 | Slide Down | `.am-slide-down` | Slides down when appearing |
+| Slide Left | `.am-slide-left` | Slides in from the right |
+| Slide Right | `.am-slide-right` | Slides in from the left |
 | Highlight | `.am-highlight` | Marker-style highlight behind text on entry |
 | Typewriter | `.am-typewriter` | Types text character by character with blinking cursor |
 

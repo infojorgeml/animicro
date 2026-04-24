@@ -9,7 +9,11 @@ interface AnimationPreviewProps {
 }
 
 const REVEAL_LINES = ['Motion', 'Micro', 'Animations'];
-const TYPEWRITER_TEXT = 'Animicro';
+const TYPEWRITER_DEMO = {
+  prefix: 'We ',
+  strings: ['design', 'code', 'launch'],
+  suffix: ' for you!',
+};
 
 export default function AnimationPreview({ moduleId, config, onReset }: AnimationPreviewProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -43,25 +47,77 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
       textNode.textContent = '';
       cursor.style.opacity = '1';
       cursor.style.transition = 'none';
+      cursor.textContent = config.cursorChar || '|';
 
-      let i = 0;
-      const speed = (config.typingSpeed ?? 0.06) * 1000;
-      const startDelay = config.delay * 1000;
+      const strings = TYPEWRITER_DEMO.strings;
+      const typingSpeed = Math.max(0.005, config.typingSpeed ?? 0.06) * 1000;
+      const backSpeed = Math.max(0.005, config.backSpeed ?? 0.03) * 1000;
+      const startDelay = Math.max(0, config.delay ?? 0) * 1000;
+      const backDelay = Math.max(0, config.backDelay ?? 1.5) * 1000;
+      const loop = config.loop ?? true;
+      const shuffle = config.shuffle ?? false;
+      const cursorPersist = config.cursorPersist ?? true;
 
-      function typeNext() {
-        if (i < TYPEWRITER_TEXT.length) {
-          textNode!.textContent += TYPEWRITER_TEXT[i];
-          i++;
-          twTimerRef.current = window.setTimeout(typeNext, speed);
-        } else {
-          twTimerRef.current = window.setTimeout(() => {
-            cursor!.style.transition = 'opacity 0.4s';
-            cursor!.style.opacity = '0';
-          }, 600);
+      // Simple order: in shuffle mode we just randomize the first cycle for
+      // the preview — not worth the no-repeat bookkeeping here.
+      let order = strings.map((_, i) => i);
+      if (shuffle) {
+        for (let i = order.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [order[i], order[j]] = [order[j], order[i]];
         }
       }
+      let orderPos = 0;
 
-      twTimerRef.current = window.setTimeout(typeNext, startDelay);
+      function typeString(str: string) {
+        let i = textNode!.textContent!.length;
+        function frame() {
+          if (i < str.length) {
+            textNode!.textContent = (textNode!.textContent ?? '') + str[i++];
+            twTimerRef.current = window.setTimeout(frame, typingSpeed);
+          } else {
+            onTyped();
+          }
+        }
+        frame();
+      }
+
+      function deleteString(done: () => void) {
+        function frame() {
+          const data = textNode!.textContent ?? '';
+          if (data.length > 0) {
+            textNode!.textContent = data.slice(0, -1);
+            twTimerRef.current = window.setTimeout(frame, backSpeed);
+          } else {
+            done();
+          }
+        }
+        frame();
+      }
+
+      function onTyped() {
+        const singleNoLoop = strings.length === 1 && !loop;
+        const isLast = orderPos === order.length - 1;
+        if (singleNoLoop || (!loop && isLast)) {
+          if (!cursorPersist) {
+            twTimerRef.current = window.setTimeout(() => {
+              cursor!.style.transition = 'opacity 0.4s';
+              cursor!.style.opacity = '0';
+            }, 600);
+          }
+          return;
+        }
+        twTimerRef.current = window.setTimeout(() => {
+          deleteString(() => {
+            orderPos = (orderPos + 1) % order.length;
+            typeString(strings[order[orderPos]]);
+          });
+        }, backDelay);
+      }
+
+      twTimerRef.current = window.setTimeout(() => {
+        typeString(strings[order[orderPos]]);
+      }, startDelay);
       return;
     }
 
@@ -294,7 +350,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
       controlsRef.current.finished.catch(() => {});
     });
-  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, config.speed, config.origin, config.highlightColor, config.highlightDirection, config.colorBase, config.colorFill, config.scrollStart, config.scrollEnd, moduleId, isSplit, isTextReveal, isTypewriter, isHighlight, isTextFillScroll, isStagger, isGridReveal, isParallax]);
+  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, config.backSpeed, config.backDelay, config.loop, config.shuffle, config.cursorChar, config.cursorPersist, config.speed, config.origin, config.highlightColor, config.highlightDirection, config.colorBase, config.colorFill, config.scrollStart, config.scrollEnd, moduleId, isSplit, isTextReveal, isTypewriter, isHighlight, isTextFillScroll, isStagger, isGridReveal, isParallax]);
 
   useEffect(() => {
     play();
@@ -415,26 +471,25 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
     }
 
     if (isTypewriter) {
+      const gradient = {
+        background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+      } as React.CSSProperties;
       return (
-        <div ref={ref} style={{ fontSize: '28px', fontWeight: 700, letterSpacing: '0.02em' }}>
-          <span
-            data-tw-text=""
-            style={{
-              background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
-          />
+        <div ref={ref} style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '0.01em', textAlign: 'center', padding: '0 12px', whiteSpace: 'pre-wrap' }}>
+          <span style={{ color: '#4b5563' }}>{TYPEWRITER_DEMO.prefix}</span>
+          <span data-tw-text="" style={gradient} />
+          <span style={{ color: '#4b5563' }}>{TYPEWRITER_DEMO.suffix}</span>
           <span
             data-tw-cursor=""
             style={{
-              display: 'inline',
+              display: 'inline-block',
               animation: 'am-tw-blink-preview 0.7s steps(2) infinite',
-              background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              marginLeft: '2px',
+              ...gradient,
             }}
-          >|</span>
+          >{config.cursorChar || '|'}</span>
           <style>{`@keyframes am-tw-blink-preview{0%,100%{opacity:1}50%{opacity:0}}`}</style>
         </div>
       );
@@ -526,7 +581,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
             : isParallax
             ? `speed ${config.speed ?? 0.5} · ${((config.speed ?? 0.5) * 100).toFixed(0)}px range`
             : isTypewriter
-            ? `${config.typingSpeed ?? 0.06}s/char · ${config.delay}s delay`
+            ? `${config.typingSpeed ?? 0.06}s type · ${config.backSpeed ?? 0.03}s back · hold ${config.backDelay ?? 1.5}s${(config.loop ?? true) ? ' · loop' : ''}${(config.shuffle ?? false) ? ' · shuffle' : ''}`
             : <>
                 {config.duration}s · {config.easing} · {config.delay}s delay
                 {moduleId.startsWith('slide') && config.distance != null && ` · ${config.distance}px`}

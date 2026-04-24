@@ -1,6 +1,6 @@
 # Animicro — Development Reference
 
-**Release:** 1.6.0 (2026-04-20). See CHANGELOG for history.
+**Release:** 1.9.0 (2026-04-24). See CHANGELOG for history.
 
 Utility-first micro-animations for WordPress powered by [Motion One](https://motion.dev/). This document describes the architecture and conventions for developers and AI assistants.
 
@@ -73,8 +73,8 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 
 ## Pro License
 
-- **Free modules**: fade, scale, slide-up, slide-down, highlight, typewriter.
-- **Pro modules**: blur, stagger, grid-reveal, text-fill-scroll, parallax, split, slide-right, slide-left, text-reveal. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
+- **Free modules**: fade, scale, slide-up, slide-down, slide-left, slide-right, highlight, typewriter.
+- **Pro modules**: blur, stagger, grid-reveal, text-fill-scroll, parallax, split, text-reveal. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
 - **Cheat Sheet** and **Smooth Scroll** tabs are Pro-only.
 - License validation via Supabase; product slug `animicro`.
 
@@ -109,13 +109,24 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 | `data-am-delay` | float (s) | 0 | All |
 | `data-am-easing` | string | ease-out | All |
 | `data-am-margin` | string | -50px 0px | All |
+| `data-am-loop` | bool | false | fade, scale, slide-*, blur — enable infinite looping |
+| `data-am-loop-mode` | string | pingpong | fade, scale, slide-*, blur — `pingpong` (A→B→A) or `restart` (A→B, A→B) |
+| `data-am-loop-delay` | float (s) | 0 | fade, scale, slide-*, blur — pause between iterations |
 | `data-am-distance` | float (px) | 30 | slide-*, split, stagger, grid-reveal |
 | `data-am-scale` | float | 0.95 | scale |
 | `data-am-blur` | float (px) | 4 | blur |
 | `data-am-stagger` | float (s) | 0.05–0.1 | stagger, split, text-reveal, grid-reveal |
 | `data-am-speed` | float | 0.5 | parallax |
-| `data-am-typing-speed` | float (s) | 0.06 | typewriter |
+| `data-am-typing-speed` | float (s) | 0.06 | typewriter — forward typing speed |
+| `data-am-back-speed` | float (s) | 0.03 | typewriter — deletion speed |
+| `data-am-back-delay` | float (s) | 1.5 | typewriter — hold before deleting |
+| `data-am-prefix` | string | (empty) | typewriter — static text before the rotating string |
+| `data-am-suffix` | string | (empty) | typewriter — static text after the rotating string |
+| `data-am-strings` | JSON / pipes | (element text) | typewriter — list of rotating strings (`"a\|b\|c"` or `'["a","b"]'`) |
+| `data-am-loop` | bool | true | typewriter — cycle strings forever |
+| `data-am-shuffle` | bool | false | typewriter — randomize order each cycle |
 | `data-am-cursor` | string | `\|` | typewriter — custom cursor char, e.g. `▍` or `_` |
+| `data-am-cursor-persist` | bool | true | typewriter — keep cursor blinking after typing ends |
 | `data-am-origin` | string | center | grid-reveal only — `center`, corners, `top`/`right`/`bottom`/`left`, or `random` (on container) |
 | `data-am-highlight-color` | hex / rgba / var(--…) | #fde68a | highlight |
 | `data-am-highlight-direction` | string | left | highlight — `left`, `right`, `center` |
@@ -139,13 +150,43 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 
 ## Typewriter (text)
 
-- **Class**: `.am-typewriter` on any text element. The script reads `textContent`, clears the element, then types characters back one-by-one via a single updating text node followed by a blinking cursor span.
-- **Config**: `typingSpeed` (seconds per character, default `0.06`), `delay` (start delay in seconds), `margin` (IntersectionObserver root margin).
-- **Custom cursor**: add `data-am-cursor="▍"` to change the cursor character. Default: `|`.
-- **Reduced motion**: when `prefers-reduced-motion: reduce` is set, the full text is shown immediately with no cursor and no animation.
-- **Accessibility**: `aria-label` is set to the full text before the element is emptied, so screen readers announce the complete string.
+- **Class**: `.am-typewriter` on any text element. The script builds a four-span structure — `<span.am-tw-prefix>` · `<span.am-tw-text>` · `<span.am-tw-suffix>` · `<span.am-tw-cursor aria-hidden>` — and mutates the text node inside `.am-tw-text` in place to avoid node churn.
+- **Content sources**: `data-am-strings` (JSON array or `|`-separated list) defines the rotating strings; `data-am-prefix` / `data-am-suffix` wrap static text around them. When neither attribute is present the module falls back to the element's `textContent` as a single string (backward-compatible with 1.6).
+- **State machine**: `IDLE → TYPING(i) → HOLDING(backDelay) → DELETING(i) → next index`. When `loop=true` it cycles forever; when `loop=false` it stops on the last string typed (no trailing delete).
+- **Shuffle**: with `shuffle=true` the module reshuffles per cycle and guarantees no two consecutive cycles start with the same string.
+- **Config keys** (module defaults, overridable per-element via `data-am-*`): `typingSpeed`, `backSpeed`, `delay` (start delay), `backDelay`, `loop`, `shuffle`, `cursorChar`, `cursorPersist`, `margin`.
+- **Cursor persists by default** (1.7 breaking change): the blinking cursor stays after typing ends. Set `data-am-cursor-persist="false"` (or disable the admin toggle) for the legacy 1.6 fade-out behaviour.
+- **Reduced motion**: when `prefers-reduced-motion: reduce` is set, renders `prefix + strings[0] + suffix` immediately without cursor or cycling.
+- **Accessibility**: `aria-label` is set to `prefix + strings.join(", ") + suffix` once, so assistive tech announces the full phrase instead of each character. The cursor span is `aria-hidden`.
 - **Double-init guard**: `data-am-typewriter-ready="1"` prevents re-running on HMR or repeated calls.
-- **Note**: `typingSpeed` and `delay` from `data-am-*` are clamped to their safe ranges at the JS layer.
+- **Clamping**: all numeric values (`typingSpeed`, `backSpeed`, `delay`, `backDelay`) are clamped at the JS layer to match the PHP sanitiser ranges.
+
+Example — rotating strings:
+
+```html
+<h1 class="am-typewriter"
+    data-am-prefix="We "
+    data-am-strings="design|code|launch"
+    data-am-suffix=" for you!"></h1>
+```
+
+## Loop (per-element, opt-in)
+
+Entry modules `fade`, `scale`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, and `blur` accept three `data-am-*` attributes that hand Motion One's `repeat` options directly to `animate()`:
+
+- `data-am-loop="true"` — enables infinite repeat.
+- `data-am-loop-mode="pingpong"` (default) — Motion's `repeatType: 'reverse'`; the animation plays A→B→A→B. Use `"restart"` for `repeatType: 'loop'` (A→B, snap back to A, A→B…).
+- `data-am-loop-delay="0.5"` — clamped to `[0, 10]` seconds, pause between iterations.
+
+Implemented in `frontend/src/core/config.js` → `getLoopOptions(el)`, which returns an empty object when loop is disabled so callers can spread it unconditionally:
+
+```js
+animate(el, keyframes, { duration, delay, easing, ...getLoopOptions(el) });
+```
+
+Opt-in only: default entry-animation semantics (one-shot on scroll-in) are unchanged. Loop is automatically ignored under `prefers-reduced-motion: reduce` because the whole module runtime is skipped via `main.js`.
+
+Not yet wired into: `highlight` (CSS transition), `stagger`, `grid-reveal`, `split`, `text-reveal`, `parallax`, `text-fill-scroll`, `typewriter` (typewriter already has its own richer loop system).
 
 ## Grid Reveal (spatial group)
 

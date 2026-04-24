@@ -1,5 +1,5 @@
 import { animate, inView } from 'motion';
-import { getElementConfig } from '../core/config.js';
+import { getElementConfig, getLoopOptions } from '../core/config.js';
 
 export function init(name) {
   const selector = `.am-${name}`;
@@ -12,12 +12,13 @@ export function init(name) {
     const cfg = getElementConfig(el, name);
     const from = isNegative ? -cfg.distance : cfg.distance;
     const axis = isHorizontal ? 'x' : 'y';
+    const loop = getLoopOptions(el);
 
     inView(el, () => {
       animate(
         el,
         { opacity: [0, 1], [axis]: [from, 0] },
-        { duration: cfg.duration, delay: cfg.delay, easing: cfg.easing }
+        { duration: cfg.duration, delay: cfg.delay, easing: cfg.easing, ...loop }
       );
     }, { margin: cfg.margin });
   });

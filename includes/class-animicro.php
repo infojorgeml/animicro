@@ -7,7 +7,7 @@ class Animicro {
 
 	const PRO_MODULES = [
 		'blur', 'stagger', 'grid-reveal', 'text-fill-scroll',
-		'parallax', 'split', 'slide-right', 'slide-left', 'text-reveal',
+		'parallax', 'split', 'text-reveal',
 	];
 
 	private static ?Animicro $instance = null;
@@ -122,11 +122,17 @@ class Animicro {
 					'staggerDelay' => 0.12,
 				],
 				'typewriter' => [
-					'duration'    => 0.6,
-					'easing'      => 'ease-out',
-					'delay'       => 0.0,
-					'margin'      => '-50px 0px',
-					'typingSpeed' => 0.06,
+					'duration'      => 0.6,
+					'easing'        => 'ease-out',
+					'delay'         => 0.0,
+					'margin'        => '-50px 0px',
+					'typingSpeed'   => 0.06,
+					'backSpeed'     => 0.03,
+					'backDelay'     => 1.5,
+					'loop'          => true,
+					'shuffle'       => false,
+					'cursorChar'    => '|',
+					'cursorPersist' => true,
 				],
 				'stagger' => [
 					'duration'     => 0.6,

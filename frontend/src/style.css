@@ -64,8 +64,13 @@
 .am-tfs-base { color: var(--color-base); }
 .am-tfs-fill { position: absolute; left: 0; top: 0; color: var(--color-fill); }
 
-/* 3b. TYPEWRITER: blinking cursor */
-.am-tw-text {
+/* 3b. TYPEWRITER: blinking cursor + rotating strings structure.
+   Prefix / text / suffix / cursor all render inline and inherit the host
+   element's typography. `pre-wrap` preserves author-authored spaces in the
+   prefix and suffix (e.g. trailing " " before the rotating string). */
+.am-tw-prefix,
+.am-tw-text,
+.am-tw-suffix {
   white-space: pre-wrap;
 }
 .am-tw-cursor {
