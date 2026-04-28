@@ -379,6 +379,9 @@ class Animicro_Admin {
 			if ( isset( $module_defaults['skew'] ) ) {
 				$entry['skew'] = $this->clamp_float( $raw_mod['skew'] ?? null, -45, 45, (float) $module_defaults['skew'] );
 			}
+			if ( isset( $module_defaults['zoomScale'] ) ) {
+				$entry['zoomScale'] = $this->clamp_float( $raw_mod['zoomScale'] ?? null, 1.01, 2, (float) $module_defaults['zoomScale'] );
+			}
 
 			$clean_module_settings[ $module_id ] = $entry;
 		}

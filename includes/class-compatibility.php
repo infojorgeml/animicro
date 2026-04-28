@@ -30,6 +30,8 @@ class Animicro_Compatibility {
 		'highlight'        => '',
 		'text-fill-scroll' => '',
 		'parallax'         => '',
+		'hover-zoom'       => '',
+		'img-parallax'     => '',
 		'split-chars' => 'opacity:0;will-change:opacity,transform;',
 		'split-words' => 'opacity:0;will-change:opacity,transform;',
 		'text-reveal' => 'opacity:0;will-change:opacity,transform;',

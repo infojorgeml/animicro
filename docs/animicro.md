@@ -1,6 +1,6 @@
 # Animicro — Development Reference
 
-**Release:** 1.10.3 (2026-04-24). See CHANGELOG for history.
+**Release:** 1.11.1 (2026-04-28). See CHANGELOG for history.
 
 Utility-first micro-animations for WordPress powered by [Motion One](https://motion.dev/). This document describes the architecture and conventions for developers and AI assistants.
 
@@ -46,7 +46,7 @@ animicro/
 ## Frontend Modules
 
 - **Entry**: `frontend/src/main.js` → `loadModules(activeModules)` from `core/registry.js`.
-- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `skew-up`, `scale`, `blur`, `float`, `pulse`, `stagger`, `grid-reveal`, `highlight`, `text-fill-scroll`, `parallax`, `split`, `text-reveal`, `typewriter`. Each exports `init()`.
+- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `skew-up`, `scale`, `blur`, `float`, `pulse`, `hover-zoom`, `stagger`, `grid-reveal`, `highlight`, `text-fill-scroll`, `parallax`, `img-parallax`, `split`, `text-reveal`, `typewriter`. Each exports `init()`.
 - **Config**: `getElementConfig(el, moduleId)` merges `el.dataset.am*` with `moduleSettings[moduleId]` and fallbacks.
 - **Code splitting**: Dynamic `import()` per module; only active modules load. **Smooth scroll** (`frontend/src/smooth-scroll.js`) is loaded only when `animicroFrontData.smoothScroll` is present (Pro + enabled in settings).
 
@@ -73,10 +73,14 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 
 ## Pro License
 
-- **Free modules**: fade, scale, slide-up, slide-down, slide-left, slide-right, skew-up, float, pulse, highlight, typewriter.
-- **Pro modules**: blur, stagger, grid-reveal, text-fill-scroll, parallax, split, text-reveal. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
+- **Free modules**: fade, scale, slide-up, slide-down, slide-left, slide-right, skew-up, float, pulse, highlight, typewriter, hover-zoom.
+- **Pro modules**: blur, stagger, grid-reveal, text-fill-scroll, parallax, img-parallax, split, text-reveal. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
 - **Cheat Sheet** and **Smooth Scroll** tabs are Pro-only.
-- License validation via Supabase; product slug `animicro`.
+- License validation via Supabase (LicenSuite v2); product slug `animicro`. Two endpoints:
+  - `GET /functions/v1/license-check?license=…&domain=…&product=animicro` — multi-site aware. Returns `{ valid, reason, plan, expires_at, sites: { used, max, unlimited } }`. New denial reason `limit_reached` when no seats are free; payload includes `sites.active_domains` for support.
+  - `GET /functions/v1/license-deactivate?license=…&domain=…&product=animicro` — releases the seat held by the current domain. Idempotent. Called fire-and-forget from `Animicro::deactivate()` (deactivation hook), `uninstall.php`, and `save_license_key()` when the user pastes a new key.
+- **Local development bypass**: `Animicro_License_Manager::is_development_domain()` short-circuits `validate_license()` on `localhost`, `*.local`, `*.test`, `*.localhost`, `*.invalid`, `*.example`, IPv6 loopback `::1`, and IPv4 private ranges (`127.x`, `10.x`, `192.168.x`, `172.16-31.x`). No network call, no seat consumed, full Pro feature unlock locally. Override via the `animicro_is_development_domain` filter for unusual setups.
+- **License key at rest**: AES-256-CBC encrypted in `animicro_license_key` using a key derived from `AUTH_KEY` + `SECURE_AUTH_KEY`. Legacy plaintext values are migrated transparently on first read.
 
 ## Key Files
 

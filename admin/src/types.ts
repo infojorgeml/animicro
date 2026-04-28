@@ -25,6 +25,7 @@ export interface ModuleConfig {
   amplitude?: number;
   scaleMax?: number;
   skew?: number;
+  zoomScale?: number;
 }
 
 export interface SmoothScrollConfig {

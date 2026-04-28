@@ -7,7 +7,7 @@ class Animicro {
 
 	const PRO_MODULES = [
 		'blur', 'stagger', 'grid-reveal', 'text-fill-scroll',
-		'parallax', 'split', 'text-reveal',
+		'parallax', 'split', 'text-reveal', 'img-parallax',
 	];
 
 	private static ?Animicro $instance = null;
@@ -49,13 +49,27 @@ class Animicro {
 	}
 
 	public static function deactivate(): void {
-		// Cleanup transients if needed in the future.
+		// LicenSuite v2: release the seat held by this domain so the user
+		// can reuse the licence on another site without contacting support.
+		// Best-effort — fire-and-forget, never blocks the deactivation flow.
+		if ( self::is_pro_plugin() ) {
+			if ( ! class_exists( 'Animicro_License_Manager' ) ) {
+				$file = ANIMICRO_DIR . 'includes/class-license-manager.php';
+				if ( is_readable( $file ) ) {
+					require_once $file;
+				}
+			}
+			if ( class_exists( 'Animicro_License_Manager' ) ) {
+				$license_manager = new Animicro_License_Manager();
+				$license_manager->deactivate_license( null, false );
+			}
+		}
 	}
 
 	public static function get_default_settings(): array {
 		return [
 			'active_modules'    => [],
-			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'float', 'pulse', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'split', 'text-reveal', 'typewriter' ],
+			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'float', 'pulse', 'hover-zoom', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'img-parallax', 'split', 'text-reveal', 'typewriter' ],
 			'active_builders'   => [ 'none' ],
 			'module_settings'   => [
 				'fade' => [
@@ -197,6 +211,20 @@ class Animicro {
 					'margin'   => '-50px 0px',
 					'distance' => 40,
 					'skew'     => 5,
+				],
+				'hover-zoom' => [
+					'duration'  => 0.4,
+					'easing'    => 'ease-out',
+					'delay'     => 0.0,
+					'margin'    => '-50px 0px',
+					'zoomScale' => 1.08,
+				],
+				'img-parallax' => [
+					'duration' => 0.6,
+					'easing'   => 'linear',
+					'delay'    => 0.0,
+					'margin'   => '-50px 0px',
+					'speed'    => 0.2,
 				],
 			],
 			'smooth_scroll' => [

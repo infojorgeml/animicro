@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 import ColorField from './ColorField';
@@ -31,6 +31,8 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   float: DEFAULT_FLOAT_CONFIG,
   pulse: DEFAULT_PULSE_CONFIG,
   'skew-up': DEFAULT_SKEW_UP_CONFIG,
+  'hover-zoom': DEFAULT_HOVER_ZOOM_CONFIG,
+  'img-parallax': DEFAULT_IMG_PARALLAX_CONFIG,
 };
 
 const hasDistance = (id: string) => id.startsWith('slide-') || id === 'skew-up' || id === 'split' || id === 'stagger' || id === 'grid-reveal';
@@ -77,6 +79,64 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-8 items-start">
 
       <div className="space-y-8 max-w-lg">
+
+        {/* Image Parallax speed (img-parallax only) */}
+        {moduleId === 'img-parallax' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Speed
+              <span className="font-mono text-brand-500">{config.speed ?? 0.2}</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              How far the inner image travels inside its frame. Higher values produce a stronger window effect.
+            </p>
+            <input
+              type="range"
+              min="0.05"
+              max="1"
+              step="0.05"
+              value={config.speed ?? 0.2}
+              onChange={e => onUpdate({ speed: parseFloat(e.target.value) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0.05 — Subtle</span>
+              <span>1.0 — Dramatic</span>
+            </div>
+            <p className="mt-2 text-[11px] text-gray-500">
+              Tip: place an <code className="rounded bg-gray-100 px-1 py-0.5">&lt;img&gt;</code> inside an element with <code className="rounded bg-gray-100 px-1 py-0.5">overflow: hidden</code>. The image translates inside its frame as the user scrolls.
+            </p>
+          </div>
+        )}
+
+        {/* Zoom scale (hover-zoom only) */}
+        {moduleId === 'hover-zoom' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Zoom scale
+              <span className="font-mono text-brand-500">{config.zoomScale ?? 1.08}</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Final scale on hover. Subtle values (1.05–1.10) feel premium; higher values feel playful.
+            </p>
+            <input
+              type="range"
+              min="1.01"
+              max="1.5"
+              step="0.01"
+              value={config.zoomScale ?? 1.08}
+              onChange={e => onUpdate({ zoomScale: parseFloat(e.target.value) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>1.01 — Whisper</span>
+              <span>1.5 — Bold</span>
+            </div>
+            <p className="mt-2 text-[11px] text-gray-500">
+              Tip: the parent of the image needs <code className="rounded bg-gray-100 px-1 py-0.5">overflow: hidden</code> so the zoom stays within the card frame.
+            </p>
+          </div>
+        )}
 
         {/* Parallax speed (parallax only) */}
         {moduleId === 'parallax' && (
@@ -361,8 +421,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && (
+        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse, img-parallax) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && moduleId !== 'img-parallax' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Duration
@@ -387,8 +447,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
         )}
 
-        {/* Delay (hidden for parallax, text-fill-scroll) */}
-        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && (
+        {/* Delay (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom) */}
+        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Delay
@@ -707,8 +767,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Easing (hidden for typewriter, parallax, text-fill-scroll) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && (
+        {/* Easing (hidden for typewriter, parallax, text-fill-scroll, img-parallax) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Easing curve
@@ -734,8 +794,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
         )}
 
-        {/* Activation margin (hidden for parallax, text-fill-scroll) */}
-        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && (
+        {/* Activation margin (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom) */}
+        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Activation margin

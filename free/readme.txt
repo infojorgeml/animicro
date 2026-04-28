@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.10.3
+Stable tag: 1.11.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -29,12 +29,13 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 * **Pulse** (`.am-pulse`) — Infinite gentle scale pulse — breathing-like (continuous)
 * **Highlight** (`.am-highlight`) — Animated marker highlight behind text on entry
 * **Typewriter** (`.am-typewriter`) — Types text character by character with a blinking cursor
+* **Zoom Hover** (`.am-hover-zoom`) — Image scales up smoothly on hover (parent needs `overflow: hidden`)
 
 Each module has its own settings panel with live preview so you can tune duration, easing, delay, and activation margin without leaving the admin.
 
 = Pro modules (available with Animicro Pro) =
 
-Blur, Stagger, Grid Reveal, Text Fill on Scroll, Parallax, Split Text, and Text Reveal. Plus Smooth Scroll and a Cheat Sheet reference panel. Learn more at [animicro.com](https://animicro.com).
+Blur, Stagger, Grid Reveal, Text Fill on Scroll, Parallax, Image Parallax (window effect), Split Text, and Text Reveal. Plus Smooth Scroll and a Cheat Sheet reference panel. Learn more at [animicro.com](https://animicro.com).
 
 = Builder compatibility =
 
@@ -84,6 +85,14 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.11.1 =
+* No user-facing changes in the free tier. Internal compatibility update for the licence backend used by Animicro Pro (multi-site licensing, automatic seat release on plugin deactivation, local-development bypass on `localhost` / `*.local` / `*.test`).
+
+= 1.11.0 =
+* New Free module: **Zoom Hover** (`.am-hover-zoom`) — image scales up on hover. Tunable via `data-am-zoom-scale`. Parent needs `overflow: hidden`.
+* New Pro module: **Image Parallax** (`.am-img-parallax`) — "window effect" that translates the inner `<img>` on scroll inside an `overflow: hidden` frame.
+* New admin category: **Media & Images**.
 
 = 1.10.3 =
 * No user-facing changes in the free tier. Internal consistency pass: deduplicated the `data-am-loop` row in the Pro Cheat Sheet, simplified the frontend module loader, and added `.am-parallax` to the base visibility selector for consistency.
@@ -159,6 +168,12 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.11.1 =
+Internal compatibility update for the Pro licence backend. No user-facing changes in the free tier.
+
+= 1.11.0 =
+New Free module Zoom Hover for image cards plus a new Media & Images category. No breaking changes.
 
 = 1.10.3 =
 Internal consistency pass. No user-facing changes in the free tier.

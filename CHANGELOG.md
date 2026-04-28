@@ -5,6 +5,41 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.1] - 2026-04-28
+
+### Changed
+
+- **Pro — License manager updated for LicenSuite v2.0.0.** The licensing backend introduced multi-site licensing and a new `/license-deactivate` endpoint. `includes/class-license-manager.php` now:
+  - Calls `/license-deactivate` on plugin deactivation (`Animicro::deactivate()`) and uninstall (`uninstall.php`) so the seat is released automatically and the user can move the licence to another site without contacting support. Fire-and-forget, never blocks the WP flow.
+  - Releases the previous seat when the user pastes a new licence key in `save_license_key()` (blocking, best-effort).
+  - Persists the v2 payload (`sites.used`, `sites.max`, `sites.unlimited`, `expires_at`) in `animicro_license_data` for `limit_reached` / `expired` / `disabled` / `product_mismatch` responses, instead of stripping the response down to a generic invalid.
+  - Handles HTTP 429 → `rate_limited` and the new v2 reasons (`limit_reached`, `reserved_domain`, `invalid_license_format`, `invalid_product_format`, `invalid_domain`) with translated user-facing messages.
+
+### Added
+
+- **Pro — Local development bypass.** `Animicro_License_Manager::is_development_domain()` mirrors LicenSuite's reserved-domain rule (`localhost`, `::1`, `*.local`, `*.test`, `*.localhost`, `*.invalid`, `*.example`, IPv4 in `127.x` / `10.x` / `192.168.x` / `172.16-31.x`) and short-circuits `validate_license()` on those hosts: no network call, no seat consumed, full Pro feature unlock locally. Override via the `animicro_is_development_domain` filter for unusual setups (custom dev TLDs, public staging that should still validate normally, etc.).
+
+### Fixed
+
+- **Pro — `reserved_domain` no longer blocks development.** Before this release, working on a Pro plugin from `localhost` returned a hard `reserved_domain` error from the v2 server and disabled all Pro modules. The new bypass restores the previous developer experience without exposing a server-side workaround.
+
+## [1.11.0] - 2026-04-24
+
+### Added
+
+- **New Free module: Zoom Hover (`.am-hover-zoom`).** Hover-driven utility animation. On `mouseenter` the element scales from `1` to `data-am-zoom-scale` (default `1.08`, clamp 1.01–2.0) and reverts on `mouseleave`. Designed for images inside service grids, blog cards and portfolio tiles. The parent must have `overflow: hidden` so the zoom stays clipped to the card frame — that's a builder-side concern, not injected by the module. Honors `prefers-reduced-motion: reduce` by attaching no listeners.
+- **New Pro module: Image Parallax (`.am-img-parallax`).** "Window effect": the element box itself doesn't move — only the inner `<img>` (or first child) translates vertically inside its `overflow: hidden` frame as the container traverses the viewport. Driven by Motion One's `scroll()`. Tunable via `data-am-speed` (default `0.2`). More subtle than the existing `.am-parallax`, which moves the entire element box.
+- **New admin category: Media & Images.** Added to `MODULE_CATEGORIES` in `admin/src/data/modules.ts`. Both new modules live here. The Modules dashboard now shows 6 categories.
+
+### Changed
+
+- `frontend/src/core/registry.js` — registered both new dynamic loaders.
+- `frontend/src/style.css` — added `.am-hover-zoom` and `.am-img-parallax` to the base visibility, `prefers-reduced-motion`, and `scripting: none` selector lists for consistency.
+- `includes/class-animicro.php` — added defaults for both modules + extended `available_modules` and `PRO_MODULES`.
+- `includes/class-license-manager.php` — added `hover-zoom` to `FREE_MODULES`, `img-parallax` to `PRO_MODULES`.
+- `includes/class-admin.php` — added `zoomScale` sanitization (clamp 1.01–2.0) in `update_settings()`.
+- `admin/src/components/ModuleSettings.tsx` and `AnimationPreview.tsx` — added settings sliders and live previews.
+
 ## [1.10.3] - 2026-04-24
 
 ### Changed

@@ -16,6 +16,8 @@
 .am-float,
 .am-pulse,
 .am-parallax,
+.am-hover-zoom,
+.am-img-parallax,
 .am-split-chars,
 .am-split-words,
 .am-text-reveal,
@@ -118,6 +120,8 @@
   .am-text-reveal,
   .am-typewriter,
   .am-parallax,
+  .am-hover-zoom,
+  .am-img-parallax,
   .am-highlight,
   .am-text-fill-scroll,
   .am-stagger > *,
@@ -145,7 +149,9 @@
   .am-split,
   .am-text-reveal,
   .am-typewriter,
-  .am-parallax {
+  .am-parallax,
+  .am-hover-zoom,
+  .am-img-parallax {
     opacity: 1 !important;
     transform: none !important;
     filter: none !important;

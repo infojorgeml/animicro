@@ -22,6 +22,8 @@ const MODULES = {
   'float':       () => import('../modules/float.js'),
   'pulse':       () => import('../modules/pulse.js'),
   'skew-up':     () => import('../modules/skew-up.js'),
+  'hover-zoom':   () => import('../modules/hover-zoom.js'),
+  'img-parallax': () => import('../modules/img-parallax.js'),
 };
 
 export async function loadModules(activeModules) {

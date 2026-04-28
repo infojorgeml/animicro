@@ -30,6 +30,8 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
   const isFloat = moduleId === 'float';
   const isPulse = moduleId === 'pulse';
   const isSkewUp = moduleId === 'skew-up';
+  const isHoverZoom = moduleId === 'hover-zoom';
+  const isImgParallax = moduleId === 'img-parallax';
 
   const play = useCallback(() => {
     const el = ref.current;
@@ -291,6 +293,37 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
       return;
     }
 
+    if (isHoverZoom) {
+      const peak = config.zoomScale ?? 1.08;
+      el.style.opacity = '1';
+      el.style.transform = 'scale(1)';
+      requestAnimationFrame(() => {
+        controlsRef.current = animate(
+          el,
+          { scale: [1, peak, peak, 1, 1] },
+          { duration: 2.4, easing: 'ease-in-out', repeat: Infinity },
+        );
+        controlsRef.current.finished.catch(() => {});
+      });
+      return;
+    }
+
+    if (isImgParallax) {
+      const inner = el.querySelector<HTMLDivElement>('[data-img-parallax-inner]');
+      if (!inner) return;
+      const distance = (config.speed ?? 0.2) * 60;
+      inner.style.transform = `translateY(${distance}px)`;
+      requestAnimationFrame(() => {
+        controlsRef.current = animate(
+          inner,
+          { y: [distance, -distance, distance] },
+          { duration: 3, easing: 'linear', repeat: Infinity },
+        );
+        controlsRef.current.finished.catch(() => {});
+      });
+      return;
+    }
+
     if (isParallax) {
       const square = el.querySelector<HTMLDivElement>('[data-parallax-item]');
       if (!square) return;
@@ -399,7 +432,7 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
 
       controlsRef.current.finished.catch(() => {});
     });
-  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, config.backSpeed, config.backDelay, config.loop, config.shuffle, config.cursorChar, config.cursorPersist, config.speed, config.origin, config.highlightColor, config.highlightDirection, config.colorBase, config.colorFill, config.scrollStart, config.scrollEnd, config.amplitude, config.scaleMax, config.skew, moduleId, isSplit, isTextReveal, isTypewriter, isHighlight, isTextFillScroll, isStagger, isGridReveal, isParallax, isFloat, isPulse, isSkewUp]);
+  }, [config.duration, config.delay, config.easing, config.distance, config.scale, config.blur, config.staggerDelay, config.typingSpeed, config.backSpeed, config.backDelay, config.loop, config.shuffle, config.cursorChar, config.cursorPersist, config.speed, config.origin, config.highlightColor, config.highlightDirection, config.colorBase, config.colorFill, config.scrollStart, config.scrollEnd, config.amplitude, config.scaleMax, config.skew, config.zoomScale, moduleId, isSplit, isTextReveal, isTypewriter, isHighlight, isTextFillScroll, isStagger, isGridReveal, isParallax, isFloat, isPulse, isSkewUp, isHoverZoom, isImgParallax]);
 
   useEffect(() => {
     play();
@@ -519,6 +552,49 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
       );
     }
 
+    if (isHoverZoom) {
+      // Card with overflow:hidden so the inner "image" tile stays clipped on zoom.
+      return (
+        <div className="flex items-center justify-center h-full">
+          <div
+            className="rounded-2xl overflow-hidden"
+            style={{ width: 140, height: 140, background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}
+          >
+            <div
+              ref={ref}
+              style={{
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                transformOrigin: 'center',
+              }}
+            />
+          </div>
+        </div>
+      );
+    }
+
+    if (isImgParallax) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <div
+            ref={ref}
+            className="rounded-2xl overflow-hidden"
+            style={{ width: 140, height: 180, background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}
+          >
+            <div
+              data-img-parallax-inner=""
+              style={{
+                width: '100%',
+                height: '160%',
+                background: 'linear-gradient(180deg, #c084fc 0%, #7c3aed 50%, #4c1d95 100%)',
+              }}
+            />
+          </div>
+        </div>
+      );
+    }
+
     if (isTypewriter) {
       const gradient = {
         background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
@@ -629,6 +705,10 @@ export default function AnimationPreview({ moduleId, config, onReset }: Animatio
             ? `${config.colorBase ?? '#ccc'} → ${config.colorFill ?? '#000'} · start ${config.scrollStart ?? 62}% · end ${config.scrollEnd ?? 60}%`
             : isParallax
             ? `speed ${config.speed ?? 0.5} · ${((config.speed ?? 0.5) * 100).toFixed(0)}px range`
+            : isImgParallax
+            ? `speed ${config.speed ?? 0.2} · ${((config.speed ?? 0.2) * 100).toFixed(0)}px inner travel`
+            : isHoverZoom
+            ? `zoom ${config.zoomScale ?? 1.08} · ${config.duration}s · ${config.easing}`
             : isTypewriter
             ? `${config.typingSpeed ?? 0.06}s type · ${config.backSpeed ?? 0.03}s back · hold ${config.backDelay ?? 1.5}s${(config.loop ?? true) ? ' · loop' : ''}${(config.shuffle ?? false) ? ' · shuffle' : ''}`
             : <>

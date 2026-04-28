@@ -158,7 +158,23 @@ export const DEFAULT_SKEW_UP_CONFIG: ModuleConfig = {
   skew: 5,
 };
 
-export type ModuleCategory = 'entry' | 'text' | 'group' | 'scroll' | 'continuous';
+export const DEFAULT_HOVER_ZOOM_CONFIG: ModuleConfig = {
+  duration: 0.4,
+  easing: 'ease-out',
+  delay: 0,
+  margin: '-50px 0px',
+  zoomScale: 1.08,
+};
+
+export const DEFAULT_IMG_PARALLAX_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing: 'linear',
+  delay: 0,
+  margin: '-50px 0px',
+  speed: 0.2,
+};
+
+export type ModuleCategory = 'entry' | 'text' | 'group' | 'scroll' | 'continuous' | 'media';
 
 export interface ModuleInfo {
   id: string;
@@ -175,6 +191,7 @@ export const MODULE_CATEGORIES: { id: ModuleCategory; label: string; description
   { id: 'text',       label: 'Text',                 description: 'Typography-specific animations' },
   { id: 'group',      label: 'Groups & Layouts',     description: 'Animate containers and their children' },
   { id: 'scroll',     label: 'Scroll & Continuous',   description: 'Scroll-linked animations' },
+  { id: 'media',      label: 'Media & Images',       description: 'Image-centric utility animations' },
 ];
 
 export const MODULE_INFO: ModuleInfo[] = [
@@ -205,6 +222,10 @@ export const MODULE_INFO: ModuleInfo[] = [
   // Scroll & Continuous
   { id: 'text-fill-scroll', name: 'Text Fill on Scroll', description: 'Fills text word by word as user scrolls', cssClass: '.am-text-fill-scroll', isPro: true, category: 'scroll' },
   { id: 'parallax',         name: 'Parallax',            description: 'Scroll-linked parallax movement',         cssClass: '.am-parallax',         isPro: true, category: 'scroll' },
+
+  // Media & Images
+  { id: 'hover-zoom',   name: 'Zoom Hover',     description: 'Image scales up on hover within an overflow:hidden parent', cssClass: '.am-hover-zoom',   isPro: false, category: 'media' },
+  { id: 'img-parallax', name: 'Image Parallax', description: 'Window effect — inner image translates on scroll inside an overflow:hidden frame', cssClass: '.am-img-parallax', isPro: true,  category: 'media' },
 ];
 
 export interface DataAttribute {
@@ -226,7 +247,7 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-scale',     type: 'float',         defaultValue: '0.95',      usedBy: 'scale' },
   { attribute: 'data-am-blur',      type: 'float (px)',    defaultValue: '4',         usedBy: 'blur' },
   { attribute: 'data-am-stagger',   type: 'float (s)',     defaultValue: '0.05',      usedBy: 'stagger, split, text-reveal, grid-reveal' },
-  { attribute: 'data-am-speed',     type: 'float',         defaultValue: '0.5',       usedBy: 'parallax' },
+  { attribute: 'data-am-speed',     type: 'float',         defaultValue: '0.5 (parallax) / 0.2 (img-parallax)', usedBy: 'parallax, img-parallax' },
   { attribute: 'data-am-typing-speed', type: 'float (s)',  defaultValue: '0.06',      usedBy: 'typewriter' },
   { attribute: 'data-am-back-speed',   type: 'float (s)',  defaultValue: '0.03',      usedBy: 'typewriter' },
   { attribute: 'data-am-back-delay',   type: 'float (s)',  defaultValue: '1.5',       usedBy: 'typewriter' },
@@ -246,6 +267,7 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-amplitude',          type: 'float (px)',   defaultValue: '12',      usedBy: 'float' },
   { attribute: 'data-am-scale-max',          type: 'float',        defaultValue: '1.05',    usedBy: 'pulse' },
   { attribute: 'data-am-skew',               type: 'float (deg)',  defaultValue: '5',       usedBy: 'skew-up' },
+  { attribute: 'data-am-zoom-scale',         type: 'float',        defaultValue: '1.08',    usedBy: 'hover-zoom' },
 ];
 
 export interface EasingOption {

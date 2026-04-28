@@ -4,7 +4,7 @@
 **Tags:** animation, motion, css, performance, page-builder
 **Requires at least:** 6.0
 **Tested up to:** 6.9
-**Stable tag:** 1.10.3
+**Stable tag:** 1.11.1
 **Requires PHP:** 7.4
 **License:** GPLv2 or later
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
@@ -46,6 +46,7 @@ Under **Animicro → Advanced** you can enable **Respect Reduced Motion** (skips
 | Pulse | `.am-pulse` | Infinite gentle scale pulse — breathing-like (continuous) |
 | Highlight | `.am-highlight` | Marker-style highlight behind text on entry |
 | Typewriter | `.am-typewriter` | Types text character by character with blinking cursor |
+| Zoom Hover | `.am-hover-zoom` | Image scales up on hover (parent needs `overflow: hidden`) |
 
 Additional modules are available with [Animicro Pro](https://animicro.com).
 
@@ -79,6 +80,8 @@ Use only one animation class per element. Do not combine `.am-fade` with `.am-sl
 | `data-am-highlight-color` | string (hex) | #fde68a | Marker color (highlight module) |
 | `data-am-highlight-direction` | string | left | Sweep direction: `left`, `right`, or `center` (highlight module) |
 | `data-am-typing-speed` | float (s) | 0.06 | Delay per character (typewriter module) |
+| `data-am-zoom-scale` | float | 1.08 | Hover scale (hover-zoom module, clamp 1.01–2.0) |
+| `data-am-speed` | float | 0.5 / 0.2 | Travel intensity (parallax = 0.5, img-parallax = 0.2) |
 
 ## Compatibility
 
