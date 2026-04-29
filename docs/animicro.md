@@ -1,6 +1,6 @@
 # Animicro — Development Reference
 
-**Release:** 1.11.1 (2026-04-28). See CHANGELOG for history.
+**Release:** 1.11.2 (2026-04-28). See CHANGELOG for history.
 
 Utility-first micro-animations for WordPress powered by [Motion One](https://motion.dev/). This document describes the architecture and conventions for developers and AI assistants.
 
@@ -211,6 +211,34 @@ Entry animation in the Stripe / Vercel aesthetic: `animate(el, { opacity: [0, 1]
 - **Class**: `.am-grid-reveal` on the **container**; animates **direct children** only (`container.children`).
 - **Config**: `getElementConfig(container, 'grid-reveal')` — `data-am-origin` on the same container as the class (not on children).
 - **Timing**: Children are sorted by distance from the focal point; each gets `delay + rank * staggerDelay` so every item has a unique stagger (wave order preserved).
+
+## Release pipeline
+
+Animicro is built from a single source tree that produces two artefacts: the Free ZIP (published to wordpress.org via SVN) and the Pro ZIP (published as a GitHub Release asset, picked up by Pro installs through the in-dashboard updater).
+
+- **Local build**: `scripts/build.sh` runs `npm run build` and stamps both `build/animicro/` (free) and `build/animicro-pro/` (pro), then zips them into `release/animicro-X.Y.Z.zip` and `release/animicro-pro-X.Y.Z.zip`. The pre-push git hook (`.githooks/pre-push`) re-runs this on every push so the local `release/` always mirrors the latest commit.
+- **WP.org SVN release (Free)**: `scripts/release-wp.sh` rsyncs `build/animicro/` into the SVN trunk, commits, then `svn cp trunk tags/VERSION`. Standard WordPress.org flow.
+- **GitHub Release (Pro)**: `.github/workflows/release-pro.yml` listens for `v*` tag pushes, rebuilds both ZIPs in CI, extracts the matching `## [VERSION]` section from `CHANGELOG.md` as release notes, and attaches the two ZIPs to a GitHub Release. The Pro plugin's `Animicro_Updater` (built on plugin-update-checker v5.6, vendored under `includes/lib/plugin-update-checker/`) polls the public repo daily and surfaces the new release as the standard WP "Update available" notice in `/wp-admin/plugins.php`.
+
+Distribution and licensing are decoupled by design: the public ZIP is downloadable by anyone, but `Animicro_License_Manager` still gates Pro modules at runtime, so an unlicensed install renders the Pro tab locked exactly as it does today.
+
+Release flow:
+
+```bash
+# 1. Bump ANIMICRO_VERSION in animicro.php and "version" in package.json.
+# 2. Prepend a "## [X.Y.Z] - YYYY-MM-DD" block to CHANGELOG.md.
+# 3. Commit.
+git push origin main
+
+# 4. Tag and push — this triggers the GitHub Release.
+git tag vX.Y.Z
+git push origin vX.Y.Z
+
+# 5. (Free) Publish to wordpress.org SVN when ready.
+bash scripts/release-wp.sh
+```
+
+The Pro side is fully automated from step 4 onward. Step 5 stays manual because WP.org reviews each release.
 
 ## Adding a New Animation Module
 

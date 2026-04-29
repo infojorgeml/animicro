@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.11.1
+Stable tag: 1.11.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,9 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.11.2 =
+* No user-facing changes in the free tier. Internal release-pipeline tooling: GitHub Actions now publishes a Release with the built ZIPs on every `v*` tag, and Animicro Pro gains in-dashboard auto-updates from those Releases. Free updates continue to flow through wordpress.org as usual.
 
 = 1.11.1 =
 * No user-facing changes in the free tier. Internal compatibility update for the licence backend used by Animicro Pro (multi-site licensing, automatic seat release on plugin deactivation, local-development bypass on `localhost` / `*.local` / `*.test`).
@@ -168,6 +171,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.11.2 =
+Internal release-tooling update. No user-facing changes in the free tier.
 
 = 1.11.1 =
 Internal compatibility update for the Pro licence backend. No user-facing changes in the free tier.

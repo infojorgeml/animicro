@@ -36,10 +36,17 @@ def should_skip(rel: Path) -> bool:
         return True
     if parts[:2] == ("frontend", "src"):
         return True
+    # Pro-only: GitHub Releases self-updater + vendored
+    # plugin-update-checker library. Free updates flow through wordpress.org,
+    # so neither belongs in the WP.org ZIP.
+    if parts[:3] == ("includes", "lib", "plugin-update-checker"):
+        return True
 
     name = rel.name
 
     if name == "class-license-manager.php":
+        return True
+    if name == "class-updater.php":
         return True
 
     # Allow .vite/ (Vite manifest folder inside dist) but skip all other dot-files/dirs.

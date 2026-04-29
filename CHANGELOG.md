@@ -5,6 +5,19 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.2] - 2026-04-28
+
+### Added
+
+- **Pro — Auto-updates from GitHub Releases.** New `includes/class-updater.php` wraps [YahnisElsts/plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker) v5.6 (vendored under `includes/lib/plugin-update-checker/`, MIT). The Pro plugin now polls the public `infojorgeml/animicro` repo once per day, picks up newer GitHub Releases tagged `v*`, and surfaces them as the standard WordPress "Update available" notice in `/wp-admin/plugins.php`. Click → WP downloads the matching `animicro-pro-X.Y.Z.zip` asset and installs it like any other plugin. Licence and update flows are intentionally decoupled — distribution is open, runtime gating still happens via `Animicro_License_Manager`.
+- **GitHub Actions — `release-pro.yml`.** New workflow triggers on `v*` tag pushes: installs deps, runs `npm run build`, runs `scripts/build.sh` (same Free + Pro ZIP builder used by the local pre-push hook), extracts the matching `## [VERSION]` section from `CHANGELOG.md` as release notes, and publishes a GitHub Release with both ZIPs attached. Free still ships through wordpress.org SVN — this workflow does not touch SVN.
+
+### Changed
+
+- **`scripts/build.sh`** — Pro build now copies `includes/class-updater.php` and `includes/lib/plugin-update-checker/` into `build/animicro-pro/`. Free build still excludes both (the shared `copy_shared` helper has never copied them).
+- **`scripts/build_release_zip.py`** — explicitly skips `includes/class-updater.php` and `includes/lib/plugin-update-checker/` when generating the WP.org Free ZIP.
+- **`animicro.php`** — when `ANIMICRO_PRO === true`, requires `class-updater.php` and calls `Animicro_Updater::init( __FILE__ )`. Guarded by `is_readable()` so a misbuilt Pro ZIP without the library never breaks WP admin.
+
 ## [1.11.1] - 2026-04-28
 
 ### Changed

@@ -99,6 +99,13 @@ rm -f "$BUILD/animicro-pro/animicro.php.bak"
 # Include license manager
 cp "$ROOT/includes/class-license-manager.php" "$BUILD/animicro-pro/includes/"
 
+# Include the GitHub Releases self-updater + vendored plugin-update-checker
+# library. Both are stripped from the free build (copy_shared above does not
+# copy them, so they only ever land in the Pro tree).
+cp "$ROOT/includes/class-updater.php" "$BUILD/animicro-pro/includes/"
+mkdir -p "$BUILD/animicro-pro/includes/lib"
+cp -R "$ROOT/includes/lib/plugin-update-checker" "$BUILD/animicro-pro/includes/lib/"
+
 # Inject Supabase anon key from environment (or .env.build) into the Pro license manager
 if [[ -z "${ANIMICRO_SUPABASE_ANON_KEY:-}" && -f "$ROOT/.env.build" ]]; then
     # shellcheck disable=SC1091

@@ -1,0 +1,82 @@
+name: Release Pro
+
+# Build the Free + Pro ZIPs and publish a GitHub Release whenever a `v*` tag
+# is pushed. Pro installs use plugin-update-checker (see
+# includes/class-updater.php) to discover and download the matching
+# `animicro-pro-X.Y.Z.zip` asset attached here, which is what makes the
+# standard WP "Update available" notice show up for Pro users.
+#
+# Free updates still flow through WordPress.org via SVN
+# (scripts/release-wp.sh), so this workflow does NOT touch SVN.
+#
+# Trigger:
+#   git tag v1.11.2 && git push origin v1.11.2
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write   # required to create the GitHub Release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build admin + frontend bundles
+        run: npm run build
+
+      - name: Build Free + Pro ZIPs
+        env:
+          # Same Supabase anon key the local pre-push hook uses. Stored as a
+          # GitHub Actions secret. Public anon key — not sensitive — but kept
+          # in secrets so it's easy to rotate without committing.
+          ANIMICRO_SUPABASE_ANON_KEY: ${{ secrets.ANIMICRO_SUPABASE_ANON_KEY }}
+        run: bash scripts/build.sh
+
+      - name: Verify ZIPs exist
+        run: |
+          ls -lh release/
+          # Both must be present for the release to be useful.
+          test -f release/animicro-${GITHUB_REF_NAME#v}.zip
+          test -f release/animicro-pro-${GITHUB_REF_NAME#v}.zip
+
+      - name: Extract changelog section for this tag
+        id: changelog
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          # Grab the section between "## [VERSION]" and the next "## [" header.
+          awk -v ver="$VERSION" '
+            $0 ~ "^## \\[" ver "\\]" { p=1; next }
+            p && /^## \[/ { exit }
+            p { print }
+          ' CHANGELOG.md > release_notes.md
+          if [ ! -s release_notes.md ]; then
+            echo "Release v$VERSION — see CHANGELOG.md for details." > release_notes.md
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Animicro ${{ github.ref_name }}
+          body_path: release_notes.md
+          files: |
+            release/animicro-*.zip
+            release/animicro-pro-*.zip
+          draft: false
+          prerelease: false
