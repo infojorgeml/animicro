@@ -19,7 +19,45 @@ class Animicro_Admin {
 			add_action( 'admin_menu', [ $this, 'register_menu' ] );
 			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 			add_action( 'admin_notices', [ $this, 'notice_free_deactivated' ] );
+			// Run before any plugin renders its admin notice. Priority 1 so
+			// we strip the action queue before WP starts firing it.
+			add_action( 'in_admin_header', [ $this, 'suppress_admin_notices' ], 1 );
 		}
+	}
+
+	/**
+	 * Suppress all third-party admin notices on Animicro screens.
+	 *
+	 * WordPress fires `admin_notices` (and friends) on every backend page,
+	 * which means SEO plugins, security tools, etc. inject their banners
+	 * into our React admin chrome and break the layout. Plugins like ASE
+	 * intercept some of these but not all (Slim SEO, for instance, uses a
+	 * custom rendering path that ASE misses).
+	 *
+	 * Standard practice in serious WP plugins (Bricks, Elementor, ACF Pro,
+	 * Yoast Premium, etc.): on their own admin pages, remove every action
+	 * from the notice hooks before they render. Visitors still see those
+	 * notices everywhere else in `/wp-admin/`, just not on our screens.
+	 *
+	 * Hook: `in_admin_header` — fires after `current_screen` is set but
+	 * before WP starts rendering the page header / notice queue.
+	 */
+	public function suppress_admin_notices(): void {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen ) {
+			return;
+		}
+
+		$animicro_screens = array_filter( [ $this->page_hook, $this->license_page_hook ] );
+		if ( ! in_array( $screen->id, $animicro_screens, true ) ) {
+			return;
+		}
+
+		// Cover every action hook WP fires for admin notices.
+		remove_all_actions( 'admin_notices' );
+		remove_all_actions( 'all_admin_notices' );
+		remove_all_actions( 'user_admin_notices' );
+		remove_all_actions( 'network_admin_notices' );
 	}
 
 	/**

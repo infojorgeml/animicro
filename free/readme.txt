@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.11.2
+Stable tag: 1.11.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,9 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.11.3 =
+* **Cleaner admin UX**: third-party admin notices (SEO plugins, security tools, etc.) are now suppressed on the Animicro settings screens. They keep showing on every other `/wp-admin/` page — they just no longer break the Animicro panel layout. This is the standard practice in plugins like Bricks, Elementor and ACF Pro.
 
 = 1.11.2 =
 * No user-facing changes in the free tier. Internal release-pipeline tooling: GitHub Actions now publishes a Release with the built ZIPs on every `v*` tag, and Animicro Pro gains in-dashboard auto-updates from those Releases. Free updates continue to flow through wordpress.org as usual.
@@ -171,6 +174,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.11.3 =
+Suppresses third-party admin notices on Animicro settings screens for a cleaner panel. No breaking changes.
 
 = 1.11.2 =
 Internal release-tooling update. No user-facing changes in the free tier.

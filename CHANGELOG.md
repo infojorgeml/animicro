@@ -5,6 +5,12 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.3] - 2026-04-29
+
+### Changed
+
+- **Suppress third-party admin notices on Animicro screens.** WordPress fires `admin_notices`, `all_admin_notices`, `user_admin_notices` and `network_admin_notices` on every backend page, which means SEO plugins (Slim SEO, Yoast, Rank Math), security tools, cache plugins, etc. inject their banners into our React admin chrome and break the layout. Plugins like ASE intercept some of these but not all (Slim SEO, for instance, uses a custom rendering path that ASE misses). New `Animicro_Admin::suppress_admin_notices()` runs on `in_admin_header` (priority 1, after `current_screen` is set, before WP starts firing the queue) and calls `remove_all_actions()` on the four notice hooks when the current screen is one of ours (`toplevel_page_animicro` or `animicro_page_animicro-license`). Visitors keep seeing those notices everywhere else in `/wp-admin/`. Standard practice in Bricks, Elementor, ACF Pro, Yoast Premium, etc.
+
 ## [1.11.2] - 2026-04-28
 
 ### Added
