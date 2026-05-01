@@ -96,7 +96,7 @@ sed -i.bak \
     "$BUILD/animicro-pro/animicro.php"
 rm -f "$BUILD/animicro-pro/animicro.php.bak"
 
-# Include license manager
+# Include license manager (LicenSuite v3 Connect flow — no build-time key injection)
 cp "$ROOT/includes/class-license-manager.php" "$BUILD/animicro-pro/includes/"
 
 # Include the GitHub Releases self-updater + vendored plugin-update-checker
@@ -105,19 +105,6 @@ cp "$ROOT/includes/class-license-manager.php" "$BUILD/animicro-pro/includes/"
 cp "$ROOT/includes/class-updater.php" "$BUILD/animicro-pro/includes/"
 mkdir -p "$BUILD/animicro-pro/includes/lib"
 cp -R "$ROOT/includes/lib/plugin-update-checker" "$BUILD/animicro-pro/includes/lib/"
-
-# Inject Supabase anon key from environment (or .env.build) into the Pro license manager
-if [[ -z "${ANIMICRO_SUPABASE_ANON_KEY:-}" && -f "$ROOT/.env.build" ]]; then
-    # shellcheck disable=SC1091
-    set -a; . "$ROOT/.env.build"; set +a
-fi
-if [[ -z "${ANIMICRO_SUPABASE_ANON_KEY:-}" ]]; then
-    echo "   ERROR: ANIMICRO_SUPABASE_ANON_KEY is not set (export it or create .env.build)" >&2
-    exit 1
-fi
-sed -i.bak "s|__ANIMICRO_SUPABASE_ANON_KEY__|${ANIMICRO_SUPABASE_ANON_KEY}|" \
-    "$BUILD/animicro-pro/includes/class-license-manager.php"
-rm -f "$BUILD/animicro-pro/includes/class-license-manager.php.bak"
 
 echo "   Done: build/animicro-pro/"
 

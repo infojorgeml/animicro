@@ -5,6 +5,32 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.0] - 2026-04-29
+
+### Changed
+
+- **Pro — Migrated to LicenSuite v3.0 Connect flow.** The licence backend dropped the v2 paste-the-key model (where users had to copy a `XXXX-XXXX-…` string into a textbox) in favour of an OAuth-style Connect flow modeled after Elementor Pro / WP Rocket. The user clicks **Connect** in the Animicro Pro license page, the LicenSuite dashboard opens in a new tab, they log in (with 2FA if enabled), pick the license to bind to this site, and the dashboard redirects back with a one-time `token`. The plugin exchanges that token for a long-lived `connection_id + connection_secret` pair (both encrypted at rest) and validates daily against `POST /functions/v1/plugin-validate` using the secret as the Bearer token. No license keys ever touch the WordPress UI.
+- **`includes/class-license-manager.php`** rewritten end-to-end. New methods: `get_connect_url()`, `handle_callback()`, `validate_connection()`, `clear_connection()`, `is_pending_reconnect()`. Same shape preserved for the rest of the plugin: `is_premium()`, `is_pro_module()`, `activate_premium()`/`deactivate_premium()`, encryption helpers, `is_development_domain()` filter (still bypasses the network call on `localhost` / `*.local` / `*.test` / private IPs).
+- **`includes/class-admin.php`** REST routes: dropped `POST /license/save` (no more pasting); added `GET /license/connect-url` (returns the dashboard URL the React UI opens) and `POST /license/disconnect` (clears local credentials). `GET /license/status` payload now returns `{ state, is_premium, is_dev, pending_reconnect, has_connection, connection_id, plan, expires_at, sites, connect_error }`. New `admin_init` handler `maybe_handle_connect_callback()` catches the dashboard redirect (`?page=animicro-license&action=connect-callback&token=…&state=…`), verifies the WP nonce, runs the token-for-secret exchange, and redirects to a clean license page.
+- **`admin/src/components/LicensePage.tsx`** rewritten as a four-state machine: `dev` (local-development unlocked card), `pending_reconnect` (orange "Reconnect required" banner for legacy v1.11.x users), `connected` (green status card with plan, expires, sites), `disconnected` (primary "Connect to your account" button).
+- **Build pipeline cleanup.** The build no longer needs an anon-key placeholder. `scripts/build.sh` drops the `__ANIMICRO_SUPABASE_ANON_KEY__` swap and the `.env.build` requirement. `.github/workflows/release-pro.yml` drops the `ANIMICRO_SUPABASE_ANON_KEY` secret. `.githooks/pre-push` no longer fails when `.env.build` is missing.
+
+### Added
+
+- **Migration banner for 1.11.x users.** On the first admin pageload after upgrading, the plugin detects a leftover `animicro_license_key` option and an absent `animicro_connection_id`, sets the `animicro_pending_reconnect` flag, and locks Pro features until the user clicks the orange Reconnect button. Once the new flow completes, the legacy key option is wiped and Pro reactivates.
+- **Deactivation reminder notice.** Because LicenSuite v3 does not yet expose a public `plugin-self-revoke` endpoint that accepts the connection_secret, the plugin cannot release the seat on the server when the user deactivates the plugin. Instead, a dismissible info notice appears on the next admin pageload telling the user to revoke the connection from their LicenSuite dashboard if they want to free the seat. Will be replaced with a real auto-revoke call in a follow-up patch when the upstream endpoint ships.
+
+### Removed
+
+- **`POST /license/save` REST route** and the `save_license()` handler. Replaced by the Connect flow.
+- **`save_license_key()`, `validate_license()`, `deactivate_license()`** in `Animicro_License_Manager` (v2-only methods).
+- **`__ANIMICRO_SUPABASE_ANON_KEY__` placeholder + build-time injection.** v3 does not need a build-time secret.
+- **`licenseKey` field from `animicroData`** localized object — the React admin no longer needs the stored key for any UI state.
+
+### Migration
+
+For users upgrading from 1.11.x: open `wp-admin/admin.php?page=animicro-license`. You will see an orange "Reconnect required" banner. Click **Reconnect now** — your LicenSuite dashboard opens in a new tab. Log in, pick the license already associated with your account, and you'll be redirected back to this site with the new connection live. Total time: ~30 seconds. Your existing license stays valid; the migration is purely about the connection mechanism.
+
 ## [1.11.3] - 2026-04-29
 
 ### Changed

@@ -49,20 +49,12 @@ class Animicro {
 	}
 
 	public static function deactivate(): void {
-		// LicenSuite v2: release the seat held by this domain so the user
-		// can reuse the licence on another site without contacting support.
-		// Best-effort — fire-and-forget, never blocks the deactivation flow.
+		// LicenSuite v3 has no public self-revoke endpoint yet. The seat
+		// stays "occupied" on the server until the user revokes the
+		// connection from their dashboard. Set a one-shot transient so the
+		// next admin pageload reminds them with a friendly notice.
 		if ( self::is_pro_plugin() ) {
-			if ( ! class_exists( 'Animicro_License_Manager' ) ) {
-				$file = ANIMICRO_DIR . 'includes/class-license-manager.php';
-				if ( is_readable( $file ) ) {
-					require_once $file;
-				}
-			}
-			if ( class_exists( 'Animicro_License_Manager' ) ) {
-				$license_manager = new Animicro_License_Manager();
-				$license_manager->deactivate_license( null, false );
-			}
+			set_transient( 'animicro_show_revoke_notice', '1', MINUTE_IN_SECONDS );
 		}
 	}
 

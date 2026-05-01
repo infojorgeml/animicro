@@ -6,11 +6,9 @@ set -e
 
 ROOT="$(git rev-parse --show-toplevel)"
 
-if [[ ! -f "$ROOT/.env.build" ]]; then
-    echo "✗ pre-push: .env.build is missing — cannot build Pro ZIP."
-    echo "  Create $ROOT/.env.build with ANIMICRO_SUPABASE_ANON_KEY=..."
-    exit 1
-fi
+# LicenSuite v3 Connect flow no longer needs a build-time anon key, so
+# .env.build is optional. Kept around in case other future build secrets
+# need it.
 
 echo "==> pre-push: rebuilding Animicro release ZIPs..."
 bash "$ROOT/scripts/build.sh"

@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.11.3
+Stable tag: 1.12.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,9 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.12.0 =
+* No user-facing changes in the free tier. Animicro Pro migrates to the LicenSuite v3 Connect flow: instead of pasting a license key, users click a "Connect" button to link their account from the LicenSuite dashboard. Existing Pro users will see a one-time "Reconnect" banner after the upgrade.
 
 = 1.11.3 =
 * **Cleaner admin UX**: third-party admin notices (SEO plugins, security tools, etc.) are now suppressed on the Animicro settings screens. They keep showing on every other `/wp-admin/` page — they just no longer break the Animicro panel layout. This is the standard practice in plugins like Bricks, Elementor and ACF Pro.
@@ -174,6 +177,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.12.0 =
+Internal change to the Pro licensing system (Connect flow replaces paste-the-key). Free users are unaffected. Pro users will see a one-time Reconnect banner.
 
 = 1.11.3 =
 Suppresses third-party admin notices on Animicro settings screens for a cleaner panel. No breaking changes.

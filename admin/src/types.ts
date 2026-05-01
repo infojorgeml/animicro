@@ -58,10 +58,33 @@ export interface AnimicroData {
   version: string;
   builders: Record<string, string>;
   isPremium: boolean;
-  licenseKey: string;
   page?: string;
   proPlugin: boolean;
   upgradeUrl: string;
+}
+
+/**
+ * Shape returned by GET /animicro/v1/license/status.
+ *
+ * `state` is the canonical UI flag for the LicensePage component:
+ *  - `dev`               — running on localhost / *.local / *.test, Pro is
+ *                          unlocked locally without contacting the server.
+ *  - `pending_reconnect` — legacy v1.11.x license_key found, user must
+ *                          re-do the Connect flow.
+ *  - `connected`         — connection_id + secret stored, validation OK.
+ *  - `disconnected`      — fresh install or after an explicit Disconnect.
+ */
+export interface LicenseStatus {
+  state: 'dev' | 'pending_reconnect' | 'connected' | 'disconnected';
+  is_premium: boolean;
+  is_dev: boolean;
+  pending_reconnect: boolean;
+  has_connection: boolean;
+  connection_id: string;
+  plan: 'pro' | 'basic' | 'free' | null;
+  expires_at: string | null;
+  sites: { used: number; max: number | null; unlimited: boolean } | null;
+  connect_error: { reason: string; message: string } | null;
 }
 
 declare global {

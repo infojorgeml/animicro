@@ -1,4 +1,28 @@
 <?php
+/**
+ * Animicro Pro — LicenSuite v3.0 Connect-flow license manager.
+ *
+ * v3 architecture (replaces v2 paste-key flow used through 1.11.x):
+ *   1. User clicks "Connect" in /wp-admin → window.open(dashboard, _blank).
+ *   2. Dashboard auths the user and redirects back to
+ *      ?page=animicro-license&action=connect-callback&token=…&state=…
+ *   3. Animicro_Admin::maybe_handle_connect_callback() catches the redirect,
+ *      verifies the WP nonce in `state`, and calls handle_callback($token).
+ *   4. handle_callback POSTs to /api/plugin-connect/exchange and persists
+ *      the returned { connection_id, connection_secret } pair (secret is
+ *      AES-256-CBC encrypted at rest, same scheme as the legacy key).
+ *   5. From there, validate_connection() polls /functions/v1/plugin-validate
+ *      with `Authorization: Bearer <connection_secret>` once per day.
+ *
+ * Migration from 1.11.x: if a stored `animicro_license_key` is found but no
+ * `animicro_connection_id`, the manager flags `animicro_pending_reconnect`,
+ * deactivates premium, and the React admin shows a banner that walks the
+ * user through reconnecting. Legacy v2 endpoints are never called in v3.
+ *
+ * Local development: localhost / *.local / *.test / private IPs short-circuit
+ * the entire flow and return a synthetic premium payload, identical to v2.
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -10,58 +34,89 @@ class Animicro_License_Manager {
 	const PRO_MODULES  = [ 'blur', 'stagger', 'grid-reveal', 'text-fill-scroll', 'parallax', 'split', 'text-reveal', 'img-parallax' ];
 	const FREE_MODULES = [ 'fade', 'slide-up', 'slide-down', 'slide-left', 'slide-right', 'skew-up', 'scale', 'float', 'pulse', 'highlight', 'typewriter', 'hover-zoom' ];
 
-	private string $api_url = 'https://uhnaedqfygrqdptjngqb.supabase.co/functions/v1/license-check';
-
-	private string $deactivate_url = 'https://uhnaedqfygrqdptjngqb.supabase.co/functions/v1/license-deactivate';
-
-	private string $supabase_anon_key = '__ANIMICRO_SUPABASE_ANON_KEY__';
-
 	private string $product_slug = 'animicro';
 
-	private string $option_name = 'animicro_license_key';
+	// LicenSuite v3 endpoints.
+	private string $validate_url  = 'https://uhnaedqfygrqdptjngqb.supabase.co/functions/v1/plugin-validate';
+	private string $exchange_url  = 'https://licensuite.vercel.app/api/plugin-connect/exchange';
+	private string $dashboard_url = 'https://licensuite.vercel.app/plugin-connect';
 
-	private string $license_data_option = 'animicro_license_data';
+	// Storage keys.
+	private string $connection_id_option     = 'animicro_connection_id';
+	private string $connection_secret_option = 'animicro_connection_secret';   // AES-256-CBC at rest
+	private string $legacy_key_option        = 'animicro_license_key';         // v2 leftover (detection only)
+	private string $pending_reconnect_option = 'animicro_pending_reconnect';
+	private string $license_data_option      = 'animicro_license_data';        // last good payload
 
-	public function __construct() {
-		if ( defined( 'ANIMICRO_SUPABASE_ANON_KEY' ) ) {
-			$this->supabase_anon_key = ANIMICRO_SUPABASE_ANON_KEY;
-		} else {
-			$this->supabase_anon_key = apply_filters( 'animicro_supabase_anon_key', $this->supabase_anon_key );
-		}
+	// ------------------------------------------------------------------
+	// Connection storage
+	// ------------------------------------------------------------------
+
+	public function get_connection_id(): string {
+		return (string) get_option( $this->connection_id_option, '' );
 	}
 
-	public function get_license_key(): string {
-		$stored = (string) get_option( $this->option_name, '' );
-		if ( '' === $stored ) {
-			return '';
-		}
-
-		$decrypted = $this->decrypt( $stored );
-		if ( '' !== $decrypted ) {
-			return $decrypted;
-		}
-
-		// Legacy plaintext value — migrate to encrypted at rest.
-		update_option( $this->option_name, $this->encrypt( $stored ) );
-		return $stored;
+	public function get_connection_secret(): string {
+		$stored = (string) get_option( $this->connection_secret_option, '' );
+		return '' === $stored ? '' : $this->decrypt( $stored );
 	}
 
-	public function save_license_key( string $license_key ): void {
-		$sanitized = sanitize_text_field( $license_key );
+	public function has_connection(): bool {
+		return '' !== $this->get_connection_id() && '' !== $this->get_connection_secret();
+	}
 
-		// If the user is replacing an existing key, release the seat held by
-		// the previous one before storing the new value (best-effort).
-		$previous = $this->get_license_key();
-		if ( '' !== $previous && strtoupper( trim( $previous ) ) !== strtoupper( trim( $sanitized ) ) ) {
-			$this->deactivate_license( $previous, true );
-		}
+	private function persist_connection( string $connection_id, string $connection_secret ): void {
+		update_option( $this->connection_id_option,     $connection_id );
+		update_option( $this->connection_secret_option, $this->encrypt( $connection_secret ) );
 
-		update_option( $this->option_name, $this->encrypt( $sanitized ) );
-
-		delete_option( $this->license_data_option );
+		// Reconnect cleared, legacy key wiped, caches dropped: the next
+		// validate_connection() call goes against the live server and
+		// rebuilds the cache cleanly.
+		delete_option( $this->pending_reconnect_option );
+		delete_option( $this->legacy_key_option );
 		delete_transient( 'animicro_license_check' );
 		delete_transient( 'animicro_license_last_check' );
 	}
+
+	public function clear_connection(): void {
+		delete_option( $this->connection_id_option );
+		delete_option( $this->connection_secret_option );
+		delete_option( $this->license_data_option );
+		delete_transient( 'animicro_license_check' );
+		delete_transient( 'animicro_license_last_check' );
+		self::deactivate_premium();
+	}
+
+	// ------------------------------------------------------------------
+	// Legacy detection (v2 → v3 migration)
+	// ------------------------------------------------------------------
+
+	/**
+	 * True when the site has a leftover v2 `animicro_license_key` and no v3
+	 * `animicro_connection_id`. Drives the React "Reconnect" banner.
+	 *
+	 * Idempotent: also sets the `animicro_pending_reconnect` option so
+	 * is_premium() can lock Pro features at the option-read layer without
+	 * needing this method to run on every pageload.
+	 */
+	public function is_pending_reconnect(): bool {
+		if ( $this->has_connection() ) {
+			delete_option( $this->pending_reconnect_option );
+			return false;
+		}
+
+		$has_legacy = '' !== (string) get_option( $this->legacy_key_option, '' );
+		if ( $has_legacy ) {
+			update_option( $this->pending_reconnect_option, '1' );
+			return true;
+		}
+
+		return (bool) get_option( $this->pending_reconnect_option, false );
+	}
+
+	// ------------------------------------------------------------------
+	// AES-256-CBC at rest (encryption helpers shared with v2)
+	// ------------------------------------------------------------------
 
 	private function encryption_key(): string {
 		$secret  = defined( 'AUTH_KEY' ) ? AUTH_KEY : '';
@@ -95,25 +150,131 @@ class Animicro_License_Manager {
 		return is_string( $plain ) ? $plain : '';
 	}
 
-	public function validate_license( ?string $license_key = null, bool $force = false ): array {
-		if ( ! $license_key ) {
-			$license_key = $this->get_license_key();
+	// ------------------------------------------------------------------
+	// Connect: build the dashboard URL the React UI opens in a new tab
+	// ------------------------------------------------------------------
+
+	public function get_connect_url(): string {
+		$state  = wp_create_nonce( 'animicro_connect' );
+		$return = admin_url( 'admin.php?page=animicro-license&action=connect-callback' );
+
+		return add_query_arg(
+			[
+				'product'  => $this->product_slug,
+				'return'   => rawurlencode( $return ),
+				'site_url' => rawurlencode( home_url() ),
+				'state'    => $state,
+			],
+			$this->dashboard_url
+		);
+	}
+
+	// ------------------------------------------------------------------
+	// Connect: handle the dashboard callback (token → connection)
+	// ------------------------------------------------------------------
+
+	/**
+	 * Exchange the one-time `token` for a long-lived connection pair.
+	 *
+	 * Verifies the WP nonce in `state` (CSRF) before any network call.
+	 * On success, persists the connection and clears legacy/migration state.
+	 * On failure, sets a 60-second transient with the reason so the React UI
+	 * can surface the error after the redirect.
+	 *
+	 * @param string $token One-time token from the dashboard redirect.
+	 * @param string $state Nonce we sent in get_connect_url(); the dashboard
+	 *                     reflects it back unchanged.
+	 * @return array{success:bool, reason:string, error?:string}
+	 */
+	public function handle_callback( string $token, string $state ): array {
+		if ( ! wp_verify_nonce( $state, 'animicro_connect' ) ) {
+			$this->record_connect_error( 'invalid_state' );
+			return [ 'success' => false, 'reason' => 'invalid_state' ];
+		}
+		if ( '' === $token ) {
+			$this->record_connect_error( 'missing_token' );
+			return [ 'success' => false, 'reason' => 'missing_token' ];
 		}
 
-		if ( empty( $license_key ) ) {
+		$response = wp_remote_post(
+			$this->exchange_url,
+			[
+				'timeout'    => 10,
+				'sslverify'  => true,
+				'headers'    => [
+					'Content-Type' => 'application/json',
+					'Accept'       => 'application/json',
+				],
+				'user-agent' => 'WordPress/' . get_bloginfo( 'version' ) . '; ' . home_url(),
+				'body'       => wp_json_encode(
+					[
+						'token'     => $token,
+						'site_uuid' => home_url() . '|' . get_option( 'admin_email' ),
+					]
+				),
+			]
+		);
+
+		if ( is_wp_error( $response ) ) {
+			$this->record_connect_error( 'connect_network_error', $response->get_error_message() );
 			return [
-				'valid'  => false,
-				'reason' => 'no_license',
-				'plan'   => null,
+				'success' => false,
+				'reason'  => 'connect_network_error',
+				'error'   => $response->get_error_message(),
 			];
 		}
 
-		// LicenSuite v2 rejects reserved/private dev hosts (localhost,
-		// *.local, *.test, *.localhost, 127.x, 10.x, 192.168.x, etc.) with
-		// reason `reserved_domain` — they must not consume a real seat.
-		// To keep local development unblocked we bypass the server check
-		// entirely on those hosts and treat the licence as a `pro` dev seat.
-		// No network call, no seat consumed, full Pro feature unlock locally.
+		$status = wp_remote_retrieve_response_code( $response );
+		$data   = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		if ( 200 !== $status || ! is_array( $data ) || empty( $data['connection_id'] ) || empty( $data['connection_secret'] ) ) {
+			$reason = is_array( $data ) && ! empty( $data['error'] ) ? sanitize_key( $data['error'] ) : 'exchange_failed';
+			$this->record_connect_error( $reason );
+			return [ 'success' => false, 'reason' => $reason ];
+		}
+
+		$this->persist_connection( (string) $data['connection_id'], (string) $data['connection_secret'] );
+
+		// Persist optional metadata returned by /exchange so the admin can
+		// show plan / expires_at / sites without waiting for the next
+		// validate_connection() call.
+		if ( isset( $data['license'] ) && is_array( $data['license'] ) ) {
+			update_option(
+				$this->license_data_option,
+				wp_parse_args( $data['license'], [ 'valid' => true, 'reason' => 'ok' ] )
+			);
+		}
+
+		// Force a fresh validation immediately so is_premium() is accurate
+		// from the very next pageload.
+		$this->validate_connection( true );
+
+		return [ 'success' => true, 'reason' => 'ok' ];
+	}
+
+	private function record_connect_error( string $reason, string $detail = '' ): void {
+		set_transient(
+			'animicro_connect_error',
+			[ 'reason' => $reason, 'detail' => $detail ],
+			MINUTE_IN_SECONDS
+		);
+	}
+
+	public function consume_connect_error(): array {
+		$error = get_transient( 'animicro_connect_error' );
+		if ( false === $error ) {
+			return [];
+		}
+		delete_transient( 'animicro_connect_error' );
+		return is_array( $error ) ? $error : [];
+	}
+
+	// ------------------------------------------------------------------
+	// Validate: poll /plugin-validate with the connection_secret as Bearer
+	// ------------------------------------------------------------------
+
+	public function validate_connection( bool $force = false ): array {
+		// Dev domain bypass — same logic as v2.
 		if ( $this->is_development_domain() ) {
 			$dev = [
 				'valid'      => true,
@@ -129,6 +290,23 @@ class Animicro_License_Manager {
 			return $dev;
 		}
 
+		// Pending reconnect → don't even try to validate, the user has to
+		// finish the Connect flow first.
+		if ( $this->is_pending_reconnect() ) {
+			self::deactivate_premium();
+			return [
+				'valid'             => false,
+				'reason'            => 'pending_reconnect',
+				'plan'              => null,
+				'pending_reconnect' => true,
+			];
+		}
+
+		if ( ! $this->has_connection() ) {
+			self::deactivate_premium();
+			return [ 'valid' => false, 'reason' => 'no_connection', 'plan' => null ];
+		}
+
 		if ( ! $force ) {
 			$cached = get_transient( 'animicro_license_check' );
 			if ( false !== $cached ) {
@@ -136,39 +314,30 @@ class Animicro_License_Manager {
 			}
 		}
 
-		$domain                 = $this->get_current_domain();
-		$license_key_normalized = strtoupper( trim( $license_key ) );
-
-		$url = add_query_arg(
-			[
-				'license' => $license_key_normalized,
-				'domain'  => $domain,
-				'product' => $this->product_slug,
-			],
-			$this->api_url
-		);
-
-		$headers = [
-			'Content-Type' => 'application/json',
-			'Accept'       => 'application/json',
-		];
-
-		if ( ! empty( $this->supabase_anon_key ) ) {
-			$headers['Authorization'] = 'Bearer ' . $this->supabase_anon_key;
-		}
-
-		$response = wp_remote_get(
-			$url,
+		$response = wp_remote_post(
+			$this->validate_url,
 			[
 				'timeout'    => 10,
 				'sslverify'  => true,
-				'headers'    => $headers,
+				'headers'    => [
+					'Content-Type'  => 'application/json',
+					'Accept'        => 'application/json',
+					'Authorization' => 'Bearer ' . $this->get_connection_secret(),
+				],
 				'user-agent' => 'WordPress/' . get_bloginfo( 'version' ) . '; ' . home_url(),
-				'blocking'   => true,
+				'body'       => wp_json_encode(
+					[ 'connection_id' => $this->get_connection_id() ]
+				),
 			]
 		);
 
 		if ( is_wp_error( $response ) ) {
+			// Fail-soft: keep the last known good state during outages so a
+			// blip in the network doesn't kick the user out of Pro.
+			$last = $this->get_license_data();
+			if ( ! empty( $last ) ) {
+				return $last;
+			}
 			return [
 				'valid'  => false,
 				'reason' => 'connection_error',
@@ -177,177 +346,83 @@ class Animicro_License_Manager {
 			];
 		}
 
-		$status_code = wp_remote_retrieve_response_code( $response );
-		$body        = wp_remote_retrieve_body( $response );
-		$data        = json_decode( $body, true );
+		$status = wp_remote_retrieve_response_code( $response );
+		$data   = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		// Rate limit (LicenSuite v2): HTTP 429 with Retry-After header.
-		if ( 429 === $status_code ) {
-			return [
+		if ( 429 === $status ) {
+			// Don't churn the cache on rate-limits — the existing transient
+			// (if any) is still our best answer.
+			$last = $this->get_license_data();
+			return ! empty( $last ) ? $last : [
 				'valid'  => false,
 				'reason' => 'rate_limited',
 				'plan'   => null,
-				'error'  => 'Too many requests. Please retry shortly.',
 			];
 		}
 
-		if ( ! $data || ! is_array( $data ) ) {
+		if ( ! is_array( $data ) ) {
 			return [
 				'valid'  => false,
 				'reason' => 'invalid_response',
 				'plan'   => null,
-				'error'  => 'Invalid response from server',
 			];
-		}
-
-		if ( 404 === $status_code && isset( $data['code'] ) && 'NOT_FOUND' === $data['code'] ) {
-			return [
-				'valid'  => false,
-				'reason' => 'function_not_found',
-				'plan'   => null,
-				'error'  => 'License validation service not available',
-			];
-		}
-
-		if ( 200 !== $status_code ) {
-			$reason = $data['reason'] ?? 'server_error';
-
-			// In LicenSuite v2 a denied check (limit_reached, expired,
-			// disabled, product_mismatch, etc.) returns valid:false but the
-			// payload itself is informative — persist it so the admin UI can
-			// show sites.active_domains, expires_at, etc.
-			if ( in_array( $reason, [ 'limit_reached', 'expired', 'disabled', 'product_mismatch', 'not_found' ], true ) ) {
-				update_option( $this->license_data_option, $data );
-			}
-
-			self::deactivate_premium();
-
-			return [
-				'valid'  => false,
-				'reason' => $reason,
-				'plan'   => $data['plan'] ?? null,
-				'sites'  => $data['sites'] ?? null,
-				'error'  => $data['message'] ?? 'Server error',
-			];
-		}
-
-		if ( isset( $data['valid'] ) && true === $data['valid'] && isset( $data['reason'] ) && 'ok' === $data['reason'] ) {
-			update_option( $this->license_data_option, $data );
-			set_transient( 'animicro_license_check', $data, DAY_IN_SECONDS );
-
-			$plan            = $data['plan'] ?? null;
-			$is_premium_plan = in_array( $plan, [ 'pro', 'basic' ], true );
-
-			if ( $is_premium_plan ) {
-				self::activate_premium();
-			} else {
-				self::deactivate_premium();
-			}
-
-			return $data;
 		}
 
 		$reason = $data['reason'] ?? 'server_error';
 
-		// LicenSuite v2: when the license exists but the seat/state is
-		// rejected (limit_reached, expired, disabled, product_mismatch),
-		// the payload carries useful metadata (sites.active_domains,
-		// expires_at, plan…). Persist it so the admin can render a helpful
-		// message instead of a generic "invalid".
-		if ( in_array( $reason, [ 'limit_reached', 'expired', 'disabled', 'product_mismatch' ], true ) ) {
+		// Connection revoked or destroyed → drop credentials so the user
+		// sees the disconnected state and can reconnect cleanly.
+		if ( in_array( $reason, [ 'revoked_or_not_found', 'invalid_credentials' ], true ) ) {
+			$this->clear_connection();
+			return [
+				'valid'  => false,
+				'reason' => $reason,
+				'plan'   => null,
+			];
+		}
+
+		// 200 + valid:true → premium, cache it, persist it.
+		if ( 200 === $status && ! empty( $data['valid'] ) && 'ok' === $reason ) {
 			update_option( $this->license_data_option, $data );
-		} else {
-			delete_option( $this->license_data_option );
+			set_transient( 'animicro_license_check', $data, DAY_IN_SECONDS );
+
+			$plan = $data['plan'] ?? null;
+			if ( in_array( $plan, [ 'pro', 'basic' ], true ) ) {
+				self::activate_premium();
+			} else {
+				self::deactivate_premium();
+			}
+			return $data;
 		}
 
+		// Known soft failures (expired / disabled): keep payload for the UI,
+		// lock premium, don't drop credentials (so the user can renew).
+		if ( in_array( $reason, [ 'expired', 'disabled' ], true ) ) {
+			update_option( $this->license_data_option, $data );
+			self::deactivate_premium();
+			return [
+				'valid'      => false,
+				'reason'     => $reason,
+				'plan'       => $data['plan'] ?? null,
+				'sites'      => $data['sites'] ?? null,
+				'expires_at' => $data['expires_at'] ?? null,
+			];
+		}
+
+		// Anything else: deactivate but don't wipe the connection — could be
+		// a transient server error.
 		self::deactivate_premium();
-
 		return [
-			'valid'      => false,
-			'reason'     => $reason,
-			'plan'       => $data['plan'] ?? null,
-			'sites'      => $data['sites'] ?? null,
-			'expires_at' => $data['expires_at'] ?? null,
-			'error'      => $data['message'] ?? 'License validation failed',
+			'valid'  => false,
+			'reason' => $reason,
+			'plan'   => $data['plan'] ?? null,
+			'error'  => $data['message'] ?? 'License validation failed',
 		];
 	}
 
-	/**
-	 * Release the seat held by this domain on the licence server.
-	 *
-	 * Called when:
-	 *  - the user replaces the saved licence key (best-effort, blocking).
-	 *  - the plugin is deactivated / uninstalled (fire-and-forget).
-	 *
-	 * Idempotent on the server side: if the seat is already released the
-	 * endpoint just returns `{ deactivated: false, reason: 'not_active' }`.
-	 *
-	 * @param string|null $license_key Optional. Defaults to the stored key.
-	 * @param bool        $blocking    Wait for the response. Default false.
-	 */
-	public function deactivate_license( ?string $license_key = null, bool $blocking = false ): array {
-		if ( null === $license_key ) {
-			$license_key = $this->get_license_key();
-		}
-
-		if ( empty( $license_key ) ) {
-			return [ 'deactivated' => false, 'reason' => 'no_license' ];
-		}
-
-		// Dev hosts never consumed a seat (we bypassed the server in
-		// validate_license), so there is nothing to release. Just clear
-		// the local cache and report success.
-		if ( $this->is_development_domain() ) {
-			delete_transient( 'animicro_license_check' );
-			delete_transient( 'animicro_license_last_check' );
-			return [ 'deactivated' => true, 'reason' => 'dev_skip' ];
-		}
-
-		$url = add_query_arg(
-			[
-				'license' => strtoupper( trim( $license_key ) ),
-				'domain'  => $this->get_current_domain(),
-				'product' => $this->product_slug,
-			],
-			$this->deactivate_url
-		);
-
-		$headers = [
-			'Content-Type' => 'application/json',
-			'Accept'       => 'application/json',
-		];
-
-		if ( ! empty( $this->supabase_anon_key ) ) {
-			$headers['Authorization'] = 'Bearer ' . $this->supabase_anon_key;
-		}
-
-		$response = wp_remote_get(
-			$url,
-			[
-				'timeout'    => $blocking ? 10 : 5,
-				'sslverify'  => true,
-				'headers'    => $headers,
-				'user-agent' => 'WordPress/' . get_bloginfo( 'version' ) . '; ' . home_url(),
-				'blocking'   => $blocking,
-			]
-		);
-
-		// Always clear the local cache regardless of whether the server
-		// confirmed — the next validate_license() call will refresh state.
-		delete_transient( 'animicro_license_check' );
-		delete_transient( 'animicro_license_last_check' );
-
-		if ( ! $blocking || is_wp_error( $response ) ) {
-			return [ 'deactivated' => false, 'reason' => 'pending' ];
-		}
-
-		$data = json_decode( wp_remote_retrieve_body( $response ), true );
-		if ( ! is_array( $data ) ) {
-			return [ 'deactivated' => false, 'reason' => 'invalid_response' ];
-		}
-
-		return $data;
-	}
+	// ------------------------------------------------------------------
+	// Domain helpers (unchanged from v2)
+	// ------------------------------------------------------------------
 
 	private function normalize_domain( string $domain_or_url ): string {
 		$domain = preg_replace( '#^https?://#', '', $domain_or_url );
@@ -367,21 +442,15 @@ class Animicro_License_Manager {
 	}
 
 	/**
-	 * True when the site is running on a reserved dev host that LicenSuite v2
-	 * rejects with `reserved_domain`. We mirror the server's rules so we can
-	 * bypass the network call up-front instead of hitting the wall.
+	 * True when the site is running on a reserved dev host. Mirrors the
+	 * server's reserved-domain rule so we can bypass the network call
+	 * entirely on localhost / .local / .test / private IPs.
 	 *
-	 * Match list: `localhost`, anything ending in `.local` / `.test` /
-	 * `.localhost` / `.invalid` / `.example`, raw IPv4 in private ranges
-	 * (10.x, 127.x, 192.168.x, 172.16–31.x), and IPv6 loopback `::1`.
-	 *
-	 * Filter `animicro_is_development_domain` lets advanced users override
-	 * the detection (e.g. to force a real check on a public staging domain
-	 * that happens to look like dev, or to force dev mode on a custom TLD).
+	 * Filter `animicro_is_development_domain` allows overriding (e.g. force
+	 * a real check on a public staging that happens to look like dev).
 	 */
 	private function is_development_domain(): bool {
 		$domain = $this->get_current_domain();
-
 		$is_dev = false;
 
 		if ( '' === $domain || 'localhost' === $domain || '::1' === $domain ) {
@@ -389,8 +458,6 @@ class Animicro_License_Manager {
 		} elseif ( preg_match( '/\.(local|test|localhost|invalid|example)$/i', $domain ) ) {
 			$is_dev = true;
 		} elseif ( filter_var( $domain, FILTER_VALIDATE_IP ) ) {
-			// Private / loopback IPv4 ranges — keep dev mode on. A public
-			// IPv4 site (rare) still gets a normal check.
 			if (
 				preg_match( '/^127\./', $domain ) ||
 				preg_match( '/^10\./', $domain ) ||
@@ -401,19 +468,20 @@ class Animicro_License_Manager {
 			}
 		}
 
-		/**
-		 * Filter whether the current domain should be treated as a dev host
-		 * (skipping the LicenSuite server check and unlocking Pro locally).
-		 *
-		 * @param bool   $is_dev Result of the built-in detection.
-		 * @param string $domain Normalized current domain.
-		 */
 		return (bool) apply_filters( 'animicro_is_development_domain', $is_dev, $domain );
 	}
 
+	public function is_dev_mode(): bool {
+		return $this->is_development_domain();
+	}
+
+	// ------------------------------------------------------------------
+	// Accessors used by the REST layer / React UI
+	// ------------------------------------------------------------------
+
 	public function get_license_plan(): string {
 		$license_data = get_option( $this->license_data_option, [] );
-		return isset( $license_data['plan'] ) ? $license_data['plan'] : 'free';
+		return isset( $license_data['plan'] ) ? (string) $license_data['plan'] : 'free';
 	}
 
 	public function get_license_data(): array {
@@ -422,37 +490,41 @@ class Animicro_License_Manager {
 
 	public function get_error_message( string $reason ): string {
 		$messages = [
-			'ok'                     => __( 'License valid', 'animicro' ),
-			'no_license'             => __( 'No license key has been entered', 'animicro' ),
-			'not_found'              => __( 'License key not found', 'animicro' ),
-			'expired'                => __( 'License has expired', 'animicro' ),
-			'disabled'               => __( 'License has been deactivated', 'animicro' ),
-			'domain_mismatch'        => __( 'Domain does not match the registered domain', 'animicro' ),
-			'product_mismatch'       => __( 'License is not valid for this product', 'animicro' ),
-			'limit_reached'          => __( 'You have reached the maximum number of sites allowed by your plan. Deactivate the plugin on another site or upgrade your plan.', 'animicro' ),
-			'rate_limited'           => __( 'Too many license checks from this server. Please try again in a minute.', 'animicro' ),
-			'reserved_domain'        => __( 'This domain (localhost / .local / .test) cannot be used to activate a license. Use a public domain.', 'animicro' ),
-			'invalid_license_format' => __( 'The license key format is not valid.', 'animicro' ),
-			'invalid_product_format' => __( 'The product identifier is not valid.', 'animicro' ),
-			'invalid_domain'         => __( 'The current site domain is not valid.', 'animicro' ),
-			'missing_params'         => __( 'Missing required parameters', 'animicro' ),
-			'connection_error'       => __( 'Could not connect to the license server', 'animicro' ),
-			'server_error'           => __( 'License server error', 'animicro' ),
-			'invalid_response'       => __( 'Invalid response from the license server', 'animicro' ),
-			'function_not_found'     => __( 'Validation service unavailable', 'animicro' ),
+			'ok'                     => __( 'Connected', 'animicro' ),
+			'no_connection'          => __( 'Not connected. Click "Connect" to link your license.', 'animicro' ),
+			'pending_reconnect'      => __( 'Your license needs to be reconnected after the security upgrade. Click "Reconnect".', 'animicro' ),
+			'revoked_or_not_found'   => __( 'This connection was revoked from your dashboard. Please reconnect.', 'animicro' ),
+			'invalid_credentials'    => __( 'The connection is no longer valid. Please reconnect.', 'animicro' ),
+			'expired'                => __( 'Your license has expired. Renew it from your dashboard.', 'animicro' ),
+			'disabled'               => __( 'Your license has been disabled by an administrator.', 'animicro' ),
+			'rate_limited'           => __( 'Too many license checks from this server. Please try again later.', 'animicro' ),
+			'connect_network_error'  => __( 'Could not reach the license server during connect. Try again.', 'animicro' ),
+			'exchange_failed'        => __( 'Failed to complete the connection. Please try again.', 'animicro' ),
+			'invalid_state'          => __( 'Security check failed during connect. Please try again from the License page.', 'animicro' ),
+			'missing_token'          => __( 'The connect callback was missing the token. Please try again.', 'animicro' ),
+			'connection_error'       => __( 'Could not connect to the license server.', 'animicro' ),
+			'invalid_response'       => __( 'Invalid response from the license server.', 'animicro' ),
+			'server_error'           => __( 'License server error.', 'animicro' ),
 		];
 
 		return $messages[ $reason ] ?? __( 'Unknown error', 'animicro' );
 	}
 
-	public static function validate_license_periodically(): void {
-		$last_check = get_transient( 'animicro_license_last_check' );
+	// ------------------------------------------------------------------
+	// Periodic re-validation (admin_init, daily)
+	// ------------------------------------------------------------------
 
-		if ( false === $last_check ) {
-			$instance = new self();
-			$instance->validate_license( null, true );
-			set_transient( 'animicro_license_last_check', time(), DAY_IN_SECONDS );
+	public static function validate_license_periodically(): void {
+		if ( false !== get_transient( 'animicro_license_last_check' ) ) {
+			return;
 		}
+
+		// Detect the legacy → v3 migration before the first network call.
+		$instance = new self();
+		$instance->is_pending_reconnect();   // sets the flag if applicable
+
+		$instance->validate_connection( true );
+		set_transient( 'animicro_license_last_check', time(), DAY_IN_SECONDS );
 	}
 
 	public function clear_cache(): void {
@@ -460,25 +532,33 @@ class Animicro_License_Manager {
 		delete_transient( 'animicro_license_last_check' );
 	}
 
-	public static function is_premium(): bool {
-		$pro_enabled = get_option( self::OPTION_NAME, false );
+	// ------------------------------------------------------------------
+	// Static gating helpers (unchanged contract — the rest of the plugin
+	// keeps calling these the same way).
+	// ------------------------------------------------------------------
 
-		if ( ! $pro_enabled ) {
+	public static function is_premium(): bool {
+		if ( ! get_option( self::OPTION_NAME, false ) ) {
 			return false;
 		}
 
-		$instance     = new self();
-		$license_data = $instance->validate_license();
+		$instance = new self();
 
-		if ( ! isset( $license_data['valid'] ) || ! $license_data['valid'] ) {
+		// Pending-reconnect users are not premium until they reconnect.
+		if ( $instance->is_pending_reconnect() ) {
 			self::deactivate_premium();
 			return false;
 		}
 
-		$plan            = $license_data['plan'] ?? null;
-		$is_premium_plan = in_array( $plan, [ 'pro', 'basic' ], true );
+		$state = $instance->validate_connection();
 
-		if ( ! $is_premium_plan ) {
+		if ( empty( $state['valid'] ) ) {
+			self::deactivate_premium();
+			return false;
+		}
+
+		$plan = $state['plan'] ?? null;
+		if ( ! in_array( $plan, [ 'pro', 'basic' ], true ) ) {
 			self::deactivate_premium();
 			return false;
 		}
@@ -498,12 +578,18 @@ class Animicro_License_Manager {
 		return (bool) update_option( self::OPTION_NAME, false );
 	}
 
+	// ------------------------------------------------------------------
+	// Lifecycle hooks
+	// ------------------------------------------------------------------
+
 	public static function register_hooks(): void {
 		add_action( 'update_option_siteurl', [ __CLASS__, 'on_domain_change' ] );
-		add_action( 'update_option_home', [ __CLASS__, 'on_domain_change' ] );
+		add_action( 'update_option_home',    [ __CLASS__, 'on_domain_change' ] );
 	}
 
 	public static function on_domain_change(): void {
+		// Domain change ≈ migrating sites; the connection_id stays valid on
+		// the server but our cached state is stale, so refresh on next read.
 		delete_transient( 'animicro_license_check' );
 		delete_transient( 'animicro_license_last_check' );
 	}

@@ -42,11 +42,8 @@ jobs:
         run: npm run build
 
       - name: Build Free + Pro ZIPs
-        env:
-          # Same Supabase anon key the local pre-push hook uses. Stored as a
-          # GitHub Actions secret. Public anon key — not sensitive — but kept
-          # in secrets so it's easy to rotate without committing.
-          ANIMICRO_SUPABASE_ANON_KEY: ${{ secrets.ANIMICRO_SUPABASE_ANON_KEY }}
+        # LicenSuite v3 Connect flow uses per-site connection_secrets stored
+        # at runtime, so the build no longer needs a build-time anon key.
         run: bash scripts/build.sh
 
       - name: Verify ZIPs exist

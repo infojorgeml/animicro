@@ -19,10 +19,78 @@ class Animicro_Admin {
 			add_action( 'admin_menu', [ $this, 'register_menu' ] );
 			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 			add_action( 'admin_notices', [ $this, 'notice_free_deactivated' ] );
+			add_action( 'admin_notices', [ $this, 'maybe_notice_revoke_reminder' ] );
 			// Run before any plugin renders its admin notice. Priority 1 so
 			// we strip the action queue before WP starts firing it.
 			add_action( 'in_admin_header', [ $this, 'suppress_admin_notices' ], 1 );
+
+			// LicenSuite v3 Connect: handle the dashboard redirect callback.
+			if ( Animicro::is_pro_plugin() ) {
+				add_action( 'admin_init', [ $this, 'maybe_handle_connect_callback' ] );
+			}
 		}
+	}
+
+	/**
+	 * Catch the LicenSuite dashboard redirect after the user completes the
+	 * Connect flow. URL shape:
+	 *   /wp-admin/admin.php?page=animicro-license&action=connect-callback
+	 *   &token=<one-time>&state=<wp-nonce>
+	 *
+	 * Verifies the WP nonce in `state`, runs the token-for-secret exchange,
+	 * then redirects to the clean license page so the React UI re-fetches
+	 * `/license/status` and renders the new connected state.
+	 */
+	public function maybe_handle_connect_callback(): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- the `state` query arg IS the nonce; we verify it inside handle_callback().
+		if ( ( $_GET['page'] ?? '' ) !== 'animicro-license' ) {
+			return;
+		}
+		if ( ( $_GET['action'] ?? '' ) !== 'connect-callback' ) {
+			return;
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		if ( ! class_exists( 'Animicro_License_Manager' ) ) {
+			return;
+		}
+
+		$token = sanitize_text_field( wp_unslash( $_GET['token'] ?? '' ) );
+		$state = sanitize_text_field( wp_unslash( $_GET['state'] ?? '' ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		$manager = new Animicro_License_Manager();
+		$manager->handle_callback( $token, $state );
+
+		wp_safe_redirect( admin_url( 'admin.php?page=animicro-license' ) );
+		exit;
+	}
+
+	/**
+	 * After the user clicks "Disconnect" in the React UI, remind them that
+	 * the seat is still held by this site on LicenSuite until they revoke
+	 * the connection from the dashboard. One-shot via a 60 s transient.
+	 */
+	public function maybe_notice_revoke_reminder(): void {
+		if ( ! Animicro::is_pro_plugin() ) {
+			return;
+		}
+		if ( ! get_transient( 'animicro_show_revoke_notice' ) ) {
+			return;
+		}
+		delete_transient( 'animicro_show_revoke_notice' );
+
+		echo '<div class="notice notice-info is-dismissible"><p>'
+			. wp_kses(
+				sprintf(
+					/* translators: %s: dashboard URL. */
+					__( '<strong>Animicro Pro:</strong> the local connection has been removed. To free up the seat for another site, also revoke this connection from your <a href="%s" target="_blank" rel="noopener">LicenSuite dashboard</a>.', 'animicro' ),
+					esc_url( 'https://licensuite.vercel.app/' )
+				),
+				[ 'strong' => [], 'a' => [ 'href' => [], 'target' => [], 'rel' => [] ] ]
+			)
+			. '</p></div>';
 	}
 
 	/**
@@ -191,12 +259,9 @@ class Animicro_Admin {
 
 		$is_pro_plugin = Animicro::is_pro_plugin();
 		$is_premium    = false;
-		$license_key   = '';
 
 		if ( $is_pro_plugin && class_exists( 'Animicro_License_Manager' ) ) {
-			$license_manager = new Animicro_License_Manager();
-			$is_premium      = Animicro_License_Manager::is_premium();
-			$license_key     = $license_manager->get_license_key();
+			$is_premium = Animicro_License_Manager::is_premium();
 		}
 
 		$data = wp_json_encode( [
@@ -206,7 +271,6 @@ class Animicro_Admin {
 			'version'    => ANIMICRO_VERSION,
 			'builders'   => Animicro_Compatibility::get_available_builders(),
 			'isPremium'  => $is_premium,
-			'licenseKey' => $license_key,
 			'page'       => $page,
 			'proPlugin'  => $is_pro_plugin,
 			'upgradeUrl' => $is_pro_plugin
@@ -270,18 +334,19 @@ class Animicro_Admin {
 				],
 			] );
 
-			register_rest_route( 'animicro/v1', '/license/save', [
+			register_rest_route( 'animicro/v1', '/license/connect-url', [
+				[
+					'methods'             => 'GET',
+					'callback'            => [ $this, 'get_connect_url' ],
+					'permission_callback' => [ $this, 'check_permission' ],
+				],
+			] );
+
+			register_rest_route( 'animicro/v1', '/license/disconnect', [
 				[
 					'methods'             => 'POST',
-					'callback'            => [ $this, 'save_license' ],
+					'callback'            => [ $this, 'disconnect_license' ],
 					'permission_callback' => [ $this, 'check_permission' ],
-					'args'                => [
-						'license_key' => [
-							'required'          => false,
-							'type'              => 'string',
-							'sanitize_callback' => 'sanitize_text_field',
-						],
-					],
 				],
 			] );
 		}
@@ -467,47 +532,48 @@ class Animicro_Admin {
 	}
 
 	public function get_license_status(): \WP_REST_Response {
-		$license_manager = new Animicro_License_Manager();
+		$manager = new Animicro_License_Manager();
+
+		$is_dev             = $manager->is_dev_mode();
+		$pending_reconnect  = $manager->is_pending_reconnect();
+		$is_premium         = Animicro_License_Manager::is_premium();
+		$license_data       = $manager->get_license_data();
+		$has_connection     = $manager->has_connection();
+		$connect_error      = $manager->consume_connect_error();
+
+		$state = $is_dev ? 'dev' : ( $pending_reconnect ? 'pending_reconnect' : ( $has_connection ? 'connected' : 'disconnected' ) );
 
 		return new \WP_REST_Response( [
-			'license_key'  => $license_manager->get_license_key(),
-			'license_data' => $license_manager->get_license_data(),
-			'is_premium'   => Animicro_License_Manager::is_premium(),
-			'plan'         => $license_manager->get_license_plan(),
+			'state'             => $state,
+			'is_premium'        => $is_premium,
+			'is_dev'            => $is_dev,
+			'pending_reconnect' => $pending_reconnect,
+			'has_connection'    => $has_connection,
+			'connection_id'     => $manager->get_connection_id(),
+			'plan'              => $license_data['plan'] ?? null,
+			'expires_at'        => $license_data['expires_at'] ?? null,
+			'sites'             => $license_data['sites'] ?? null,
+			'connect_error'     => empty( $connect_error ) ? null : [
+				'reason'  => $connect_error['reason'] ?? 'unknown',
+				'message' => $manager->get_error_message( $connect_error['reason'] ?? 'server_error' ),
+			],
 		], 200 );
 	}
 
-	public function save_license( \WP_REST_Request $request ): \WP_REST_Response {
-		$license_key     = $request->get_param( 'license_key' ) ?? '';
-		$license_manager = new Animicro_License_Manager();
+	public function get_connect_url(): \WP_REST_Response {
+		$manager = new Animicro_License_Manager();
+		return new \WP_REST_Response( [ 'url' => $manager->get_connect_url() ], 200 );
+	}
 
-		$license_manager->save_license_key( $license_key );
+	public function disconnect_license(): \WP_REST_Response {
+		$manager = new Animicro_License_Manager();
+		$manager->clear_connection();
 
-		if ( ! empty( $license_key ) ) {
-			$result = $license_manager->validate_license( $license_key, true );
+		// Hint the user that the seat is still occupied on the server until
+		// they revoke from the dashboard.
+		set_transient( 'animicro_show_revoke_notice', '1', MINUTE_IN_SECONDS );
 
-			if ( isset( $result['valid'] ) && $result['valid'] ) {
-				Animicro_License_Manager::activate_premium();
-			} else {
-				Animicro_License_Manager::deactivate_premium();
-			}
-
-			return new \WP_REST_Response( [
-				'success'    => true,
-				'is_premium' => isset( $result['valid'] ) && $result['valid'],
-				'data'       => $result,
-				'message'    => $license_manager->get_error_message( $result['reason'] ?? 'server_error' ),
-			], 200 );
-		}
-
-		Animicro_License_Manager::deactivate_premium();
-
-		return new \WP_REST_Response( [
-			'success'    => true,
-			'is_premium' => false,
-			'data'       => [ 'valid' => false, 'reason' => 'no_license', 'plan' => null ],
-			'message'    => $license_manager->get_error_message( 'no_license' ),
-		], 200 );
+		return new \WP_REST_Response( [ 'success' => true ], 200 );
 	}
 
 	private function sanitize_margin( $value, string $fallback ): string {
