@@ -5,6 +5,25 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.3] - 2026-04-29
+
+### Fixed
+
+- **Pro — License page showed "active" but Pro modules stayed locked.** Two-bug compound:
+  1. **`is_premium()` short-circuited on a stored boolean.** The static check read the `animicro_premium_active` option as a hot-path guard and returned `false` if it was `false`, never reaching the live validation. Any path that briefly set the flag to `false` (a 1.11.x → 1.12.x migration with corrupt cached data, a disconnect mid-pageload, etc.) left the plugin permanently locked even after the underlying connection became healthy. Refactored to always derive the answer from current state: `is_pending_reconnect()` → `has_connection() / is_dev_mode()` → `validate_connection()` (uses the daily transient, no extra round-trip in the hot path) → `is_premium_slug()`. The stored flag is still kept in sync via `activate_premium()` / `deactivate_premium()` for any external code that introspects it.
+  2. **`validate_connection()` success branch required `reason === 'ok'`.** LicenSuite v4 doesn't always echo the `reason` field on success, so the gate was failing silently and `activate_premium()` was never called even when the licence was perfectly valid. Now only requires `valid: true`.
+
+### Added
+
+- **`animicro_premium_plan_slugs` filter** for operators with custom dashboard plans. Default list: `['pro', 'basic', 'agency', 'enterprise']`. To extend:
+  ```php
+  add_filter( 'animicro_premium_plan_slugs', function ( $slugs ) {
+      $slugs[] = 'studio';
+      return $slugs;
+  } );
+  ```
+  Backed by a new `Animicro_License_Manager::is_premium_slug( ?string $slug ): bool` static helper, used at every gating site.
+
 ## [1.12.2] - 2026-04-29
 
 ### Changed

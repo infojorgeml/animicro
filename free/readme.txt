@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.12.2
+Stable tag: 1.12.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,9 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.12.3 =
+* Animicro Pro: fixes a bug introduced by the v3 Connect migration where the License page showed "License active, Plan: PRO" but Pro modules stayed locked in the modules grid. The premium check now always re-derives the answer from current connection state instead of trusting a possibly-stale internal flag, and the premium-tier list is now filterable so custom dashboard plans (e.g. `agency`, `studio`) can unlock Pro features without a code change. No user-facing changes in the free tier.
 
 = 1.12.2 =
 * Animicro Pro: license panel now shows the plan name as configured by the operator on the LicenSuite dashboard (e.g. "Pro", "Agency", "Enterprise 50 sites"), instead of an uppercased slug. Internal upgrade to LicenSuite v4.0 plan shape (rich object with `slug` + `name` + `max_sites`). No user-facing changes in the free tier.
@@ -183,6 +186,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.12.3 =
+Pro license bugfix: Pro modules now unlock correctly after Connect on every install. No user-facing changes in the free tier.
 
 = 1.12.2 =
 Pro license panel now shows the operator-configured plan name (e.g. "Agency"). No user-facing changes in the free tier.

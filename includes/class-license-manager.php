@@ -349,6 +349,33 @@ class Animicro_License_Manager {
 		return null;
 	}
 
+	/**
+	 * Decide whether a given plan slug counts as a premium tier.
+	 *
+	 * The default list mirrors the LicenSuite product catalogue
+	 * (`pro`, `basic`, `agency`, `enterprise`). Operators with custom
+	 * slugs can extend the list via the `animicro_premium_plan_slugs`
+	 * filter:
+	 *
+	 *     add_filter( 'animicro_premium_plan_slugs', function ( $slugs ) {
+	 *         $slugs[] = 'studio';
+	 *         return $slugs;
+	 *     } );
+	 *
+	 * Returns false for `null`, empty strings, or any slug not in the
+	 * resolved list.
+	 */
+	public static function is_premium_slug( ?string $slug ): bool {
+		if ( ! is_string( $slug ) || '' === $slug ) {
+			return false;
+		}
+		$premium_slugs = apply_filters(
+			'animicro_premium_plan_slugs',
+			[ 'pro', 'basic', 'agency', 'enterprise' ]
+		);
+		return in_array( $slug, (array) $premium_slugs, true );
+	}
+
 	private function record_connect_error( string $reason, string $detail = '' ): void {
 		set_transient(
 			'animicro_connect_error',
@@ -480,13 +507,15 @@ class Animicro_License_Manager {
 
 		$normalized = $this->normalize_payload( $data );
 
-		// 200 + valid:true → premium, cache it, persist it.
-		if ( 200 === $status && ! empty( $normalized['valid'] ) && 'ok' === $reason ) {
+		// HTTP 200 + valid:true ⇒ premium. Don't gate on `reason === 'ok'`:
+		// LicenSuite v4 may not always echo the reason on success, and
+		// gating on it caused 1.12.2 installs to skip activate_premium()
+		// even when the licence was perfectly fine.
+		if ( 200 === $status && ! empty( $normalized['valid'] ) ) {
 			update_option( $this->license_data_option, $normalized );
 			set_transient( 'animicro_license_check', $normalized, DAY_IN_SECONDS );
 
-			$slug = self::plan_slug( $normalized['plan'] ?? null );
-			if ( in_array( $slug, [ 'pro', 'basic' ], true ) ) {
+			if ( self::is_premium_slug( self::plan_slug( $normalized['plan'] ?? null ) ) ) {
 				self::activate_premium();
 			} else {
 				self::deactivate_premium();
@@ -644,19 +673,41 @@ class Animicro_License_Manager {
 	// keeps calling these the same way).
 	// ------------------------------------------------------------------
 
+	/**
+	 * Canonical "is the visitor on a paid plan right now?" check.
+	 *
+	 * Always derives the answer from current state (connection presence +
+	 * cached validation transient) instead of reading the stored
+	 * `animicro_premium_active` flag first. The previous implementation
+	 * short-circuited on the flag, which meant any path that briefly set it
+	 * to `false` (e.g. a v2→v3 migration with corrupt cached data, or a
+	 * disconnect followed by a reconnect on the same pageload) could leave
+	 * the plugin permanently locked even after the underlying connection
+	 * was healthy again.
+	 *
+	 * The hot-path cost stays low: `validate_connection()` reads from the
+	 * `animicro_license_check` transient (24 h TTL), so the typical call
+	 * is just a couple of `get_option()` reads — no network. The stored
+	 * flag is still kept in sync via `activate_premium()` / `deactivate_premium()`
+	 * so external code that introspects the option directly still gets
+	 * the right answer eventually.
+	 */
 	public static function is_premium(): bool {
-		if ( ! get_option( self::OPTION_NAME, false ) ) {
-			return false;
-		}
-
 		$instance = new self();
 
-		// Pending-reconnect users are not premium until they reconnect.
+		// Legacy v1.11.x users that haven't reconnected yet — locked.
 		if ( $instance->is_pending_reconnect() ) {
 			self::deactivate_premium();
 			return false;
 		}
 
+		// No credentials and not on a dev domain — locked.
+		if ( ! $instance->is_dev_mode() && ! $instance->has_connection() ) {
+			self::deactivate_premium();
+			return false;
+		}
+
+		// Cached validation result (or a fresh round-trip on cache miss).
 		$state = $instance->validate_connection();
 
 		if ( empty( $state['valid'] ) ) {
@@ -664,12 +715,13 @@ class Animicro_License_Manager {
 			return false;
 		}
 
-		$slug = self::plan_slug( $state['plan'] ?? null );
-		if ( ! in_array( $slug, [ 'pro', 'basic' ], true ) ) {
+		if ( ! self::is_premium_slug( self::plan_slug( $state['plan'] ?? null ) ) ) {
 			self::deactivate_premium();
 			return false;
 		}
 
+		// Keep the flag in sync for any external code that reads it.
+		self::activate_premium();
 		return true;
 	}
 
