@@ -2,16 +2,14 @@ import { useEffect, useState } from 'react';
 import type { LicenseStatus } from '../types';
 
 /**
- * LicenSuite v3 — Connect-flow license page.
+ * LicenSuite v4 — Connect-flow license page.
  *
- * Renders four states based on the `state` field returned by
+ * Renders three states based on the `state` field returned by
  * GET /animicro/v1/license/status:
  *
- *   - "dev"               : neutral card, Pro unlocked locally.
- *   - "pending_reconnect" : orange banner; user upgraded from 1.11.x and
- *                           must reconnect (legacy license_key still on disk).
- *   - "connected"         : green card with plan / expires / sites + Disconnect.
- *   - "disconnected"      : prompt with the primary "Connect" button.
+ *   - "dev"          : neutral card, Pro unlocked locally on dev hosts.
+ *   - "connected"    : green card with plan / expires / sites + Disconnect.
+ *   - "disconnected" : prompt with the primary "Connect" button.
  *
  * The Connect button calls /license/connect-url to get the dashboard URL,
  * then opens it in a new tab. The dashboard redirects back to
@@ -114,13 +112,6 @@ export default function LicensePage() {
 
       {status.state === 'dev' && <DevModeCard />}
 
-      {status.state === 'pending_reconnect' && (
-        <PendingReconnectCard
-          onReconnect={handleConnect}
-          isConnecting={connecting}
-        />
-      )}
-
       {status.state === 'connected' && (
         <ConnectedCard
           status={status}
@@ -206,45 +197,6 @@ function DisconnectedCard({
         `}
       >
         {isConnecting ? 'Opening dashboard…' : 'Connect to your account'}
-      </button>
-    </div>
-  );
-}
-
-function PendingReconnectCard({
-  onReconnect,
-  isConnecting,
-}: {
-  onReconnect: () => void;
-  isConnecting: boolean;
-}) {
-  return (
-    <div className="rounded-lg border-2 border-orange-300 bg-orange-50 p-6">
-      <div className="flex items-center gap-3 mb-3">
-        <div className="w-3 h-3 rounded-full bg-orange-500 shrink-0" />
-        <p className="text-sm font-semibold text-orange-900">Reconnect required</p>
-      </div>
-
-      <p className="text-sm text-orange-900 mb-2">
-        Animicro Pro upgraded its licensing system to a more secure connection-based flow
-        (no more pasting keys). Your existing license is still valid — you just need to
-        link it to this site one more time.
-      </p>
-      <p className="text-xs text-orange-800 mb-5 opacity-80">
-        Pro modules are temporarily locked until you reconnect.
-      </p>
-
-      <button
-        onClick={onReconnect}
-        disabled={isConnecting}
-        className={`
-          rounded-lg px-5 py-2.5 text-sm font-medium text-white transition-all
-          ${isConnecting
-            ? 'bg-orange-300 cursor-not-allowed'
-            : 'bg-orange-600 hover:bg-orange-700 shadow-sm'}
-        `}
-      >
-        {isConnecting ? 'Opening dashboard…' : 'Reconnect now'}
       </button>
     </div>
   );

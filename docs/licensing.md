@@ -47,7 +47,7 @@ The server-side documentation (endpoints, response shapes, dashboard flow) lives
 | **LicenSuite dashboard** (Next.js on Vercel) | Owns the user-facing Connect UI: shows the user's licenses, generates one-time tokens. | `licensuite.vercel.app` |
 | **`/api/plugin-connect/exchange`** (Next.js route) | Trades a one-time `token` for a long-lived `connection_id + connection_secret`. | Same Vercel app |
 | **`/functions/v1/plugin-validate`** (Supabase Edge Function) | Validates a connection. The plugin calls this once per day. | `[ref].supabase.co` |
-| **`class-license-manager.php`** | Builds the dashboard URL, handles the redirect callback, runs the token exchange, validates daily, encrypts the secret at rest, manages the legacy v2→v3 migration banner, dev-host bypass. | Inside the plugin. **One file, ~440 lines.** |
+| **`class-license-manager.php`** | Builds the dashboard URL, handles the redirect callback, runs the token exchange, validates daily against the live server, encrypts the secret at rest, dev-host bypass. | Inside the plugin. **One file, ~400 lines.** |
 | **The rest of the plugin** | Calls `Yourplugin_License_Manager::is_premium()` wherever it needs to gate Pro features. | Wherever Pro features live. |
 
 Distribution and licensing are intentionally decoupled: the public ZIP is downloadable by anyone (see `docs/animicro.md` → Release pipeline), but the connection still gates Pro features at runtime. Stealing the ZIP gets the user a locked plugin.
@@ -124,7 +124,7 @@ Failure reasons (HTTP 200 with `valid: false`, or HTTP 4xx):
 
 ### Revoke
 
-`POST https://licensuite.vercel.app/api/plugin-connect/[id]/revoke` exists but currently requires owner/admin auth (the user's dashboard session), **not** the connection secret. The plugin therefore cannot self-revoke at deactivation. We show an admin notice instead, and will wire up auto-revoke when LicenSuite ships a public endpoint that accepts the secret.
+`POST https://licensuite.vercel.app/api/plugin-connect/[id]/revoke` requires user dashboard session (cookie auth), **not** the connection secret. The plugin therefore cannot self-revoke at deactivation — the canonical workflow is: at deactivation, the plugin cleans its local options; the user revokes the seat from their LicenSuite dashboard with one click when they want to free it for another site. See §7.1 for implementation.
 
 ---
 
@@ -161,8 +161,6 @@ class Yourplugin_License_Manager {
     // === Storage keys (wp_options) ===
     private string $connection_id_option     = 'yourplugin_connection_id';     // UUID, plain
     private string $connection_secret_option = 'yourplugin_connection_secret'; // AES-256-CBC at rest
-    private string $legacy_key_option        = 'yourplugin_license_key';       // v2 leftover
-    private string $pending_reconnect_option = 'yourplugin_pending_reconnect';
     private string $license_data_option      = 'yourplugin_license_data';
 
     // === Connection storage ===
@@ -170,10 +168,7 @@ class Yourplugin_License_Manager {
     public  function get_connection_secret(): string         // decrypts
     public  function has_connection(): bool
     private function persist_connection( $id, $secret )      // encrypts secret
-    public  function clear_connection()
-
-    // === v2 → v3 migration ===
-    public  function is_pending_reconnect(): bool
+    public  function clear_connection()                      // wipes everything
 
     // === Encryption at rest ===
     private function encryption_key()                        // SHA-256 of AUTH_KEY + SECURE_AUTH_KEY
@@ -303,7 +298,6 @@ Daily, on `admin_init`, throttled by a transient:
 ```php
 public function validate_connection( bool $force = false ): array {
     if ( $this->is_development_domain() )    return $this->dev_premium_payload();
-    if ( $this->is_pending_reconnect() )     return $this->pending_payload();
     if ( ! $this->has_connection() )         return $this->no_connection_payload();
 
     if ( ! $force ) {
@@ -315,16 +309,45 @@ public function validate_connection( bool $force = false ): array {
         'timeout' => 10,
         'headers' => [
             'Content-Type'  => 'application/json',
-            'Authorization' => 'Bearer ' . $this->get_connection_secret(),  // decrypted
+            // Supabase anon key — public, satisfies the Edge Function JWT
+            // verification layer. NOT the connection_secret.
+            'Authorization' => 'Bearer ' . $this->supabase_anon_key,
         ],
-        'body' => wp_json_encode( [ 'connection_id' => $this->get_connection_id() ] ),
+        'body' => wp_json_encode( [
+            'connection_id'     => $this->get_connection_id(),
+            'connection_secret' => $this->get_connection_secret(),
+        ] ),
     ] );
 
     // … parse response, cache for DAY_IN_SECONDS, activate/deactivate premium …
 }
 ```
 
-> **Important**: the Bearer token is the **`connection_secret`**, NOT the Supabase anon key. The LicenSuite Edge Function is deployed with `--no-verify-jwt` and does its own auth (lookup the connection by id, compare secret with bcrypt). This is why the v3 build pipeline no longer needs a build-time anon key placeholder.
+> **Two-layer auth**: the Supabase Edge Function runtime verifies the `Authorization: Bearer <token>` header as a JWT before your function code runs — that's why the **anon key** (the same public key the LicenSuite frontend embeds in its HTML) goes there. The function then reads `connection_id` + `connection_secret` from the request body and validates them against `plugin_connections` in the database with bcrypt. Sending the connection_secret in `Authorization` makes Supabase return `401 UNAUTHORIZED_INVALID_JWT_FORMAT` before your function executes — which manifests as "Last check: Never" on the dashboard while everything else looks fine. Don't fall into the same trap.
+
+#### Sidebar — How this auth flow was discovered the hard way
+
+In Animicro Pro 1.12.0–1.12.3 we put the `connection_secret` in the `Authorization` header (the v3 doc's PHP example showed it that way). Symptoms in production:
+- `/exchange` succeeded (it's hosted on Vercel/Next.js, no Supabase JWT layer involved).
+- The plugin's local License page rendered "License active, Plan: PRO" from the `/exchange` payload.
+- Pro modules stayed locked indefinitely.
+- The LicenSuite dashboard "Last check" column stayed at `Never`.
+
+A 5-minute live `curl` probe against the function URL surfaced the truth:
+
+```bash
+$ curl -X POST https://[REF].supabase.co/functions/v1/plugin-validate
+  → 401 UNAUTHORIZED_NO_AUTH_HEADER
+
+$ curl -X POST -H "Authorization: Bearer fake-secret" ...
+  → 401 UNAUTHORIZED_INVALID_JWT_FORMAT       # the smoking gun
+
+$ curl -X POST -H "Authorization: Bearer <ANON_KEY>" ...
+  → 200 + { "valid": false, "reason": "invalid_connection_id", ... }
+                                                # function executes
+```
+
+When porting this pattern to a new plugin, **always probe the endpoint directly with `curl` first**. Don't trust documentation alone — even when the doc author wrote it.
 
 ### 4.5 Failure handling
 
@@ -407,9 +430,9 @@ This re-enables the Connect button locally so you can actually click through the
 
 ## 7. Lifecycle hooks
 
-### 7.1 Plugin deactivation — no auto-revoke (yet)
+### 7.1 Plugin deactivation — clean local options, dashboard handles revoke
 
-LicenSuite v3 currently lacks a public `plugin-self-revoke` endpoint that accepts the connection secret. So the plugin can't release the seat on the server when the user deactivates. Workaround: drop a one-shot transient and surface a notice on the next admin pageload.
+LicenSuite's `/api/plugin-connect/[id]/revoke` requires a user dashboard session (cookie auth), not Bearer. The plugin therefore cannot auto-release the seat on the server from `register_deactivation_hook`. The doc-recommended pattern (mirrored by Bricks, WP Rocket, Elementor): on deactivation, just clean the local options. The seat stays listed under "Connected sites" in the user's dashboard until they revoke it manually with one click.
 
 ```php
 // Main plugin file
@@ -417,18 +440,38 @@ register_deactivation_hook( __FILE__, [ 'Yourplugin', 'deactivate' ] );
 
 // Orchestrator
 public static function deactivate(): void {
-    if ( self::is_pro_plugin() ) {
-        set_transient( 'yourplugin_show_revoke_notice', '1', MINUTE_IN_SECONDS );
+    if ( ! self::is_pro_plugin() ) return;
+
+    if ( ! class_exists( 'Yourplugin_License_Manager' ) ) {
+        require_once YOURPLUGIN_DIR . 'includes/class-license-manager.php';
+    }
+    if ( class_exists( 'Yourplugin_License_Manager' ) ) {
+        ( new Yourplugin_License_Manager() )->clear_connection();
     }
 }
+```
 
-// Admin notice handler (in your admin class, hooked to admin_notices)
+`clear_connection()` deletes `connection_id`, `connection_secret`, `license_data`, the validation transients, and flips the premium flag off. On reactivation the user starts cleanly from the disconnected state and runs Connect again — same one-click flow.
+
+> **Why not just leave the connection alone on deactivation?** The user's mental model when they deactivate a plugin is "this site stops using it". If we kept credentials around, a subsequent re-activation would silently re-claim the seat with stale state — surprising at best, broken at worst (server may have rotated the secret in the meantime). Cleaning is honest.
+
+If you specifically want to surface a follow-up notice (e.g. "the seat is still listed under your dashboard — revoke it from there if you don't want this site counted anymore"), do it from the React **Disconnect** button path, not the deactivation hook — the deactivation hook fires inside the request that unloads the plugin, so any transient it sets won't be consumed until the plugin is reactivated, which is the wrong moment.
+
+```php
+// In the orchestrator's REST handler for the React Disconnect button:
+public function disconnect_license(): \WP_REST_Response {
+    ( new Yourplugin_License_Manager() )->clear_connection();
+    set_transient( 'yourplugin_show_revoke_notice', '1', MINUTE_IN_SECONDS );
+    return new \WP_REST_Response( [ 'success' => true ], 200 );
+}
+
+// Admin notice handler (only fires while the plugin is active):
 public function maybe_notice_revoke_reminder(): void {
     if ( ! get_transient( 'yourplugin_show_revoke_notice' ) ) return;
     delete_transient( 'yourplugin_show_revoke_notice' );
 
     echo '<div class="notice notice-info is-dismissible"><p>'
-       . __( 'Yourplugin Pro: the local connection has been removed. To free up the seat for another site, also revoke this connection from your dashboard.', 'yourplugin' )
+       . __( 'The local connection has been removed. To free up the seat for another site, also revoke this connection from your dashboard.', 'yourplugin' )
        . '</p></div>';
 }
 ```
@@ -442,8 +485,6 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) exit;
 
 delete_option( 'yourplugin_connection_id' );
 delete_option( 'yourplugin_connection_secret' );
-delete_option( 'yourplugin_pending_reconnect' );
-delete_option( 'yourplugin_license_key' );          // v2 leftover
 delete_option( 'yourplugin_license_data' );
 delete_option( 'yourplugin_premium_active' );
 delete_option( 'yourplugin_settings' );
@@ -473,9 +514,7 @@ The connection itself stays valid on the server (it's tied to the connection_id,
 public static function validate_license_periodically(): void {
     if ( false !== get_transient( 'yourplugin_license_last_check' ) ) return;
 
-    $instance = new self();
-    $instance->is_pending_reconnect();      // triggers v2→v3 detection
-    $instance->validate_connection( true ); // force, bypass cache
+    ( new self() )->validate_connection( true ); // force, bypass cache
     set_transient( 'yourplugin_license_last_check', time(), DAY_IN_SECONDS );
 }
 
@@ -485,32 +524,28 @@ add_action( 'admin_init', [ 'Yourplugin_License_Manager', 'validate_license_peri
 
 ---
 
-## 8. v2 → v3 migration (legacy users)
+## 8. Migrating from a v2 paste-the-key plugin
 
-If you're porting an existing plugin that used the v2 paste-the-key flow, users will have a stored `yourplugin_license_key` option that's now useless — the new server expects `connection_id + secret`.
+If you're upgrading an existing plugin that used to ship the v2 "user pastes a license_key" flow, every install will have a stored `yourplugin_license_key` option that the new server doesn't accept.
 
-The cleanest UX: detect the leftover, lock Pro until the user reconnects, surface a banner.
+The cleanest path is a **one-shot detection on the first admin pageload after upgrade**: if `yourplugin_license_key` exists and `yourplugin_connection_id` doesn't, lock Pro features and render a banner that walks the user through the Connect flow. After Connect succeeds, `persist_connection()` wipes the legacy key option and Pro re-activates automatically.
 
 ```php
 public function is_pending_reconnect(): bool {
-    if ( $this->has_connection() ) {
-        delete_option( $this->pending_reconnect_option );
-        return false;
-    }
+    if ( $this->has_connection() ) return false;
+    return '' !== (string) get_option( 'yourplugin_license_key', '' );
+}
 
-    $has_legacy = '' !== (string) get_option( $this->legacy_key_option, '' );
-    if ( $has_legacy ) {
-        update_option( $this->pending_reconnect_option, '1' );
-        return true;
-    }
-
-    return (bool) get_option( $this->pending_reconnect_option, false );
+// In is_premium():
+if ( ( new self() )->is_pending_reconnect() ) {
+    self::deactivate_premium();
+    return false;
 }
 ```
 
-`is_premium()` returns `false` while pending, so Pro features lock immediately. The React UI reads `pending_reconnect` from `/license/status` and renders an orange banner with a prominent **Reconnect now** button.
+In the REST `/license/status` payload, expose a `pending_reconnect` flag and a `'pending_reconnect'` value for `state`. The React component renders an orange banner with a **Reconnect** button (which is the same handler as the regular Connect button — the dashboard handles the rest).
 
-When the user completes the new flow, `persist_connection()` wipes the legacy key option, deletes the pending flag, and Pro reactivates.
+> **Animicro's history**: Animicro Pro 1.12.0–1.12.4 shipped this migration scaffolding. We dropped it in 1.12.5 once we verified there were no v1.11.x installs in the wild. If your plugin ships fresh on the v3 Connect flow (no v2 history), skip this entire section.
 
 ---
 
@@ -536,34 +571,28 @@ register_rest_route( 'yourplugin/v1', '/license/disconnect', [
 ] );
 ```
 
-`get_license_status()` returns everything the React UI needs to render any of the four states:
+`get_license_status()` returns everything the React UI needs to render any of the three states (or four, if you also support the `pending_reconnect` migration banner from §8):
 
 ```php
 public function get_license_status(): \WP_REST_Response {
     $manager = new Yourplugin_License_Manager();
 
-    $is_dev            = $manager->is_dev_mode();
-    $pending_reconnect = $manager->is_pending_reconnect();
-    $has_connection    = $manager->has_connection();
-    $license_data      = $manager->get_license_data();
+    $is_dev         = $manager->is_dev_mode();
+    $has_connection = $manager->has_connection();
+    $license_data   = $manager->get_license_data();
 
-    $state = $is_dev
-        ? 'dev'
-        : ( $pending_reconnect
-            ? 'pending_reconnect'
-            : ( $has_connection ? 'connected' : 'disconnected' ) );
+    $state = $is_dev ? 'dev' : ( $has_connection ? 'connected' : 'disconnected' );
 
     return new \WP_REST_Response( [
-        'state'             => $state,
-        'is_premium'        => Yourplugin_License_Manager::is_premium(),
-        'is_dev'            => $is_dev,
-        'pending_reconnect' => $pending_reconnect,
-        'has_connection'    => $has_connection,
-        'connection_id'     => $manager->get_connection_id(),
-        'plan'              => $license_data['plan'] ?? null,
-        'expires_at'        => $license_data['expires_at'] ?? null,
-        'sites'             => $license_data['sites'] ?? null,
-        'connect_error'     => $manager->consume_connect_error() ?: null,
+        'state'          => $state,
+        'is_premium'     => Yourplugin_License_Manager::is_premium(),
+        'is_dev'         => $is_dev,
+        'has_connection' => $has_connection,
+        'connection_id'  => $manager->get_connection_id(),
+        'plan'           => $license_data['plan'] ?? null,
+        'expires_at'     => $license_data['expires_at'] ?? null,
+        'sites'          => $license_data['sites'] ?? null,
+        'connect_error'  => $manager->consume_connect_error() ?: null,
     ] );
 }
 ```
@@ -578,29 +607,32 @@ Same shape as v2 — `is_premium()` is the canonical check, `is_pro_module()` ch
 
 ```php
 public static function is_premium(): bool {
-    if ( ! get_option( self::OPTION_NAME, false ) ) return false;
-
     $instance = new self();
-    if ( $instance->is_pending_reconnect() ) {
+
+    // No credentials and not on a dev domain → locked.
+    if ( ! $instance->is_dev_mode() && ! $instance->has_connection() ) {
         self::deactivate_premium();
         return false;
     }
 
-    $state = $instance->validate_connection();
+    $state = $instance->validate_connection();   // uses transient cache
     if ( empty( $state['valid'] ) ) {
         self::deactivate_premium();
         return false;
     }
 
-    $plan = $state['plan'] ?? null;
-    if ( ! in_array( $plan, [ 'pro', 'basic' ], true ) ) {
+    $slug = self::plan_slug( $state['plan'] ?? null );
+    if ( ! self::is_premium_slug( $slug ) ) {
         self::deactivate_premium();
         return false;
     }
 
+    self::activate_premium();   // keep the stored flag in sync
     return true;
 }
 ```
+
+> **Lesson from 1.12.0–1.12.3**: an earlier version of this method *started* with `if ( ! get_option( self::OPTION_NAME ) ) return false;` as a perceived hot-path optimization. That early-bail meant any path that briefly set the flag to `false` (e.g. a network blip, a corrupted transient) left the plugin permanently locked even after the underlying state was healthy again. Always derive `is_premium()` from current state, never from a stored boolean. The `OPTION_NAME` flag should be downstream-only — written by this method, never gated on by it.
 
 Use everywhere a Pro feature is gated:
 
@@ -694,7 +726,7 @@ Assuming you already have the plugin scaffolded:
 
 7. **Add the REST routes** for the admin UI. (See §9)
 
-8. **Build the React component** with four states (`dev`, `pending_reconnect`, `connected`, `disconnected`). Reference: `admin/src/components/LicensePage.tsx` in this repo.
+8. **Build the React component** with three states (`dev`, `connected`, `disconnected`). Add a fourth (`pending_reconnect`) only if you're migrating from a v2 paste-the-key plugin (see §8). Reference: `admin/src/components/LicensePage.tsx` in this repo.
 
 9. **Use `Yourplugin_License_Manager::is_premium()`** wherever you gate Pro features.
 

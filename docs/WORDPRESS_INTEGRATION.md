@@ -28,7 +28,8 @@ Este documento explica cómo conectar un plugin de WordPress al sistema de licen
 │            │                                  │                  │
 │            │  ─── después: validate cada 12h ─                   │
 │            │  POST /functions/v1/plugin-validate                  │
-│            │  Authorization: Bearer <secret>                      │
+│            │  Authorization: Bearer ANON_KEY                      │
+│            │  body: { connection_id, connection_secret }          │
 │            ├─────────────────────────────────►│                  │
 │            │  { valid, plan, expires_at, sites }                 │
 │            │◄─────────────────────────────────┤                  │
@@ -54,9 +55,15 @@ Este documento explica cómo conectar un plugin de WordPress al sistema de licen
 
 `[REF]` es el subdominio de tu proyecto Supabase (en este proyecto: `uhnaedqfygrqdptjngqb`). `licensuite.vercel.app` es la URL del Licence Manager Next.js.
 
-### Anon key
+### Anon key (Authorization)
 
-Las llamadas a `plugin-validate` requieren `Authorization: Bearer <SUPABASE_ANON_KEY>`. Es la clave **pública** (la misma que usa el frontend). No es secreta.
+Las llamadas a `plugin-validate` (Edge Function de Supabase) **siempre** llevan `Authorization: Bearer <SUPABASE_ANON_KEY>`. Es la clave **pública** (la misma que el frontend) y es necesaria para pasar la JWT verification del runtime de Supabase Edge Functions — el gateway rechaza cualquier otra cosa antes de que tu request llegue al código.
+
+> **Atención** — El `connection_secret` (que devuelve `/exchange`) **no** va en el header `Authorization`. Va en el **body** de la petición:
+> ```json
+> { "connection_id": "...", "connection_secret": "..." }
+> ```
+> Si lo pones en el header `Authorization`, Supabase lo trata como un JWT inválido y devuelve `401 UNAUTHORIZED_INVALID_JWT_FORMAT` antes de tocar la lógica del endpoint.
 
 ### Product slug
 
@@ -164,10 +171,13 @@ function mi_plugin_validate() {
             'sslverify' => true,
             'headers'   => [
                 'Content-Type'  => 'application/json',
-                'Authorization' => 'Bearer ' . get_option('mi_plugin_connection_secret'),
+                // ANON_KEY (pública, igual que en el frontend del LicenSuite). Es lo
+                // que requiere el gateway de Supabase para pasar la JWT verification.
+                'Authorization' => 'Bearer ' . MI_PLUGIN_SUPABASE_ANON_KEY,
             ],
             'body' => wp_json_encode([
-                'connection_id' => get_option('mi_plugin_connection_id'),
+                'connection_id'     => get_option('mi_plugin_connection_id'),
+                'connection_secret' => get_option('mi_plugin_connection_secret'),
             ]),
         ]
     );
@@ -192,9 +202,13 @@ function mi_plugin_validate() {
 
 // En las features Pro:
 $state = mi_plugin_validate();
-if (!empty($state['valid']) && in_array($state['plan'], ['pro', 'basic'], true)) {
-    // Activar features Pro
+$planSlug = $state['plan']['slug'] ?? null;
+if (!empty($state['valid']) && in_array($planSlug, ['pro', 'basic', 'agency'], true)) {
+    // Activar features Pro (ajusta los slugs a los que tengas configurados)
 }
+
+// Mostrar el nombre del plan en la UI del plugin sin hardcodear traducciones:
+$planName = $state['plan']['name'] ?? '—';
 ```
 
 **Importante:** cachea con un transient (`12 * HOUR_IN_SECONDS` recomendado). El rate limit es 60 req/min/IP, suficiente para uso normal pero NO para validar en cada request.
@@ -205,12 +219,19 @@ if (!empty($state['valid']) && in_array($state['plan'], ['pro', 'basic'], true))
 {
   "valid": true,
   "reason": "ok",
-  "plan": "pro",
+  "plan": {
+    "slug": "agency",
+    "name": "Agency",
+    "max_sites": 10,
+    "sort_order": 20
+  },
   "product_slug": "mi-plugin",
   "expires_at": "2026-12-31T23:59:59Z",
-  "sites": { "used": 3, "max": 5, "unlimited": false }
+  "sites": { "used": 3, "max": 10, "unlimited": false }
 }
 ```
+
+> **A partir de v4.0.0**, el campo `plan` es un **objeto**, no un string. Si tu plugin parseaba `data['plan']` como string (`"pro"`, `"basic"`…), debes cambiarlo a `data['plan']['slug']`. El cambio es **breaking**.
 
 Mostrar `sites.used / sites.max` en el panel del plugin es buena UX:
 
@@ -239,28 +260,26 @@ if (!empty($state['valid']) && isset($state['sites'])) {
 
 ---
 
-## Paso 4 — Revocar al desinstalar
+## Paso 4 — Liberar el seat al desinstalar
 
-```php
-register_deactivation_hook(__FILE__, 'mi_plugin_on_deactivate');
-
-function mi_plugin_on_deactivate() {
-    $id = get_option('mi_plugin_connection_id');
-    if (!$id) return;
-
-    wp_remote_post(
-        'https://licensuite.vercel.app/api/plugin-connect/' . rawurlencode($id) . '/revoke',
-        [
-            'timeout'   => 5,
-            'blocking'  => false,           // fire-and-forget
-            'sslverify' => true,
-            'headers'   => [
-                'Authorization' => 'Bearer ' . get_option('mi_plugin_connection_secret'),
-            ],
-        ]
-    );
-}
-```
+> **Importante** — El endpoint `POST /api/plugin-connect/[id]/revoke` del LicenSuite requiere **sesión de usuario** (cookie de Supabase Auth), no acepta Bearer Token. El plugin **no** puede invocarlo desde `register_deactivation_hook`.
+>
+> Para liberar el seat al desinstalar tienes dos caminos:
+>
+> **A) Recomendado, vía dashboard del usuario.** Cuando el plugin se desactiva, lo único que hace es limpiar las options locales:
+>
+> ```php
+> register_deactivation_hook(__FILE__, function () {
+>     delete_option('mi_plugin_connection_id');
+>     delete_option('mi_plugin_connection_secret');
+>     delete_transient('mi_plugin_validation');
+>     delete_option('mi_plugin_last_validation');
+> });
+> ```
+>
+> El usuario sigue viendo el sitio en su lista de "Connected sites" en LicenSuite y puede revocarlo manualmente con un click. Es lo que hacen Elementor, Bricks, WP Rocket, etc.
+>
+> **B) Auto-revoke vía endpoint público (no implementado todavía).** Si quieres que el plugin libere el seat solo, hay que añadir un endpoint público que acepte `Bearer ANON_KEY` + body `{ connection_id, connection_secret }`. Avisa si lo necesitas y lo añadimos en una iteración.
 
 > Nota: el endpoint de revoke acepta credenciales del propietario o del admin. La forma "el plugin revoca su propia conexión" requiere autenticación con la sesión del usuario en el dashboard, **no** con el secret del plugin. Por simplicidad recomendamos: al desactivar el plugin, mostrar un aviso al usuario "Para liberar el seat, ve al dashboard y revoca esta conexión", o documentar que `revoked_at` se gestiona desde el dashboard.
 

@@ -67,18 +67,15 @@ export interface AnimicroData {
  * Shape returned by GET /animicro/v1/license/status.
  *
  * `state` is the canonical UI flag for the LicensePage component:
- *  - `dev`               — running on localhost / *.local / *.test, Pro is
- *                          unlocked locally without contacting the server.
- *  - `pending_reconnect` — legacy v1.11.x license_key found, user must
- *                          re-do the Connect flow.
- *  - `connected`         — connection_id + secret stored, validation OK.
- *  - `disconnected`      — fresh install or after an explicit Disconnect.
+ *  - `dev`          — running on localhost / *.local / *.test, Pro is
+ *                     unlocked locally without contacting the server.
+ *  - `connected`    — connection_id + secret stored, validation OK.
+ *  - `disconnected` — fresh install or after an explicit Disconnect.
  */
 export interface LicenseStatus {
-  state: 'dev' | 'pending_reconnect' | 'connected' | 'disconnected';
+  state: 'dev' | 'connected' | 'disconnected';
   is_premium: boolean;
   is_dev: boolean;
-  pending_reconnect: boolean;
   has_connection: boolean;
   connection_id: string;
   // From LicenSuite v4, plan is an object with display metadata. The PHP

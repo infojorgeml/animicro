@@ -1,8 +1,8 @@
 <?php
 /**
- * Animicro Pro — LicenSuite v3.0 Connect-flow license manager.
+ * Animicro Pro — LicenSuite v4.0 Connect-flow license manager.
  *
- * v3 architecture (replaces v2 paste-key flow used through 1.11.x):
+ * Architecture:
  *   1. User clicks "Connect" in /wp-admin → window.open(dashboard, _blank).
  *   2. Dashboard auths the user and redirects back to
  *      ?page=animicro-license&action=connect-callback&token=…&state=…
@@ -10,17 +10,14 @@
  *      verifies the WP nonce in `state`, and calls handle_callback($token).
  *   4. handle_callback POSTs to /api/plugin-connect/exchange and persists
  *      the returned { connection_id, connection_secret } pair (secret is
- *      AES-256-CBC encrypted at rest, same scheme as the legacy key).
+ *      AES-256-CBC encrypted at rest using AUTH_KEY-derived salt).
  *   5. From there, validate_connection() polls /functions/v1/plugin-validate
- *      with `Authorization: Bearer <connection_secret>` once per day.
- *
- * Migration from 1.11.x: if a stored `animicro_license_key` is found but no
- * `animicro_connection_id`, the manager flags `animicro_pending_reconnect`,
- * deactivates premium, and the React admin shows a banner that walks the
- * user through reconnecting. Legacy v2 endpoints are never called in v3.
+ *      with `Authorization: Bearer <SUPABASE_ANON_KEY>` (Supabase JWT layer)
+ *      and `{ connection_id, connection_secret }` in the body (function-level
+ *      auth) once per day.
  *
  * Local development: localhost / *.local / *.test / private IPs short-circuit
- * the entire flow and return a synthetic premium payload, identical to v2.
+ * the entire flow and return a synthetic premium payload, no network call.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -70,8 +67,6 @@ class Animicro_License_Manager {
 	// Storage keys.
 	private string $connection_id_option     = 'animicro_connection_id';
 	private string $connection_secret_option = 'animicro_connection_secret';   // AES-256-CBC at rest
-	private string $legacy_key_option        = 'animicro_license_key';         // v2 leftover (detection only)
-	private string $pending_reconnect_option = 'animicro_pending_reconnect';
 	private string $license_data_option      = 'animicro_license_data';        // last good payload
 
 	// ------------------------------------------------------------------
@@ -95,11 +90,14 @@ class Animicro_License_Manager {
 		update_option( $this->connection_id_option,     $connection_id );
 		update_option( $this->connection_secret_option, $this->encrypt( $connection_secret ) );
 
-		// Reconnect cleared, legacy key wiped, caches dropped: the next
-		// validate_connection() call goes against the live server and
-		// rebuilds the cache cleanly.
-		delete_option( $this->pending_reconnect_option );
-		delete_option( $this->legacy_key_option );
+		// Defensive: wipe leftover keys from any pre-1.12.5 dev install
+		// that ever ran the legacy v2 paste-the-key flow. Production never
+		// shipped that path, but it's cheap insurance against test sites.
+		delete_option( 'animicro_license_key' );
+		delete_option( 'animicro_pending_reconnect' );
+
+		// Drop the validation caches so the next read goes against the
+		// live server and rebuilds them cleanly with the new credentials.
 		delete_transient( 'animicro_license_check' );
 		delete_transient( 'animicro_license_last_check' );
 	}
@@ -111,33 +109,6 @@ class Animicro_License_Manager {
 		delete_transient( 'animicro_license_check' );
 		delete_transient( 'animicro_license_last_check' );
 		self::deactivate_premium();
-	}
-
-	// ------------------------------------------------------------------
-	// Legacy detection (v2 → v3 migration)
-	// ------------------------------------------------------------------
-
-	/**
-	 * True when the site has a leftover v2 `animicro_license_key` and no v3
-	 * `animicro_connection_id`. Drives the React "Reconnect" banner.
-	 *
-	 * Idempotent: also sets the `animicro_pending_reconnect` option so
-	 * is_premium() can lock Pro features at the option-read layer without
-	 * needing this method to run on every pageload.
-	 */
-	public function is_pending_reconnect(): bool {
-		if ( $this->has_connection() ) {
-			delete_option( $this->pending_reconnect_option );
-			return false;
-		}
-
-		$has_legacy = '' !== (string) get_option( $this->legacy_key_option, '' );
-		if ( $has_legacy ) {
-			update_option( $this->pending_reconnect_option, '1' );
-			return true;
-		}
-
-		return (bool) get_option( $this->pending_reconnect_option, false );
 	}
 
 	// ------------------------------------------------------------------
@@ -440,18 +411,6 @@ class Animicro_License_Manager {
 			return $dev;
 		}
 
-		// Pending reconnect → don't even try to validate, the user has to
-		// finish the Connect flow first.
-		if ( $this->is_pending_reconnect() ) {
-			self::deactivate_premium();
-			return [
-				'valid'             => false,
-				'reason'            => 'pending_reconnect',
-				'plan'              => null,
-				'pending_reconnect' => true,
-			];
-		}
-
 		if ( ! $this->has_connection() ) {
 			self::deactivate_premium();
 			return [ 'valid' => false, 'reason' => 'no_connection', 'plan' => null ];
@@ -665,7 +624,6 @@ class Animicro_License_Manager {
 		$messages = [
 			'ok'                     => __( 'Connected', 'animicro' ),
 			'no_connection'          => __( 'Not connected. Click "Connect" to link your license.', 'animicro' ),
-			'pending_reconnect'      => __( 'Your license needs to be reconnected after the security upgrade. Click "Reconnect".', 'animicro' ),
 			'revoked_or_not_found'   => __( 'This connection was revoked from your dashboard. Please reconnect.', 'animicro' ),
 			'invalid_credentials'    => __( 'The connection is no longer valid. Please reconnect.', 'animicro' ),
 			'invalid_connection_id'  => __( 'This site is no longer recognised by the license server. Please reconnect.', 'animicro' ),
@@ -693,11 +651,7 @@ class Animicro_License_Manager {
 			return;
 		}
 
-		// Detect the legacy → v3 migration before the first network call.
-		$instance = new self();
-		$instance->is_pending_reconnect();   // sets the flag if applicable
-
-		$instance->validate_connection( true );
+		( new self() )->validate_connection( true );
 		set_transient( 'animicro_license_last_check', time(), DAY_IN_SECONDS );
 	}
 
@@ -732,12 +686,6 @@ class Animicro_License_Manager {
 	 */
 	public static function is_premium(): bool {
 		$instance = new self();
-
-		// Legacy v1.11.x users that haven't reconnected yet — locked.
-		if ( $instance->is_pending_reconnect() ) {
-			self::deactivate_premium();
-			return false;
-		}
 
 		// No credentials and not on a dev domain — locked.
 		if ( ! $instance->is_dev_mode() && ! $instance->has_connection() ) {

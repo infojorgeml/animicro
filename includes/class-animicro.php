@@ -49,12 +49,26 @@ class Animicro {
 	}
 
 	public static function deactivate(): void {
-		// LicenSuite v3 has no public self-revoke endpoint yet. The seat
-		// stays "occupied" on the server until the user revokes the
-		// connection from their dashboard. Set a one-shot transient so the
-		// next admin pageload reminds them with a friendly notice.
-		if ( self::is_pro_plugin() ) {
-			set_transient( 'animicro_show_revoke_notice', '1', MINUTE_IN_SECONDS );
+		// LicenSuite v4 recommendation (matches Bricks / WP Rocket / Elementor):
+		// when the user deactivates the plugin, clean the local connection
+		// options. The seat remains listed on the LicenSuite dashboard until
+		// the user revokes it there manually — there is no public
+		// self-revoke endpoint that accepts the connection_secret yet.
+		// On reactivation, the user starts cleanly from the disconnected
+		// state and runs Connect again.
+		if ( ! self::is_pro_plugin() ) {
+			return;
+		}
+
+		if ( ! class_exists( 'Animicro_License_Manager' ) ) {
+			$file = ANIMICRO_DIR . 'includes/class-license-manager.php';
+			if ( is_readable( $file ) ) {
+				require_once $file;
+			}
+		}
+
+		if ( class_exists( 'Animicro_License_Manager' ) ) {
+			( new Animicro_License_Manager() )->clear_connection();
 		}
 	}
 

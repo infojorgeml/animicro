@@ -534,26 +534,23 @@ class Animicro_Admin {
 	public function get_license_status(): \WP_REST_Response {
 		$manager = new Animicro_License_Manager();
 
-		$is_dev             = $manager->is_dev_mode();
-		$pending_reconnect  = $manager->is_pending_reconnect();
-		$is_premium         = Animicro_License_Manager::is_premium();
-		$license_data       = $manager->get_license_data();
-		$has_connection     = $manager->has_connection();
-		$connect_error      = $manager->consume_connect_error();
+		$is_dev         = $manager->is_dev_mode();
+		$has_connection = $manager->has_connection();
+		$license_data   = $manager->get_license_data();
+		$connect_error  = $manager->consume_connect_error();
 
-		$state = $is_dev ? 'dev' : ( $pending_reconnect ? 'pending_reconnect' : ( $has_connection ? 'connected' : 'disconnected' ) );
+		$state = $is_dev ? 'dev' : ( $has_connection ? 'connected' : 'disconnected' );
 
 		return new \WP_REST_Response( [
-			'state'             => $state,
-			'is_premium'        => $is_premium,
-			'is_dev'            => $is_dev,
-			'pending_reconnect' => $pending_reconnect,
-			'has_connection'    => $has_connection,
-			'connection_id'     => $manager->get_connection_id(),
-			'plan'              => $license_data['plan'] ?? null,
-			'expires_at'        => $license_data['expires_at'] ?? null,
-			'sites'             => $license_data['sites'] ?? null,
-			'connect_error'     => empty( $connect_error ) ? null : [
+			'state'          => $state,
+			'is_premium'     => Animicro_License_Manager::is_premium(),
+			'is_dev'         => $is_dev,
+			'has_connection' => $has_connection,
+			'connection_id'  => $manager->get_connection_id(),
+			'plan'           => $license_data['plan'] ?? null,
+			'expires_at'     => $license_data['expires_at'] ?? null,
+			'sites'          => $license_data['sites'] ?? null,
+			'connect_error'  => empty( $connect_error ) ? null : [
 				'reason'  => $connect_error['reason'] ?? 'unknown',
 				'message' => $manager->get_error_message( $connect_error['reason'] ?? 'server_error' ),
 			],

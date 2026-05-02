@@ -5,6 +5,20 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.5] - 2026-05-02
+
+### Changed
+
+- **Pro — Plugin deactivation now clears the local connection.** `Animicro::deactivate()` calls `Animicro_License_Manager::clear_connection()` (delete `connection_id`, `connection_secret`, `license_data`, validation transients, deactivate premium). Matches the LicenSuite v4 doc recommendation and the prior art of Bricks / WP Rocket / Elementor. The previous behaviour (just set a transient that fired a "go to dashboard to revoke" notice) was mostly inert — the transient could only be consumed if the user re-activated the plugin, which is the wrong moment for the message. The seat stays listed under "Connected sites" in the user's LicenSuite dashboard until they revoke it manually with one click; the plugin no longer pretends to manage that side of the lifecycle.
+- **Pro — `docs/WORDPRESS_INTEGRATION.md` synced with the upstream LicenSuite v4 final release.** The doc now correctly states that `/plugin-validate` requires `Authorization: Bearer <SUPABASE_ANON_KEY>` (Supabase JWT layer) plus `connection_id` + `connection_secret` in the request body. Resolves the v3 doc contradiction that caused the 1.12.0 → 1.12.3 auth bug.
+- **Pro — `docs/licensing.md` rewritten** for v4 + added "How we discovered the auth flow" sidebar with the live `curl` probes that surfaced the bug. Consolidated §7.1 (deactivation behaviour) with the new clear-on-deactivate pattern.
+- **Pro — `docs/animicro.md`** Pro Licence section tightened: removed the "auto-revoke deferred" note (no longer relevant — the LicenSuite recommendation is "don't auto-revoke, clean locally").
+
+### Removed
+
+- **Pro — Migration scaffolding for v1.11.x → v1.12.x.** Confirmed with the operator that no Pro sites exist on the legacy paste-the-key flow, so the dead code can go: `Animicro_License_Manager::is_pending_reconnect()`, the `animicro_pending_reconnect` option, the `animicro_license_key` legacy detection, the `pending_reconnect` payload branch in `validate_connection()`, the `pending_reconnect` reason from `get_error_message()`, the `pending_reconnect` field from the `/license/status` REST payload, the `PendingReconnectCard` React component (~35 lines), and the `'pending_reconnect'` literal from `LicenseStatus.state`. The defensive `delete_option( 'animicro_license_key' )` and `delete_option( 'animicro_pending_reconnect' )` calls inside `persist_connection()` and `uninstall.php` stay — cheap insurance against any rogue dev install that still has those rows.
+- **Pro — Stale "auto-revoke pending" follow-up note** removed from `docs/animicro.md` and `docs/licensing.md`.
+
 ## [1.12.4] - 2026-05-02
 
 ### Fixed

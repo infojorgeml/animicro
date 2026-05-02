@@ -1,6 +1,6 @@
 # Animicro — Development Reference
 
-**Release:** 1.12.4 (2026-04-29). See CHANGELOG for history.
+**Release:** 1.12.5 (2026-05-02). See CHANGELOG for history.
 
 Utility-first micro-animations for WordPress powered by [Motion One](https://motion.dev/). This document describes the architecture and conventions for developers and AI assistants.
 
@@ -79,11 +79,11 @@ Builder body classes: `elementor-editor-active`, `bricks-is-builder`, `breakdanc
 - License activation via **LicenSuite v3.0 Connect flow** (OAuth-style account binding); product slug `animicro`. The user never pastes a license key — they click **Connect**, authenticate on the LicenSuite dashboard, pick a license, and the dashboard redirects back with a one-time `token`. The plugin exchanges that token for a long-lived `connection_id + connection_secret` pair stored in `wp_options` (secret AES-256-CBC encrypted at rest). Endpoints:
   - `GET https://licensuite.vercel.app/plugin-connect?product=…&return=…&site_url=…&state=…` — dashboard page the plugin opens in a new tab.
   - `POST https://licensuite.vercel.app/api/plugin-connect/exchange` — body `{ token, site_uuid }`, returns `{ connection_id, connection_secret, license: { plan, expires_at, sites } }`.
-  - `POST https://[ref].supabase.co/functions/v1/plugin-validate` — `Authorization: Bearer <connection_secret>`, body `{ connection_id }`. Returns `{ valid, reason, plan, expires_at, sites }`. Cached in a transient for 24 h.
+  - `POST https://[ref].supabase.co/functions/v1/plugin-validate` — **two-layer auth**: `Authorization: Bearer <SUPABASE_ANON_KEY>` satisfies the Edge Function JWT verification layer, then the function reads `{ connection_id, connection_secret }` from the request body and matches them against `plugin_connections` server-side. Returns `{ valid, reason, plan: { slug, name, max_sites }, expires_at, sites }`. Cached in a transient for 24 h.
 - **Local development bypass**: `Animicro_License_Manager::is_development_domain()` short-circuits `validate_connection()` on `localhost`, `*.local`, `*.test`, `*.localhost`, `*.invalid`, `*.example`, IPv6 loopback `::1`, and IPv4 private ranges (`127.x`, `10.x`, `192.168.x`, `172.16-31.x`). No network call, no Connect flow needed, full Pro feature unlock locally. Override via the `animicro_is_development_domain` filter (set to `__return_false`) to test the real Connect flow against a staging dashboard.
-- **Migration from v1.11.x** (legacy paste-the-key flow): on first load after upgrade, if `animicro_license_key` exists and `animicro_connection_id` doesn't, the plugin sets `animicro_pending_reconnect`, locks Pro features, and the React UI shows an orange "Reconnect required" banner. After the user reconnects, the legacy key option is deleted and the new connection takes over.
-- **Connection secret at rest**: AES-256-CBC encrypted in `animicro_connection_secret` using a key derived from `AUTH_KEY` + `SECURE_AUTH_KEY`. The `connection_id` (a UUID, not sensitive) is stored plain. The build pipeline no longer injects a Supabase anon key at build time — v3 doesn't need one.
-- **Auto-revoke at deactivation**: not yet wired (LicenSuite v3 has no public `plugin-self-revoke` endpoint that accepts the connection_secret). When the user deactivates the plugin a one-shot admin notice tells them to revoke from their dashboard. Will become an automatic call in a follow-up patch once the upstream endpoint ships.
+- **Premium gating**: `Animicro_License_Manager::is_premium()` derives the answer from current state on every call (no early-bail on a stored bool — that footgun caused 1.12.0–1.12.3 to lock-out users permanently after a transient cache hiccup). The premium-tier slug list is filterable via `animicro_premium_plan_slugs` (default `['pro', 'basic', 'agency', 'enterprise']`).
+- **Connection secret at rest**: AES-256-CBC encrypted in `animicro_connection_secret` using a key derived from `AUTH_KEY` + `SECURE_AUTH_KEY`. The `connection_id` (a UUID, not sensitive) is stored plain. The Supabase anon key is hardcoded in the source — it's public by design (the LicenSuite frontend embeds the same key in its HTML), so a build-time injection pipeline would have been overengineering.
+- **Plugin deactivation**: `Animicro::deactivate()` calls `clear_connection()` (delete connection_id, connection_secret, license_data, validation transients, deactivate_premium). Matches LicenSuite recommendation + Bricks/WP Rocket/Elementor prior art. The seat stays listed under "Connected sites" in the user's dashboard until they revoke it manually with one click — no public `plugin-self-revoke` endpoint exists yet.
 
 ## Key Files
 
