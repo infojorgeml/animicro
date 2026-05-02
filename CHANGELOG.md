@@ -5,6 +5,14 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.1] - 2026-04-29
+
+### Fixed
+
+- **Pro — License page crashed (blank screen) right after Connect.** The LicenSuite v3 server returns the `plan` field as a rich object (`{ slug, name, id }`) instead of the plain string the 1.12.0 React code assumed, so `status.plan.toUpperCase()` threw `TypeError: s.plan.toUpperCase is not a function` and the whole admin chrome went white. Two-layer fix:
+  - **PHP**: new `Animicro_License_Manager::normalize_payload()` coerces `plan` to a string (preferring `slug`, then `name`, then `id`), `expires_at` to an ISO string or null, and `sites` to `{ used:int, max:int|null, unlimited:bool }`. Applied at every persist point (`handle_callback()` after `/exchange` and `validate_connection()` after `/plugin-validate`).
+  - **TypeScript**: `LicensePage.tsx` gains a `formatPlanLabel()` helper that gracefully handles strings, `{ slug | name | id }` objects, and any other shape — no more crashes regardless of what the server returns. `LicenseStatus.plan` typed as `string | { slug?, name?, id? } | null` to mirror reality.
+
 ## [1.12.0] - 2026-04-29
 
 ### Changed

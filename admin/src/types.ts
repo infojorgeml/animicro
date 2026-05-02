@@ -81,7 +81,11 @@ export interface LicenseStatus {
   pending_reconnect: boolean;
   has_connection: boolean;
   connection_id: string;
-  plan: 'pro' | 'basic' | 'free' | null;
+  // The PHP layer normalizes plan to a string in 1.12.1+, but the server
+  // historically has returned it as either a string ("pro") or as an
+  // object ({ slug, name, id }). The React code uses a defensive helper
+  // (formatPlanLabel) so any shape is fine here.
+  plan: string | { slug?: string; name?: string; id?: string } | null;
   expires_at: string | null;
   sites: { used: number; max: number | null; unlimited: boolean } | null;
   connect_error: { reason: string; message: string } | null;

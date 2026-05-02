@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.12.0
+Stable tag: 1.12.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,9 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.12.1 =
+* Hotfix for Animicro Pro: the License page could crash with a blank screen right after a successful Connect when the LicenSuite server returned the `plan` field as an object instead of a plain string. The plugin now normalizes the plan shape on the PHP side and the React UI is defensive against any shape. No user-facing changes in the free tier.
 
 = 1.12.0 =
 * No user-facing changes in the free tier. Animicro Pro migrates to the LicenSuite v3 Connect flow: instead of pasting a license key, users click a "Connect" button to link their account from the LicenSuite dashboard. Existing Pro users will see a one-time "Reconnect" banner after the upgrade.
@@ -177,6 +180,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.12.1 =
+Hotfix for the Pro license page crash after Connect. No user-facing changes in the free tier.
 
 = 1.12.0 =
 Internal change to the Pro licensing system (Connect flow replaces paste-the-key). Free users are unaffected. Pro users will see a one-time Reconnect banner.

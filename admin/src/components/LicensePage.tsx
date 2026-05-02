@@ -250,6 +250,25 @@ function PendingReconnectCard({
   );
 }
 
+/**
+ * Defensive plan-label formatter. The LicenSuite server may return `plan`
+ * as a plain string ("pro"), as an object ({ slug, name, id }), or as null.
+ * The PHP layer normalizes most cases, but we still want a hard guarantee
+ * that the React code never crashes on a bad shape — so we accept anything.
+ */
+function formatPlanLabel(plan: unknown): string {
+  if (typeof plan === 'string' && plan.length > 0) {
+    return plan.toUpperCase();
+  }
+  if (plan && typeof plan === 'object') {
+    const obj = plan as Record<string, unknown>;
+    if (typeof obj.slug === 'string' && obj.slug.length > 0) return obj.slug.toUpperCase();
+    if (typeof obj.name === 'string' && obj.name.length > 0) return obj.name.toUpperCase();
+    if (typeof obj.id === 'string' && obj.id.length > 0)     return obj.id.toUpperCase();
+  }
+  return 'PRO';
+}
+
 function ConnectedCard({
   status,
   onDisconnect,
@@ -259,8 +278,8 @@ function ConnectedCard({
   onDisconnect: () => void;
   isDisconnecting: boolean;
 }) {
-  const planLabel = status.plan ? status.plan.toUpperCase() : 'PRO';
-  const expires   = status.expires_at
+  const planLabel = formatPlanLabel(status.plan);
+  const expires   = typeof status.expires_at === 'string'
     ? new Date(status.expires_at).toLocaleDateString()
     : null;
 

@@ -241,7 +241,9 @@ class Animicro_License_Manager {
 		if ( isset( $data['license'] ) && is_array( $data['license'] ) ) {
 			update_option(
 				$this->license_data_option,
-				wp_parse_args( $data['license'], [ 'valid' => true, 'reason' => 'ok' ] )
+				$this->normalize_payload(
+					wp_parse_args( $data['license'], [ 'valid' => true, 'reason' => 'ok' ] )
+				)
 			);
 		}
 
@@ -250,6 +252,63 @@ class Animicro_License_Manager {
 		$this->validate_connection( true );
 
 		return [ 'success' => true, 'reason' => 'ok' ];
+	}
+
+	/**
+	 * Normalize the heterogeneous shapes the LicenSuite server may return
+	 * for `plan`, `expires_at`, and `sites` into the shape the React UI and
+	 * the rest of the plugin expect.
+	 *
+	 * Defensive against the server returning `plan` as an object (e.g.
+	 * `{ slug: 'pro', name: 'Pro' }`) instead of a plain string — which
+	 * crashed the UI in 1.12.0.
+	 *
+	 * @param array<string, mixed> $payload Raw payload (from /exchange or /plugin-validate).
+	 * @return array<string, mixed> Same payload with normalized shapes.
+	 */
+	private function normalize_payload( array $payload ): array {
+		// Normalize plan to a string. Common server-side shapes:
+		//   - "pro"                              (simple string)
+		//   - { slug: "pro", name: "Pro" }       (rich object)
+		//   - { id: "pro_basic", … }             (id-only)
+		if ( isset( $payload['plan'] ) ) {
+			$plan = $payload['plan'];
+			if ( is_string( $plan ) ) {
+				$payload['plan'] = $plan;
+			} elseif ( is_array( $plan ) ) {
+				if ( isset( $plan['slug'] ) && is_string( $plan['slug'] ) ) {
+					$payload['plan'] = $plan['slug'];
+				} elseif ( isset( $plan['name'] ) && is_string( $plan['name'] ) ) {
+					$payload['plan'] = strtolower( $plan['name'] );
+				} elseif ( isset( $plan['id'] ) && is_string( $plan['id'] ) ) {
+					$payload['plan'] = $plan['id'];
+				} else {
+					$payload['plan'] = null;
+				}
+			} else {
+				$payload['plan'] = null;
+			}
+		}
+
+		// Normalize expires_at to an ISO string or null.
+		if ( isset( $payload['expires_at'] ) && ! is_string( $payload['expires_at'] ) ) {
+			$payload['expires_at'] = null;
+		}
+
+		// Normalize sites to { used:int, max:int|null, unlimited:bool } or null.
+		if ( isset( $payload['sites'] ) ) {
+			if ( is_array( $payload['sites'] ) ) {
+				$payload['sites'] = [
+					'used'      => isset( $payload['sites']['used'] ) ? (int) $payload['sites']['used'] : 0,
+					'max'       => isset( $payload['sites']['max'] ) && is_numeric( $payload['sites']['max'] ) ? (int) $payload['sites']['max'] : null,
+					'unlimited' => ! empty( $payload['sites']['unlimited'] ),
+				];
+			} else {
+				$payload['sites'] = null;
+			}
+		}
+
+		return $payload;
 	}
 
 	private function record_connect_error( string $reason, string $detail = '' ): void {
@@ -381,31 +440,33 @@ class Animicro_License_Manager {
 			];
 		}
 
-		// 200 + valid:true → premium, cache it, persist it.
-		if ( 200 === $status && ! empty( $data['valid'] ) && 'ok' === $reason ) {
-			update_option( $this->license_data_option, $data );
-			set_transient( 'animicro_license_check', $data, DAY_IN_SECONDS );
+		$normalized = $this->normalize_payload( $data );
 
-			$plan = $data['plan'] ?? null;
+		// 200 + valid:true → premium, cache it, persist it.
+		if ( 200 === $status && ! empty( $normalized['valid'] ) && 'ok' === $reason ) {
+			update_option( $this->license_data_option, $normalized );
+			set_transient( 'animicro_license_check', $normalized, DAY_IN_SECONDS );
+
+			$plan = $normalized['plan'] ?? null;
 			if ( in_array( $plan, [ 'pro', 'basic' ], true ) ) {
 				self::activate_premium();
 			} else {
 				self::deactivate_premium();
 			}
-			return $data;
+			return $normalized;
 		}
 
 		// Known soft failures (expired / disabled): keep payload for the UI,
 		// lock premium, don't drop credentials (so the user can renew).
 		if ( in_array( $reason, [ 'expired', 'disabled' ], true ) ) {
-			update_option( $this->license_data_option, $data );
+			update_option( $this->license_data_option, $normalized );
 			self::deactivate_premium();
 			return [
 				'valid'      => false,
 				'reason'     => $reason,
-				'plan'       => $data['plan'] ?? null,
-				'sites'      => $data['sites'] ?? null,
-				'expires_at' => $data['expires_at'] ?? null,
+				'plan'       => $normalized['plan'] ?? null,
+				'sites'      => $normalized['sites'] ?? null,
+				'expires_at' => $normalized['expires_at'] ?? null,
 			];
 		}
 
@@ -415,7 +476,7 @@ class Animicro_License_Manager {
 		return [
 			'valid'  => false,
 			'reason' => $reason,
-			'plan'   => $data['plan'] ?? null,
+			'plan'   => $normalized['plan'] ?? null,
 			'error'  => $data['message'] ?? 'License validation failed',
 		];
 	}
