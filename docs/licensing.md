@@ -130,18 +130,31 @@ Failure reasons (HTTP 200 with `valid: false`, or HTTP 4xx):
 
 ## 3. Plugin-side files
 
-For Animicro Pro the licensing layer is ONE file plus three integration points:
+> **Honest answer up front**: the licensing layer is **not** a self-contained folder you can drop into another plugin. The bulk of the logic lives in one self-contained PHP class, but the integration points (REST routes, admin_init callback, deactivation hook, React component) are wired across ~6 files in different parts of the plugin. To port to a new plugin you copy the **green** file verbatim and recreate the **yellow** files manually using the recipes in §13.
+
+| Layer | File | Status when porting |
+|-------|------|---------------------|
+| 🟢 **Core** (drop-in) | `includes/class-license-manager.php` | Copy. Find/replace prefixes. Swap `product_slug` and the three URLs. ~400 lines. No dependencies on the rest of the plugin. |
+| 🟡 Admin wiring | `includes/class-admin.php` | Add the 3 REST routes (`/license/status`, `/license/connect-url`, `/license/disconnect`), the `maybe_handle_connect_callback()` admin_init handler, the `maybe_notice_revoke_reminder()` admin_notices handler. (See §9.) |
+| 🟡 Orchestrator | `includes/class-yourplugin.php` | `Yourplugin::deactivate()` calls `clear_connection()`. (See §7.1.) |
+| 🟡 Lifecycle | `uninstall.php` | `delete_option()` cleanup of all licensing options. (See §7.2.) |
+| 🟡 React UI | `admin/src/components/LicensePage.tsx` | Copy structure, retheme. 3 states: `dev` / `connected` / `disconnected`. Rename `window.animicroData` → `window.yourpluginData`. (See `admin/src/components/LicensePage.tsx` in this repo as reference.) |
+| 🟡 React types | `admin/src/types.ts` | `LicenseStatus` interface — copy verbatim. |
 
 ```
 yourplugin/
-├── yourplugin.php                    # main file — registers (de)activation hooks
-├── uninstall.php                     # cleans options
-└── includes/
-    ├── class-license-manager.php     # the whole licensing module
-    └── class-admin.php               # REST routes + admin_init callback
+├── yourplugin.php                          # main file — registers (de)activation hooks
+├── uninstall.php                           # 🟡 cleans options
+├── includes/
+│   ├── class-license-manager.php           # 🟢 the core — copy verbatim, find/replace prefixes
+│   ├── class-admin.php                     # 🟡 add REST + callback wiring
+│   └── class-yourplugin.php                # 🟡 deactivate() calls clear_connection()
+└── admin/src/
+    ├── components/LicensePage.tsx          # 🟡 React UI — copy structure
+    └── types.ts                            # 🟡 LicenseStatus interface
 ```
 
-The license manager file is ~440 lines and self-contained. To port: copy, rename the prefix, swap the `product_slug`, swap the dashboard / Supabase URLs. That's it.
+The license manager file is ~400 lines and self-contained. The wiring around it is ~150 lines of WP-specific glue spread across the other files. Total time-to-port for the second plugin: ~30 minutes if you follow §13.
 
 ### File map (what each section of the class does)
 
@@ -695,48 +708,219 @@ If the server is unreachable (network error), the plugin **fails soft** — retu
 
 ---
 
-## 13. Step-by-step: porting to a new plugin
+## 13. Hard-learned lessons (read before porting)
 
-Assuming you already have the plugin scaffolded:
+Eleven painful truths discovered while shipping 1.12.0 → 1.12.5. Skim before you start porting; it'll save you the same multi-day debug cycle.
 
-1. **Create a Supabase product** in the LicenSuite admin. Note the product `slug`.
+### 13.1 Probe the endpoint with `curl` BEFORE you trust any documentation
 
-2. **Copy `includes/class-license-manager.php`** into your plugin's includes folder.
+The LicenSuite v3 doc had a contradiction between its §URLs section ("anon key") and its PHP example ("connection_secret"). We picked the wrong path on first reading and shipped 1.12.0–1.12.3 with broken validation. The "Last check: Never" symptom in the dashboard was the only clue, and it took until 1.12.4 to root-cause.
 
-3. **Find/replace** in that file:
-   - `Animicro_License_Manager` → `Yourplugin_License_Manager`
-   - `animicro_` → `yourplugin_` (option names, transient names, filter names)
-   - `'animicro'` (product slug) → `'your-slug'` from step 1
+Before writing a single line of plugin code, run:
 
-4. **Update the URLs** if you're on a different Supabase project:
-   ```php
-   private string $validate_url   = 'https://<NEW_REF>.supabase.co/functions/v1/plugin-validate';
-   private string $exchange_url   = 'https://<YOUR_DASHBOARD>/api/plugin-connect/exchange';
-   private string $dashboard_url  = 'https://<YOUR_DASHBOARD>/plugin-connect';
-   ```
+```bash
+# Should fail with UNAUTHORIZED_NO_AUTH_HEADER
+curl -X POST -H "Content-Type: application/json" -d '{}' \
+  https://[ref].supabase.co/functions/v1/plugin-validate
 
-5. **Adjust `PRO_MODULES` / `FREE_MODULES`** to your plugin's module list. Or remove them if you don't have the Animicro-style module concept.
+# Should fail with UNAUTHORIZED_INVALID_JWT_FORMAT  ← if you ever see this in production, you're sending a non-JWT in Authorization
+curl -X POST -H "Authorization: Bearer fake-secret" \
+  -H "Content-Type: application/json" -d '{"connection_id":"test"}' \
+  https://[ref].supabase.co/functions/v1/plugin-validate
 
-6. **Wire into the lifecycle**:
-   - `register_deactivation_hook` calls a static `Yourplugin::deactivate()` that sets the revoke-reminder transient. (See §7.1)
-   - `uninstall.php` cleans options. (See §7.2)
-   - `add_action('admin_init', ['Yourplugin_License_Manager', 'validate_license_periodically'])` in your main class.
-   - `add_action('admin_init', [$this, 'maybe_handle_connect_callback'])` in your admin class.
-   - `add_action('admin_notices', [$this, 'maybe_notice_revoke_reminder'])` for the deactivation reminder.
+# Should return 200 + { valid: false, reason: "invalid_connection_id", ... }
+curl -X POST -H "Authorization: Bearer <YOUR_ANON_KEY>" \
+  -H "Content-Type: application/json" -d '{"connection_id":"test"}' \
+  https://[ref].supabase.co/functions/v1/plugin-validate
+```
 
-7. **Add the REST routes** for the admin UI. (See §9)
+If the third call doesn't return 200, the endpoint isn't reachable as the doc claims. Talk to whoever maintains LicenSuite before integrating.
 
-8. **Build the React component** with three states (`dev`, `connected`, `disconnected`). Add a fourth (`pending_reconnect`) only if you're migrating from a v2 paste-the-key plugin (see §8). Reference: `admin/src/components/LicensePage.tsx` in this repo.
+### 13.2 Two-layer auth — anon key in header, secret in body
 
-9. **Use `Yourplugin_License_Manager::is_premium()`** wherever you gate Pro features.
+Supabase Edge Functions verify the `Authorization: Bearer <token>` as a JWT *before* your function code runs. The anon key (public, baked into every Supabase frontend) satisfies that gate. The function then reads `connection_id` + `connection_secret` from the request body and validates them against the database.
 
-That's it. No build-time anon-key injection, no GitHub Actions secret, no manual config. The whole port should take an afternoon, mostly find/replace and wiring up the React state machine.
+Sending the connection_secret in `Authorization` returns `401 UNAUTHORIZED_INVALID_JWT_FORMAT` and your function never executes — but every error path in your plugin sees a generic 401 and fails opaquely. Don't go there.
+
+### 13.3 The plan is an object, not a string
+
+LicenSuite v4 returns `plan: { slug, name, max_sites, sort_order }` instead of `plan: "pro"`. Naive `plan.toUpperCase()` crashes the React UI with `TypeError`. Two-layer fix:
+
+- **PHP** normalizes `plan` to a canonical `{ slug, name, max_sites }` object on every persist (`normalize_payload()` in this repo). String inputs get wrapped (`"pro"` → `{ slug: 'pro', name: 'Pro', max_sites: null }`).
+- **React** reads `plan.name` for display (operator-configured, "Agency", "Enterprise 50 sites") and falls back defensively to slug → 'Pro' if the name is missing.
+
+### 13.4 Use `plan.name` for display, `plan.slug` for gating
+
+`plan.name` is what the operator wrote in the LicenSuite admin — already formatted ("Agency", "Pro Annual"). Don't uppercase it; just render it. `plan.slug` is the stable identifier — use it whenever you compare against "is this premium?".
+
+### 13.5 Premium gating must be filterable, not hardcoded
+
+Hardcoding `['pro', 'basic']` in `is_premium()` is a footgun. If the operator adds an `agency` or `studio` plan in the dashboard, the plugin silently rejects them. Use a filter:
+
+```php
+public static function is_premium_slug( ?string $slug ): bool {
+    if ( ! is_string( $slug ) || '' === $slug ) return false;
+    $premium = apply_filters(
+        'yourplugin_premium_plan_slugs',
+        [ 'pro', 'basic', 'agency', 'enterprise' ]
+    );
+    return in_array( $slug, (array) $premium, true );
+}
+```
+
+Operators can extend without touching plugin code. Default list is whatever ships in the LicenSuite catalogue today.
+
+### 13.6 Never early-bail in `is_premium()` on a stored boolean
+
+We had this in 1.12.0–1.12.2:
+
+```php
+// WRONG — locks the plugin permanently if the option ever flips to false
+public static function is_premium(): bool {
+    if ( ! get_option( self::OPTION_NAME, false ) ) return false;
+    // … rest of the check
+}
+```
+
+Any path that briefly set the flag to `false` (a corrupted transient, a network blip, a v2→v3 migration with malformed data, anything) trapped the plugin in a "locked" state from which `is_premium()` could never recover — because it bailed out before reaching the live validation that would have unstuck it.
+
+**Always derive `is_premium()` from current state**: connection presence → cached validation transient → premium slug check. Use the stored `OPTION_NAME` as a downstream mirror only (write to it inside the method, never gate on it at the top).
+
+### 13.7 `valid: true` is enough — don't gate on `reason: 'ok'`
+
+Early code required both:
+
+```php
+// WRONG — server may not always echo reason on success
+if ( 200 === $status && ! empty( $data['valid'] ) && 'ok' === $data['reason'] ) {
+    self::activate_premium();
+}
+```
+
+LicenSuite v4 sometimes omits `reason` on successful validations. Gating on it caused `activate_premium()` to never fire, which fed bug 13.6 above. Loosen to `if ( 200 === $status && ! empty( $data['valid'] ) )` and you're safe.
+
+### 13.8 The deactivation hook fires INSIDE the deactivating request
+
+`register_deactivation_hook` runs once during the request that deactivates the plugin. After it returns, the plugin is unloaded. Any transient or admin notice you set inside it will not fire on a subsequent admin pageload — because your `admin_notices` callback is no longer registered.
+
+If you want a "this site is no longer using the licence, go revoke from the dashboard" notice, set the transient from the **React Disconnect button path** (REST endpoint, plugin still active), not from the deactivation hook.
+
+For the deactivation hook itself, the canonical behaviour is "clean up and shut up" — call `clear_connection()`, then return. The seat stays listed on the LicenSuite dashboard until the user revokes it manually with one click. This matches Bricks / WP Rocket / Elementor.
+
+### 13.9 The Supabase anon key is public — hardcode it
+
+We initially built a placeholder + `sed` swap + GitHub Actions secret pipeline to inject the anon key at build time. That was overengineering. The same key is embedded in plain text on every page of the LicenSuite frontend (and on every other Supabase-backed website on the planet). Hardcode it directly in `class-license-manager.php`. Allow override via constant + filter for forks. Rotation, when needed, is a regular plugin release — not a CI rebuild trigger.
+
+### 13.10 Mirror the server's reserved-domain rule for dev hosts
+
+LicenSuite refuses connections from `localhost`, `*.local`, `*.test`, `*.localhost`, `*.invalid`, `*.example`, IPv6 `::1`, and IPv4 private ranges (`127.x`, `10.x`, `192.168.x`, `172.16-31.x`). Your `is_development_domain()` should mirror that exactly and short-circuit `validate_connection()` before the network call — otherwise every dev pageload makes a doomed HTTP request and gets a `reserved_domain` error.
+
+Expose the override as a filter so a developer can force the real Connect flow against a staging dashboard from `localhost`:
+
+```php
+add_filter( 'yourplugin_is_development_domain', '__return_false' );
+```
+
+### 13.11 Migration scaffolding only matters if you're upgrading an existing user base
+
+The `pending_reconnect` banner pattern (§8) was useful for Animicro Pro 1.11.x → 1.12.x because there were existing installs with stored `license_key` options that needed to be transitioned. If your new plugin starts directly on the v3 Connect flow, skip §8 entirely — the migration code is dead weight.
+
+We dropped it from Animicro Pro in 1.12.5 once we confirmed no installs were running the legacy flow.
 
 ---
 
-## 14. References
+## 14. Step-by-step: porting to a new plugin
 
-- **LicenSuite server docs**: `~/Desktop/Licence Manager/docs/WORDPRESS_INTEGRATION.md` — endpoint reference, dashboard flow.
-- **Animicro Pro implementation**: `includes/class-license-manager.php` in this repo (the "official" reference implementation for a v3 consumer).
-- **Reference React component**: `admin/src/components/LicensePage.tsx` — four-state machine that wires the REST routes to the UI.
-- **CHANGELOG**: 1.12.0 introduced LicenSuite v3 support; the migration banner; encrypted-at-rest connection secret.
+Assuming you already have the plugin scaffolded. Read §13 first — most steps below are the action items derived from those lessons.
+
+### 14.1 Server-side prep
+
+1. **Create the product in the LicenSuite admin**. Note the product `slug` (e.g. `pulse-chat-ai`). It must match exactly.
+
+2. **Probe the endpoint with `curl`** (see §13.1). Confirm:
+   - Anon-key-only request returns 200.
+   - The shape of the response (`plan` object, `sites`, `expires_at`).
+   - Any reasons your plugin needs to handle that aren't documented.
+
+   Don't skip this. Every shipping bug we hit was something `curl` would have caught in five minutes.
+
+### 14.2 PHP — copy + customize the core
+
+3. **Copy `includes/class-license-manager.php`** verbatim into your plugin's includes folder.
+
+4. **Find/replace** in that file:
+   - `Animicro_License_Manager` → `Yourplugin_License_Manager`
+   - `animicro_` → `yourplugin_` (option names, transient names, filter names)
+   - `'animicro'` (product_slug literal) → `'your-product-slug'` from step 1
+
+5. **Verify the URLs**. If you're on the same Supabase project as Animicro, the URLs are already right (the `[ref]` is the same project — verify against your `.env` to be sure). Otherwise:
+   ```php
+   private string $validate_url   = 'https://<NEW_REF>.supabase.co/functions/v1/plugin-validate';
+   private string $exchange_url   = 'https://<DASHBOARD_HOST>/api/plugin-connect/exchange';
+   private string $dashboard_url  = 'https://<DASHBOARD_HOST>/plugin-connect';
+   ```
+
+6. **Verify the anon key** in `$supabase_anon_key`. Same key as the LicenSuite frontend → if your plugin talks to the same project as Animicro, the key is identical. If different project, copy the new project's anon key (public, the same one their frontend embeds).
+
+7. **Adapt `PRO_MODULES` / `FREE_MODULES`** to your plugin's actual module list, or remove the constants entirely if your plugin doesn't have an Animicro-style module catalogue. The `is_pro_module()` helper is plugin-specific; only `is_premium_slug()` matters globally.
+
+8. **Verify the premium-slug list**. The default `[ 'pro', 'basic', 'agency', 'enterprise' ]` covers the LicenSuite catalogue today. Adjust the default if your dashboard has different slugs, but always wrap in the `apply_filters( 'yourplugin_premium_plan_slugs', … )` so future operators can extend without code changes.
+
+### 14.3 PHP — wire into WordPress
+
+9. **`register_deactivation_hook`** in your main plugin file calls a static `Yourplugin::deactivate()` that calls `clear_connection()`. (See §7.1.) Don't try to ping the server — there is no public self-revoke endpoint.
+
+10. **`uninstall.php`** runs the same cleanup unconditionally — see §7.2 for the exact `delete_option()` list.
+
+11. **`admin_init`** wires both periodic validation and the OAuth callback handler:
+    ```php
+    add_action( 'admin_init', [ 'Yourplugin_License_Manager', 'validate_license_periodically' ] );
+    add_action( 'admin_init', [ $this, 'maybe_handle_connect_callback' ] );
+    ```
+
+12. **`admin_notices`** hooks the disconnect reminder (only fires for the React Disconnect path — see §13.8 for why):
+    ```php
+    add_action( 'admin_notices', [ $this, 'maybe_notice_revoke_reminder' ] );
+    ```
+
+### 14.4 PHP — REST routes
+
+13. **Register the three REST routes** in your admin class — `GET /license/status`, `GET /license/connect-url`, `POST /license/disconnect`. Copy the implementations from §9 / `class-admin.php` in this repo.
+
+### 14.5 React — UI
+
+14. **Copy `admin/src/components/LicensePage.tsx`** as a starting template. Adapt:
+    - Rename `window.animicroData` → `window.yourpluginData`.
+    - Rebrand colours / copy / icons to match your plugin's design system.
+    - Keep the three states (`dev` / `connected` / `disconnected`). Add `pending_reconnect` only if §8 applies to you.
+
+15. **Copy the `LicenseStatus` interface** from `admin/src/types.ts` verbatim. Same shape works for any LicenSuite-backed plugin.
+
+### 14.6 Gating + tests
+
+16. **Use `Yourplugin_License_Manager::is_premium()`** wherever you gate Pro features in PHP. In React, read `is_premium` from `/license/status` or from `window.yourpluginData.isPremium` (set during admin asset enqueue).
+
+17. **Smoke-test the full cycle**:
+    - **Fresh install** → Connect → Pro features unlock, LicenSuite "Last check" updates within ~24 h.
+    - **Deactivate plugin** → connection cleared from `wp_options`. Reactivate → state is "Disconnected", re-Connect works.
+    - **Disconnect button** (React) → connection cleared, info notice appears on next admin pageload reminding to revoke from dashboard.
+    - **Localhost** → "Dev mode" card, no network call. `add_filter('yourplugin_is_development_domain','__return_false')` re-enables the real flow for local testing.
+
+That's the full port. Plan ~30 minutes for the second plugin (you already have the pattern memorised), ~2 hours for the first one (most time on the React rebrand and the smoke-tests).
+
+> **What you do NOT need**: build-time anon-key injection, GitHub Actions secrets, custom build scripts, runtime config files. Everything is hardcoded with public values + filters for overrides. If the LicenSuite project ever rotates the anon key, the rotation is a normal plugin release.
+
+---
+
+## 15. References
+
+- **LicenSuite server docs**: `docs/WORDPRESS_INTEGRATION.md` (in this repo, mirrored from upstream) — endpoint reference, dashboard flow, response shapes.
+- **Reference PHP implementation**: `includes/class-license-manager.php` — the canonical v4-aligned consumer (~400 lines, self-contained, no dependencies on the rest of Animicro).
+- **Reference React component**: `admin/src/components/LicensePage.tsx` — three-state UI (dev/connected/disconnected) wiring the REST routes.
+- **CHANGELOG history of the auth saga**:
+  - 1.12.0 — initial v3 Connect flow (auth-broken: connection_secret in Authorization header).
+  - 1.12.1 — defensive frontend against `plan` shape change in v4.
+  - 1.12.2 — keep the rich `{slug, name, max_sites}` plan shape end-to-end.
+  - 1.12.3 — `is_premium()` always derives from current state; `animicro_premium_plan_slugs` filter.
+  - 1.12.4 — auth fix: anon key in Authorization, secret in body. The bug everyone should learn from.
+  - 1.12.5 — clear-on-deactivate; doc-sync with v4 final; migration scaffolding purged.
