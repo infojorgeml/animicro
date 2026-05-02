@@ -5,6 +5,25 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.4] - 2026-05-02
+
+### Fixed
+
+- **Pro — `/plugin-validate` requests were being silently rejected by Supabase's JWT layer.** Symptom: a successful Connect created the row in LicenSuite (the dashboard showed the connected site), the plugin's License page showed "License active, Plan: PRO" (rendered from the `/exchange` payload), but the modules grid kept Pro features locked indefinitely and the LicenSuite "Last check" column stayed at `Never`. Live tested with `curl`:
+  - Sending `Authorization: Bearer <connection_secret>` (what the v3 doc's code example showed) → HTTP 401 `UNAUTHORIZED_INVALID_JWT_FORMAT`. The Edge Function never ran. The connection_secret is not a JWT.
+  - Sending `Authorization: Bearer <SUPABASE_ANON_KEY>` (what the same doc's §URLs section actually said) → HTTP 200, function executes.
+  - Fix: send the public Supabase anon key in `Authorization` to satisfy JWT verification, and move the per-site `connection_secret` into the request body alongside `connection_id` so the function can do its own auth after Supabase clears the request.
+- **`is_premium()` now serves cached state instead of treating a transient network failure as "not premium".** Combined with the auth fix above, a single failing `/plugin-validate` round-trip no longer locks Pro features — `validate_connection()` already serves the last known good state on `WP_Error`; this commit ensures `is_premium()` honours that fallback.
+
+### Added
+
+- **`invalid_connection_id` reason added to the recoverable-error list.** Treated like `revoked_or_not_found`: the plugin clears credentials so the user can reconnect cleanly. Translated user-facing message included in `get_error_message()`.
+- **Hardcoded Supabase anon key** in `class-license-manager.php` (with `ANIMICRO_SUPABASE_ANON_KEY` constant + `animicro_supabase_anon_key` filter overrides for forks). The build-time injection (`__ANIMICRO_SUPABASE_ANON_KEY__` placeholder + `sed` swap + `ANIMICRO_SUPABASE_ANON_KEY` GH secret) was overengineering for a value that is public by design — the LicenSuite frontend itself embeds the same key in every page-load. Rotation, when needed, will go through a regular plugin release like any other source change.
+
+### Removed
+
+- The build-time anon-key injection block had already been deleted in 1.12.0; this release keeps it gone. `scripts/build.sh`, `.github/workflows/release-pro.yml` and `.githooks/pre-push` all stay free of the anon-key requirement.
+
 ## [1.12.3] - 2026-04-29
 
 ### Fixed

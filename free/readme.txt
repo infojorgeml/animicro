@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.12.3
+Stable tag: 1.12.4
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,9 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.12.4 =
+* Animicro Pro: critical fix for the v3 Connect flow. The validation calls to LicenSuite were being rejected by the Supabase JWT layer before the function code ran ("Last check: Never" in the dashboard), so Pro modules never unlocked even after a successful Connect. The plugin now sends the public Supabase anon key in the Authorization header (to satisfy JWT verification) and the per-site connection secret in the request body (where the function reads it). No user-facing changes in the free tier.
 
 = 1.12.3 =
 * Animicro Pro: fixes a bug introduced by the v3 Connect migration where the License page showed "License active, Plan: PRO" but Pro modules stayed locked in the modules grid. The premium check now always re-derives the answer from current connection state instead of trusting a possibly-stale internal flag, and the premium-tier list is now filterable so custom dashboard plans (e.g. `agency`, `studio`) can unlock Pro features without a code change. No user-facing changes in the free tier.
@@ -186,6 +189,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.12.4 =
+Critical fix for the Pro license validation flow. Strongly recommended for Pro users on 1.12.0–1.12.3.
 
 = 1.12.3 =
 Pro license bugfix: Pro modules now unlock correctly after Connect on every install. No user-facing changes in the free tier.

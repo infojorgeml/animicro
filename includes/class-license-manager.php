@@ -41,6 +41,32 @@ class Animicro_License_Manager {
 	private string $exchange_url  = 'https://licensuite.vercel.app/api/plugin-connect/exchange';
 	private string $dashboard_url = 'https://licensuite.vercel.app/plugin-connect';
 
+	/**
+	 * Supabase project anon key used to satisfy the Edge Function JWT
+	 * verification layer on every call to /plugin-validate. This is the
+	 * SAME public key the LicenSuite frontend embeds in its own HTML —
+	 * it is not a secret, has no privileges beyond invoking the public
+	 * Edge Functions, and rotating it requires re-publishing every
+	 * consumer (so we hardcode it instead of dragging build-time
+	 * injection through the pipeline).
+	 *
+	 * The actual per-site authentication is the `connection_secret`,
+	 * which travels in the request body so the function can match it
+	 * against `connection_id` server-side.
+	 *
+	 * Override via the `ANIMICRO_SUPABASE_ANON_KEY` constant or the
+	 * `animicro_supabase_anon_key` filter for forks / custom backends.
+	 */
+	private string $supabase_anon_key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVobmFlZHFmeWdycWRwdGpuZ3FiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MDE2NjQsImV4cCI6MjA3ODI3NzY2NH0.USJDoMqD-B9rYYb4EHUnpwI99QHqJpty3IJLO8Kh7uM';
+
+	public function __construct() {
+		if ( defined( 'ANIMICRO_SUPABASE_ANON_KEY' ) && is_string( ANIMICRO_SUPABASE_ANON_KEY ) && '' !== ANIMICRO_SUPABASE_ANON_KEY ) {
+			$this->supabase_anon_key = ANIMICRO_SUPABASE_ANON_KEY;
+		} else {
+			$this->supabase_anon_key = (string) apply_filters( 'animicro_supabase_anon_key', $this->supabase_anon_key );
+		}
+	}
+
 	// Storage keys.
 	private string $connection_id_option     = 'animicro_connection_id';
 	private string $connection_secret_option = 'animicro_connection_secret';   // AES-256-CBC at rest
@@ -438,6 +464,14 @@ class Animicro_License_Manager {
 			}
 		}
 
+		// Supabase Edge Functions verify the Authorization Bearer as a JWT
+		// (the project anon key) BEFORE the function code runs. Sending the
+		// per-site connection_secret here was rejected with HTTP 401
+		// `UNAUTHORIZED_INVALID_JWT_FORMAT` (which is exactly why the
+		// LicenSuite "Last check" column stayed at "Never" in 1.12.0–1.12.3
+		// — the function was never reached). The connection_secret travels
+		// in the body so the function can match it against connection_id
+		// server-side after Supabase clears the JWT layer.
 		$response = wp_remote_post(
 			$this->validate_url,
 			[
@@ -446,11 +480,14 @@ class Animicro_License_Manager {
 				'headers'    => [
 					'Content-Type'  => 'application/json',
 					'Accept'        => 'application/json',
-					'Authorization' => 'Bearer ' . $this->get_connection_secret(),
+					'Authorization' => 'Bearer ' . $this->supabase_anon_key,
 				],
 				'user-agent' => 'WordPress/' . get_bloginfo( 'version' ) . '; ' . home_url(),
 				'body'       => wp_json_encode(
-					[ 'connection_id' => $this->get_connection_id() ]
+					[
+						'connection_id'     => $this->get_connection_id(),
+						'connection_secret' => $this->get_connection_secret(),
+					]
 				),
 			]
 		);
@@ -496,7 +533,7 @@ class Animicro_License_Manager {
 
 		// Connection revoked or destroyed → drop credentials so the user
 		// sees the disconnected state and can reconnect cleanly.
-		if ( in_array( $reason, [ 'revoked_or_not_found', 'invalid_credentials' ], true ) ) {
+		if ( in_array( $reason, [ 'revoked_or_not_found', 'invalid_credentials', 'invalid_connection_id' ], true ) ) {
 			$this->clear_connection();
 			return [
 				'valid'  => false,
@@ -631,6 +668,7 @@ class Animicro_License_Manager {
 			'pending_reconnect'      => __( 'Your license needs to be reconnected after the security upgrade. Click "Reconnect".', 'animicro' ),
 			'revoked_or_not_found'   => __( 'This connection was revoked from your dashboard. Please reconnect.', 'animicro' ),
 			'invalid_credentials'    => __( 'The connection is no longer valid. Please reconnect.', 'animicro' ),
+			'invalid_connection_id'  => __( 'This site is no longer recognised by the license server. Please reconnect.', 'animicro' ),
 			'expired'                => __( 'Your license has expired. Renew it from your dashboard.', 'animicro' ),
 			'disabled'               => __( 'Your license has been disabled by an administrator.', 'animicro' ),
 			'rate_limited'           => __( 'Too many license checks from this server. Please try again later.', 'animicro' ),
