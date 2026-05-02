@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.12.1
+Stable tag: 1.12.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,9 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.12.2 =
+* Animicro Pro: license panel now shows the plan name as configured by the operator on the LicenSuite dashboard (e.g. "Pro", "Agency", "Enterprise 50 sites"), instead of an uppercased slug. Internal upgrade to LicenSuite v4.0 plan shape (rich object with `slug` + `name` + `max_sites`). No user-facing changes in the free tier.
 
 = 1.12.1 =
 * Hotfix for Animicro Pro: the License page could crash with a blank screen right after a successful Connect when the LicenSuite server returned the `plan` field as an object instead of a plain string. The plugin now normalizes the plan shape on the PHP side and the React UI is defensive against any shape. No user-facing changes in the free tier.
@@ -180,6 +183,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.12.2 =
+Pro license panel now shows the operator-configured plan name (e.g. "Agency"). No user-facing changes in the free tier.
 
 = 1.12.1 =
 Hotfix for the Pro license page crash after Connect. No user-facing changes in the free tier.

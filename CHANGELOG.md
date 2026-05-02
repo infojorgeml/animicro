@@ -5,6 +5,19 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.2] - 2026-04-29
+
+### Changed
+
+- **Pro — Adopted LicenSuite v4.0 rich plan shape end-to-end.** The previous 1.12.1 hotfix flattened the v4 `plan` object (`{ slug, name, max_sites, sort_order }`) down to just the slug string and uppercased it for display. That worked but threw away the operator-configured display `name`. 1.12.2 keeps the rich shape:
+  - **PHP `normalize_payload()`** now produces the canonical `plan: { slug, name, max_sites }` object regardless of input shape (legacy v3 string `"pro"` is wrapped to `{ slug: 'pro', name: 'Pro', max_sites: null }`; v4 objects are passed through with type-safe coercion).
+  - **`Animicro_License_Manager::plan_slug()`** new public static helper that pulls the slug from any plan shape (legacy string, v4 object, null) — used by every gating site (`is_premium()`, the `/plugin-validate` post-processing branch).
+  - **React `formatPlanLabel()`** now prefers `plan.name` (the operator-configured display string from the dashboard, e.g. "Agency", "Enterprise 50 sites") over the slug uppercased. Falls back to title-cased slug, then plain "Pro".
+  - **`LicenseStatus.plan` typed** as `{ slug, name, max_sites } | string | null` to mirror the canonical shape while keeping the legacy-string fallback path.
+- **Dev mode payload** updated to the new shape: `plan: { slug: 'pro', name: 'Pro (Dev)', max_sites: null }`.
+
+This is purely additive over 1.12.1 — both releases prevent the original `plan.toUpperCase` crash; 1.12.2 also surfaces nicer plan names in the UI.
+
 ## [1.12.1] - 2026-04-29
 
 ### Fixed

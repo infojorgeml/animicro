@@ -251,22 +251,30 @@ function PendingReconnectCard({
 }
 
 /**
- * Defensive plan-label formatter. The LicenSuite server may return `plan`
- * as a plain string ("pro"), as an object ({ slug, name, id }), or as null.
- * The PHP layer normalizes most cases, but we still want a hard guarantee
- * that the React code never crashes on a bad shape — so we accept anything.
+ * Build the plan label shown on the connected card.
+ *
+ * Prefers `plan.name` because the LicenSuite operator configures it as a
+ * proper display string in the dashboard ("Pro", "Agency", "Enterprise 50
+ * sites") — far better UX than uppercasing a slug. Falls back to the slug
+ * with title-case styling, then to a plain "Pro" if everything is missing.
+ *
+ * The PHP layer normalizes the payload to `{ slug, name, max_sites }`
+ * before we get here, but we still accept legacy strings and unknown
+ * shapes so the component cannot crash on a future server change.
  */
 function formatPlanLabel(plan: unknown): string {
-  if (typeof plan === 'string' && plan.length > 0) {
-    return plan.toUpperCase();
-  }
   if (plan && typeof plan === 'object') {
     const obj = plan as Record<string, unknown>;
-    if (typeof obj.slug === 'string' && obj.slug.length > 0) return obj.slug.toUpperCase();
-    if (typeof obj.name === 'string' && obj.name.length > 0) return obj.name.toUpperCase();
-    if (typeof obj.id === 'string' && obj.id.length > 0)     return obj.id.toUpperCase();
+    if (typeof obj.name === 'string' && obj.name.length > 0) return obj.name;
+    if (typeof obj.slug === 'string' && obj.slug.length > 0) return titleCase(obj.slug);
+    if (typeof obj.id === 'string' && obj.id.length > 0)     return titleCase(obj.id);
   }
-  return 'PRO';
+  if (typeof plan === 'string' && plan.length > 0) return titleCase(plan);
+  return 'Pro';
+}
+
+function titleCase(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 }
 
 function ConnectedCard({

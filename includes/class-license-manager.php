@@ -256,38 +256,26 @@ class Animicro_License_Manager {
 
 	/**
 	 * Normalize the heterogeneous shapes the LicenSuite server may return
-	 * for `plan`, `expires_at`, and `sites` into the shape the React UI and
-	 * the rest of the plugin expect.
+	 * for `plan`, `expires_at`, and `sites` into a single canonical shape.
 	 *
-	 * Defensive against the server returning `plan` as an object (e.g.
-	 * `{ slug: 'pro', name: 'Pro' }`) instead of a plain string — which
-	 * crashed the UI in 1.12.0.
+	 * **Plan**: from LicenSuite v4 the server returns `plan` as a rich
+	 * object `{ slug, name, max_sites, sort_order }` instead of the v3
+	 * plain string `"pro"`. Both shapes are accepted; the output is always
+	 * a `{ slug, name, max_sites }` object (or `null`):
 	 *
-	 * @param array<string, mixed> $payload Raw payload (from /exchange or /plugin-validate).
+	 *   - "pro"                                       → { slug: "pro", name: "Pro", max_sites: null }
+	 *   - { slug: "pro", name: "Pro", max_sites: 10 } → { slug: "pro", name: "Pro", max_sites: 10 }
+	 *
+	 * Keeping the rich object means the React UI can display the operator
+	 * configured `name` directly (e.g. "Agency", "Enterprise 50 sites")
+	 * instead of forcing a slug-uppercase fallback.
+	 *
+	 * @param array<string, mixed> $payload Raw payload from /exchange or /plugin-validate.
 	 * @return array<string, mixed> Same payload with normalized shapes.
 	 */
 	private function normalize_payload( array $payload ): array {
-		// Normalize plan to a string. Common server-side shapes:
-		//   - "pro"                              (simple string)
-		//   - { slug: "pro", name: "Pro" }       (rich object)
-		//   - { id: "pro_basic", … }             (id-only)
-		if ( isset( $payload['plan'] ) ) {
-			$plan = $payload['plan'];
-			if ( is_string( $plan ) ) {
-				$payload['plan'] = $plan;
-			} elseif ( is_array( $plan ) ) {
-				if ( isset( $plan['slug'] ) && is_string( $plan['slug'] ) ) {
-					$payload['plan'] = $plan['slug'];
-				} elseif ( isset( $plan['name'] ) && is_string( $plan['name'] ) ) {
-					$payload['plan'] = strtolower( $plan['name'] );
-				} elseif ( isset( $plan['id'] ) && is_string( $plan['id'] ) ) {
-					$payload['plan'] = $plan['id'];
-				} else {
-					$payload['plan'] = null;
-				}
-			} else {
-				$payload['plan'] = null;
-			}
+		if ( array_key_exists( 'plan', $payload ) ) {
+			$payload['plan'] = $this->normalize_plan( $payload['plan'] );
 		}
 
 		// Normalize expires_at to an ISO string or null.
@@ -309,6 +297,56 @@ class Animicro_License_Manager {
 		}
 
 		return $payload;
+	}
+
+	/**
+	 * Coerce any plan shape to the canonical `{ slug, name, max_sites }`
+	 * object — or null if the input is unusable.
+	 */
+	private function normalize_plan( $plan ): ?array {
+		if ( is_string( $plan ) && '' !== $plan ) {
+			// Legacy v3 string. Synthesize a basic display name from the slug.
+			return [
+				'slug'      => $plan,
+				'name'      => ucfirst( $plan ),
+				'max_sites' => null,
+			];
+		}
+
+		if ( is_array( $plan ) ) {
+			$slug = isset( $plan['slug'] ) && is_string( $plan['slug'] ) ? $plan['slug'] : '';
+			$name = isset( $plan['name'] ) && is_string( $plan['name'] ) && '' !== $plan['name']
+				? $plan['name']
+				: ( '' !== $slug ? ucfirst( $slug ) : '' );
+
+			if ( '' === $slug && '' === $name ) {
+				return null;
+			}
+
+			return [
+				'slug'      => $slug,
+				'name'      => $name,
+				'max_sites' => isset( $plan['max_sites'] ) && is_numeric( $plan['max_sites'] ) ? (int) $plan['max_sites'] : null,
+			];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Pull the slug from a normalized plan structure. Backwards-compatible
+	 * with stored data from older versions where `plan` may still be a
+	 * string. Use this anywhere that compares against well-known slugs
+	 * (`'pro'`, `'basic'`, etc.).
+	 */
+	public static function plan_slug( $plan ): ?string {
+		if ( is_string( $plan ) ) {
+			return '' === $plan ? null : $plan;
+		}
+		if ( is_array( $plan ) && isset( $plan['slug'] ) && is_string( $plan['slug'] ) ) {
+			return '' === $plan['slug'] ? null : $plan['slug'];
+		}
+		return null;
 	}
 
 	private function record_connect_error( string $reason, string $detail = '' ): void {
@@ -338,7 +376,7 @@ class Animicro_License_Manager {
 			$dev = [
 				'valid'      => true,
 				'reason'     => 'ok',
-				'plan'       => 'pro',
+				'plan'       => [ 'slug' => 'pro', 'name' => 'Pro (Dev)', 'max_sites' => null ],
 				'expires_at' => null,
 				'sites'      => [ 'used' => 0, 'max' => null, 'unlimited' => true ],
 				'dev'        => true,
@@ -447,8 +485,8 @@ class Animicro_License_Manager {
 			update_option( $this->license_data_option, $normalized );
 			set_transient( 'animicro_license_check', $normalized, DAY_IN_SECONDS );
 
-			$plan = $normalized['plan'] ?? null;
-			if ( in_array( $plan, [ 'pro', 'basic' ], true ) ) {
+			$slug = self::plan_slug( $normalized['plan'] ?? null );
+			if ( in_array( $slug, [ 'pro', 'basic' ], true ) ) {
 				self::activate_premium();
 			} else {
 				self::deactivate_premium();
@@ -540,9 +578,17 @@ class Animicro_License_Manager {
 	// Accessors used by the REST layer / React UI
 	// ------------------------------------------------------------------
 
+	/**
+	 * Backwards-compatible accessor: always returns the plan SLUG as a
+	 * string (e.g. "pro", "basic", "free"), regardless of whether the
+	 * stored payload uses the legacy v3 string shape or the v4 object
+	 * shape. For the rich object (with name + max_sites), read
+	 * `get_license_data()['plan']` directly.
+	 */
 	public function get_license_plan(): string {
 		$license_data = get_option( $this->license_data_option, [] );
-		return isset( $license_data['plan'] ) ? (string) $license_data['plan'] : 'free';
+		$slug = self::plan_slug( $license_data['plan'] ?? null );
+		return $slug ?? 'free';
 	}
 
 	public function get_license_data(): array {
@@ -618,8 +664,8 @@ class Animicro_License_Manager {
 			return false;
 		}
 
-		$plan = $state['plan'] ?? null;
-		if ( ! in_array( $plan, [ 'pro', 'basic' ], true ) ) {
+		$slug = self::plan_slug( $state['plan'] ?? null );
+		if ( ! in_array( $slug, [ 'pro', 'basic' ], true ) ) {
 			self::deactivate_premium();
 			return false;
 		}
