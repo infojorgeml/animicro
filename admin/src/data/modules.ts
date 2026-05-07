@@ -277,9 +277,12 @@ export interface EasingOption {
 }
 
 export const EASING_OPTIONS: EasingOption[] = [
-  { value: 'ease-out',                       label: 'Ease Out',        description: 'Fast at start, slows at end — Recommended' },
-  { value: 'ease-in-out',                    label: 'Ease In Out',     description: 'Smooth start and stop' },
-  { value: 'linear',                         label: 'Linear',          description: 'Constant, ideal for parallax' },
+  { value: 'ease-out',                       label: 'Ease Out',             description: 'Fast at start, slows at end — Recommended' },
+  { value: 'ease-in',                        label: 'Ease In',              description: 'Slow at start, accelerates at end — useful for exits' },
+  { value: 'ease-in-out',                    label: 'Ease In Out',          description: 'Smooth start and stop' },
+  { value: 'linear',                         label: 'Linear',               description: 'Constant speed, ideal for parallax and continuous motion' },
+  { value: 'back-out',                       label: 'Bounce Out',           description: 'Slight overshoot then settles — playful, great for CTAs and badges' },
+  { value: 'circ-out',                       label: 'Snap Out',             description: 'Sharper deceleration than ease-out — feels snappy and modern' },
   { value: 'cubic-bezier(0.25, 0.4, 0.25, 1)', label: 'Premium (Apple-like)', description: 'Smooth Apple-style curve' },
 ];
 

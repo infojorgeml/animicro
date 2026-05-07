@@ -1,6 +1,6 @@
 # Animicro — Development Reference
 
-**Release:** 1.12.7 (2026-05-02). See CHANGELOG for history.
+**Release:** 1.12.8 (2026-05-07). See CHANGELOG for history.
 
 Utility-first micro-animations for WordPress powered by [Motion One](https://motion.dev/). This document describes the architecture and conventions for developers and AI assistants.
 

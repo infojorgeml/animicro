@@ -5,6 +5,16 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.8] - 2026-05-07
+
+### Added
+
+- **Three new easing options in the admin dropdown** — palette goes from 4 to 7 curves. The translation layer added in 1.12.7 (`parseEasing` in `frontend/src/core/config.js`) already supported all of Motion's named easings, so this release is purely a UI change in `admin/src/data/modules.ts::EASING_OPTIONS`:
+  - **`ease-in`** ("Ease In") — slow start, fast end. Useful for exit-style animations or chained sequences where this element comes after another.
+  - **`back-out`** ("Bounce Out") — slight overshoot then settles. Visually distinctive — great for CTAs, badges, notifications. Maps to Motion's `backOut` via `parseEasing`.
+  - **`circ-out`** ("Snap Out") — sharper deceleration than `ease-out`, feels modern and snappy. Popular in design system trends (Linear, Vercel-style). Maps to Motion's `circOut`.
+- **No changes to existing easing values.** Users with `data-am-easing="ease-out"` or any other current value keep working unchanged.
+
 ## [1.12.7] - 2026-05-02
 
 ### Fixed

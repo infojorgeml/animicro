@@ -1,7 +1,7 @@
 {
   "name": "animicro",
   "private": true,
-  "version": "1.12.7",
+  "version": "1.12.8",
   "type": "module",
   "scripts": {
     "dev:admin": "vite build --watch --mode admin",

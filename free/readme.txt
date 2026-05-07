@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.12.7
+Stable tag: 1.12.8
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,9 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.12.8 =
+* Three new easing options in the Modules settings panel: **Ease In** (slow start, fast end — useful for exits), **Bounce Out** (slight overshoot then settles — playful for CTAs), and **Snap Out** (sharper than ease-out — feels modern and snappy). Total goes from 4 to 7 easing curves. Existing `data-am-easing` values keep working unchanged.
 
 = 1.12.7 =
 * **Easing curves now actually work.** Long-standing bug since v1.0: every easing option in the admin dropdown (Ease Out, Ease In Out, Linear, Premium Apple-like) was being silently ignored by the underlying animation engine, which fell back to its default ease for every single animation regardless of what was selected. Fixed across all 18 animation modules. **Visual change**: animations on existing sites will now respect the easing setting you picked — most look subtly different, and the Premium (Apple-like) curve in particular is dramatically smoother since it never applied at all before. If you preferred the old look, set the easing to "Ease In Out" (which is closest to Motion's previous default).
@@ -198,6 +201,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.12.8 =
+Three new easing curves added: Ease In, Bounce Out, Snap Out. No breaking changes.
 
 = 1.12.7 =
 Critical fix: easing curves (Ease Out, Linear, Apple-like, etc.) now actually apply to your animations. Visual change after upgrading is intentional — your animations now respect the easing setting you chose.
