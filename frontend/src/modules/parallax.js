@@ -9,7 +9,7 @@ export function init() {
     const distance = cfg.speed * 100;
 
     scroll(
-      animate(el, { y: [-distance, distance] }, { easing: 'linear' }),
+      animate(el, { y: [-distance, distance] }, { ease: 'linear' }),
       { target: el }
     );
 

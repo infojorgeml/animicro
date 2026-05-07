@@ -1,4 +1,5 @@
 import { animate } from 'motion';
+import { parseEasing } from '../core/config.js';
 
 /**
  * Pulse: infinite soft scale breathing. Continuous — no viewport gating.
@@ -44,12 +45,12 @@ export function init() {
     const scaleMax = clamp(readFloat(el.dataset.amScaleMax, defScaleMax), 1, 2);
     const duration = clamp(readFloat(el.dataset.amDuration, defDuration), 0.1, 30);
     const delay    = clamp(readFloat(el.dataset.amDelay, defDelay), 0, 10);
-    const easing   = el.dataset.amEasing || defEasing;
+    const ease     = parseEasing(el.dataset.amEasing || defEasing);
 
     animate(
       el,
       { scale: [1, scaleMax, 1] },
-      { duration, delay, easing, repeat: Infinity }
+      { duration, delay, ease, repeat: Infinity }
     );
   });
 }

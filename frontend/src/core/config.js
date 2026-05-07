@@ -22,6 +22,73 @@ function safeInt(raw, fallback) {
 }
 
 /**
+ * Translate user-facing easing strings (CSS-style, camelCase, or
+ * `cubic-bezier(...)`) into the values Motion's `animate()` actually
+ * accepts.
+ *
+ * Why this exists: from v1 we shipped CSS-style easing strings
+ * (`'ease-out'`, `'ease-in-out'`, `'cubic-bezier(...)'`) all the way
+ * to Motion's `animate()` call. Motion's API expects camelCase
+ * (`'easeOut'`, `'easeInOut'`) or a `[a, b, c, d]` BezierDefinition
+ * array. CSS-style strings were silently ignored and the animation
+ * fell back to Motion's default ease, regardless of what the admin
+ * user picked. See CHANGELOG 1.12.7 for the full bug story.
+ *
+ * Motion accepts:
+ *   - `'linear'`, `'ease'`, `'easeIn'`, `'easeOut'`, `'easeInOut'`
+ *   - `'circIn'`, `'circOut'`, `'circInOut'`
+ *   - `'backIn'`, `'backOut'`, `'backInOut'`
+ *   - `'anticipate'`
+ *   - `[number, number, number, number]` (BezierDefinition)
+ *
+ * Anything unrecognised falls back to `'easeOut'` — the default we
+ * always intended.
+ *
+ * @param {string} input CSS easing string, camelCase name, or cubic-bezier(...).
+ * @returns {string|number[]} Motion-compatible easing value.
+ */
+export function parseEasing(input) {
+  if (typeof input !== 'string' || input.length === 0) return 'easeOut';
+
+  const trimmed = input.trim();
+  const lower   = trimmed.toLowerCase();
+
+  // Direct map: CSS-style with hyphens + case-insensitive camelCase.
+  const aliases = {
+    'linear':       'linear',
+    'ease':         'ease',
+    'ease-in':      'easeIn',
+    'ease-out':     'easeOut',
+    'ease-in-out':  'easeInOut',
+    'easein':       'easeIn',
+    'easeout':      'easeOut',
+    'easeinout':    'easeInOut',
+    'circin':       'circIn',
+    'circout':      'circOut',
+    'circinout':    'circInOut',
+    'backin':       'backIn',
+    'backout':      'backOut',
+    'backinout':    'backInOut',
+    'anticipate':   'anticipate',
+  };
+  if (aliases[lower] !== undefined) return aliases[lower];
+
+  // cubic-bezier(a, b, c, d)  →  [a, b, c, d]
+  const m = trimmed.match(
+    /^cubic-bezier\s*\(\s*([-\d.]+)\s*,\s*([-\d.]+)\s*,\s*([-\d.]+)\s*,\s*([-\d.]+)\s*\)$/i,
+  );
+  if (m) {
+    const arr = [
+      parseFloat(m[1]), parseFloat(m[2]),
+      parseFloat(m[3]), parseFloat(m[4]),
+    ];
+    if (arr.every(Number.isFinite)) return arr;
+  }
+
+  return 'easeOut';
+}
+
+/**
  * Reads loop-related `data-am-*` attributes and returns Motion One-compatible
  * options ({ repeat, repeatType, repeatDelay }). Returns an empty object when
  * loop is disabled, so callers can spread it unconditionally:
@@ -58,7 +125,7 @@ export function getElementConfig(el, moduleId = '') {
   return {
     duration:     safeFloat(d.amDuration,    mod.duration     ?? 0.6),
     delay:        safeFloat(d.amDelay,       mod.delay        ?? 0),
-    easing:       d.amEasing    || mod.easing  || 'ease-out',
+    easing:       parseEasing( d.amEasing || mod.easing || 'easeOut' ),
     distance:     safeFloat(d.amDistance,     mod.distance     ?? 30),
     scale:        safeFloat(d.amScale,       mod.scale        ?? 0.95),
     blur:         safeFloat(d.amBlur,        mod.blur         ?? 4),

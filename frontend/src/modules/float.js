@@ -1,4 +1,5 @@
 import { animate } from 'motion';
+import { parseEasing } from '../core/config.js';
 
 /**
  * Float: infinite vertical bob. Continuous — no viewport gating.
@@ -44,12 +45,12 @@ export function init() {
     const amp      = clamp(readFloat(el.dataset.amAmplitude, defAmp), 1, 100);
     const duration = clamp(readFloat(el.dataset.amDuration, defDuration), 0.1, 30);
     const delay    = clamp(readFloat(el.dataset.amDelay, defDelay), 0, 10);
-    const easing   = el.dataset.amEasing || defEasing;
+    const ease     = parseEasing(el.dataset.amEasing || defEasing);
 
     animate(
       el,
       { y: [0, -amp, 0] },
-      { duration, delay, easing, repeat: Infinity }
+      { duration, delay, ease, repeat: Infinity }
     );
   });
 }

@@ -5,6 +5,23 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.7] - 2026-05-02
+
+### Fixed
+
+- **Easing curves never applied — latent bug from v1.0 fixed across all animation modules.** The four easing options in the admin dropdown (Ease Out, Ease In Out, Linear, Premium Apple-like cubic-bezier) were producing visually identical animations because two underlying issues stacked:
+  1. **Wrong option key**: every module passed `easing: cfg.easing` to Motion's `animate()` call. Motion's API expects `ease:`, not `easing:` — the rename happened during the Motion One → Motion library rebrand, and we never followed. Motion silently ignored the unknown option and fell back to its built-in default ease.
+  2. **Wrong values**: even with the correct key, the values we shipped (`'ease-out'`, `'ease-in-out'`, `'cubic-bezier(0.25, 0.4, 0.25, 1)'`) didn't match Motion's accepted strings (`'easeOut'`, `'easeInOut'`, `[0.25, 0.4, 0.25, 1]` array). Only `'linear'` matched by coincidence.
+- **Fix**: new `parseEasing()` helper in `frontend/src/core/config.js` translates user-facing CSS-style strings + camelCase aliases + `cubic-bezier(a, b, c, d)` strings into Motion's accepted shapes. Applied at the boundary in `getElementConfig()` so all 13 modules using the shared config get correct easing automatically. Three modules (`float`, `pulse`, `hover-zoom`) read `el.dataset.amEasing` directly and now import + apply `parseEasing` themselves. Renamed the `easing:` property → `ease:` at every `animate()` call site (15 call sites across 15 module files).
+- **`highlight` not affected**: it pipes the easing string into a CSS custom property consumed by a CSS `transition` rule, and CSS natively accepts `'ease-out'`, `'ease-in-out'`, `'linear'`, `'cubic-bezier(...)'`. Highlight has been working correctly the whole time.
+- **`typewriter` not affected**: doesn't use Motion easing (uses `setTimeout` for character-by-character timing).
+- **Backwards compatibility**: any user with `data-am-easing="ease-out"` (or any other CSS-style value) in their existing markup keeps working — the translator accepts CSS-style aliases as input. The dropdown values in the admin UI are unchanged.
+
+### Notes
+
+- **Visual change on existing installs is intentional and expected.** Before 1.12.7, every animation used Motion's built-in default ease (closest to `'easeInOut'`) regardless of what users picked. After 1.12.7, animations actually use the configured easing. Most settings will look subtly different; the cubic-bezier "Premium (Apple-like)" curve in particular is now noticeably smoother because it never applied at all before. If users prefer the previous look, picking `'ease-in-out'` in the admin gets them closest to the old default.
+- New PUBLIC export: `parseEasing(input)` from `frontend/src/core/config.js`. Used by `float`/`pulse`/`hover-zoom` and reusable by any future module that reads `el.dataset.amEasing` directly without going through `getElementConfig()`.
+
 ## [1.12.6] - 2026-05-02
 
 ### Changed

@@ -105,7 +105,7 @@ export function init() {
       animate(
         target,
         { y: [distance, -distance], scale: [overscale, overscale] },
-        { easing: 'linear' }
+        { ease: 'linear' }
       ),
       { target: frame }
     );

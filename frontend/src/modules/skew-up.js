@@ -33,7 +33,7 @@ export function init() {
       animate(
         el,
         { opacity: [0, 1], y: [distance, 0], skewY: [skew, 0] },
-        { duration: cfg.duration, delay: cfg.delay, easing: cfg.easing, ...loop }
+        { duration: cfg.duration, delay: cfg.delay, ease: cfg.easing, ...loop }
       );
     }, { margin: cfg.margin });
   });

@@ -48,7 +48,7 @@ export function init() {
       const ep = (i + 1) / total;
 
       scroll(
-        animate(word, { opacity: [0, 1] }, { easing: 'linear' }),
+        animate(word, { opacity: [0, 1] }, { ease: 'linear' }),
         {
           target: el,
           offset: [

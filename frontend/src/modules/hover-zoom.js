@@ -1,4 +1,5 @@
 import { animate } from 'motion';
+import { parseEasing } from '../core/config.js';
 
 /**
  * Hover Zoom: scale up on mouseenter, return on mouseleave.
@@ -90,7 +91,7 @@ export function init() {
 
     const zoom     = clamp(readFloat(el.dataset.amZoomScale, defScale), 1.01, 2);
     const duration = clamp(readFloat(el.dataset.amDuration, defDuration), 0.05, 3);
-    const easing   = el.dataset.amEasing || defEasing;
+    const ease     = parseEasing(el.dataset.amEasing || defEasing);
 
     target.style.willChange = 'transform';
 
@@ -98,10 +99,10 @@ export function init() {
     // (otherwise hovering near the edge of an overscaled image would still
     // trigger fine, but the frame is the more natural hit target).
     frame.addEventListener('mouseenter', () => {
-      animate(target, { scale: zoom }, { duration, easing });
+      animate(target, { scale: zoom }, { duration, ease });
     });
     frame.addEventListener('mouseleave', () => {
-      animate(target, { scale: 1 }, { duration, easing });
+      animate(target, { scale: 1 }, { duration, ease });
     });
   });
 }

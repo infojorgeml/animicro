@@ -73,7 +73,7 @@ export function init() {
           {
             duration: cfg.duration,
             delay: delays[i],
-            easing: cfg.easing,
+            ease: cfg.easing,
           }
         );
       });

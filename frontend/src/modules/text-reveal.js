@@ -89,7 +89,7 @@ export function init() {
           {
             duration: cfg.duration,
             delay: stagger(cfg.staggerDelay, { start: cfg.delay }),
-            easing: cfg.easing,
+            ease: cfg.easing,
           }
         );
       }, { margin: cfg.margin });

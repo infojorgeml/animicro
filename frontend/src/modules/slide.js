@@ -18,7 +18,7 @@ export function init(name) {
       animate(
         el,
         { opacity: [0, 1], [axis]: [from, 0] },
-        { duration: cfg.duration, delay: cfg.delay, easing: cfg.easing, ...loop }
+        { duration: cfg.duration, delay: cfg.delay, ease: cfg.easing, ...loop }
       );
     }, { margin: cfg.margin });
   });

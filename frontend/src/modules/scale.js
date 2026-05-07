@@ -13,7 +13,7 @@ export function init() {
       animate(
         el,
         { opacity: [0, 1], scale: [cfg.scale, 1] },
-        { duration: cfg.duration, delay: cfg.delay, easing: cfg.easing, ...loop }
+        { duration: cfg.duration, delay: cfg.delay, ease: cfg.easing, ...loop }
       );
     }, { margin: cfg.margin });
   });

@@ -13,7 +13,7 @@ export function init() {
       animate(
         el,
         { opacity: [0, 1], filter: [`blur(${cfg.blur}px)`, 'blur(0px)'] },
-        { duration: cfg.duration, delay: cfg.delay, easing: cfg.easing, ...loop }
+        { duration: cfg.duration, delay: cfg.delay, ease: cfg.easing, ...loop }
       );
     }, { margin: cfg.margin });
   });
