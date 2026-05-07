@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.12.5
+Stable tag: 1.12.6
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,9 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.12.6 =
+* Updated the underlying Motion animation library from 11.18.x to 12.38.0. ~12 months of upstream bug fixes plus better hardware acceleration on scroll-linked animations (Parallax, Image Parallax, Text Fill on Scroll). Bundle size grows by ~3 KB gzipped on the main animation chunk; per-module chunks unchanged. No API or CSS class changes — your existing markup keeps working as-is.
 
 = 1.12.5 =
 * Animicro Pro: synced internal docs and tightened the licensing flow to match LicenSuite v4. Plugin deactivation now cleans the local connection (matches Bricks / WP Rocket / Elementor); the seat stays listed under "Connected sites" in the LicenSuite dashboard until the user revokes it manually. Dropped the v1.11.x → v1.12.x migration scaffolding (no installations to migrate). No user-facing changes in the free tier.
@@ -192,6 +195,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.12.6 =
+Motion library upgraded from 11.18.x to 12.38.0 — better scroll-linked perf and 12 months of bug fixes. ~3 KB gzipped bundle growth. No breaking changes for your markup.
 
 = 1.12.5 =
 Pro licensing tightened to match LicenSuite v4 final. No user-facing changes in the free tier.

@@ -5,6 +5,21 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.6] - 2026-05-02
+
+### Changed
+
+- **Motion upgraded from `^11.18.0` → `^12.37.0`** (resolved to **12.38.0** at install time). 12 months of upstream patches accumulated since the original 11.18.x pin in early 2025. Audit before bumping confirmed:
+  - The only breaking change in Motion 12.0 affects gesture callback signatures — `inView`, `press`, and `hover` callbacks now receive the target element as the first argument. Animicro uses `inView` in 11 modules (fade, scale, slide-*, skew-up, blur, stagger, grid-reveal, split-text, text-reveal, highlight, typewriter), but **all 11 call sites already ignore the callback arguments** (`() => { … }`), so the change is a no-op for us.
+  - `animate()`, `scroll()`, `stagger()` API surface unchanged.
+  - Easing strings (`'ease-out'`, `'linear'`, etc.) unchanged.
+- **Bundle size delta**: the main Motion chunk grew from 19.59 KB → 22.11 KB gzipped (+~2.5 KB / +13%). Per-module chunks unchanged. Net cost: ~3 KB extra on every page-load that uses Animicro animations. Acceptable trade for the upstream improvements; relevant scroll-linked modules (`parallax`, `img-parallax`, `text-fill-scroll`) get hardware-accelerated `start`/`end` offsets, which should compensate at runtime.
+
+### Notes
+
+- No API changes. CSS classes, `data-am-*` attributes, and module-loading semantics are identical.
+- The Motion upgrade was a `package.json` caret bump only — no code changes were needed in `frontend/src/`.
+
 ## [1.12.5] - 2026-05-02
 
 ### Changed
