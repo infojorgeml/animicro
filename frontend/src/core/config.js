@@ -57,9 +57,17 @@ export function parseEasing(input) {
   const aliases = {
     'linear':       'linear',
     'ease':         'ease',
+    // CSS-style hyphenated forms
     'ease-in':      'easeIn',
     'ease-out':     'easeOut',
     'ease-in-out':  'easeInOut',
+    'circ-in':      'circIn',
+    'circ-out':     'circOut',
+    'circ-in-out':  'circInOut',
+    'back-in':      'backIn',
+    'back-out':     'backOut',
+    'back-in-out':  'backInOut',
+    // camelCase / no-hyphen forms (case-insensitive matching above)
     'easein':       'easeIn',
     'easeout':      'easeOut',
     'easeinout':    'easeInOut',

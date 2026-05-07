@@ -5,6 +5,13 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.9] - 2026-05-07
+
+### Fixed
+
+- **`parseEasing()` missed the hyphenated forms `back-out`, `back-in`, `back-in-out`, `circ-out`, `circ-in`, `circ-in-out`** introduced as dropdown values in 1.12.8. Side-by-side smoke testing surfaced this immediately — Bounce Out and Snap Out looked identical to Ease Out because both were silently falling back to the default `'easeOut'` after the alias lookup missed. Root cause: when adding the camelCase aliases to the parser in 1.12.7, the hyphenated CSS-style equivalents were only added for `ease-in/out/in-out` (the original 4-option set), and 1.12.8 added new dropdown values without corresponding hyphenated aliases. Fix: extended the aliases map with `back-out → backOut`, `circ-out → circOut`, and the four other hyphenated `circ-*`/`back-*` forms so the parser recognises every shape the dropdown can emit.
+- **Visible result**: Bounce Out now actually overshoots past the destination and settles back (the Motion bezier is `[0.33, 1.53, 0.69, 0.99]`, with Y=1.53 giving ~53% overshoot). Snap Out has its sharper deceleration curve as designed (Motion bezier `[0.55, 0, 1, 0.45]`).
+
 ## [1.12.8] - 2026-05-07
 
 ### Added

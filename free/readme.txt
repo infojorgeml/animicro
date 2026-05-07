@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.12.8
+Stable tag: 1.12.9
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,9 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.12.9 =
+* Hotfix for the new easings shipped in 1.12.8: **Bounce Out** and **Snap Out** were silently falling back to Ease Out (looked identical). The translator missed the hyphenated forms `back-out` / `circ-out` that the dropdown emits, so these values weren't being recognised by the underlying animation engine. Now both work as intended — Bounce Out actually bounces, Snap Out actually snaps.
 
 = 1.12.8 =
 * Three new easing options in the Modules settings panel: **Ease In** (slow start, fast end — useful for exits), **Bounce Out** (slight overshoot then settles — playful for CTAs), and **Snap Out** (sharper than ease-out — feels modern and snappy). Total goes from 4 to 7 easing curves. Existing `data-am-easing` values keep working unchanged.
@@ -201,6 +204,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.12.9 =
+Hotfix: Bounce Out and Snap Out now actually apply (they were silently falling back to Ease Out in 1.12.8).
 
 = 1.12.8 =
 Three new easing curves added: Ease In, Bounce Out, Snap Out. No breaking changes.
