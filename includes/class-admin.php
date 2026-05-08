@@ -269,7 +269,6 @@ class Animicro_Admin {
 			'nonce'      => wp_create_nonce( 'wp_rest' ),
 			'settings'   => Animicro::get_settings(),
 			'version'    => ANIMICRO_VERSION,
-			'builders'   => Animicro_Compatibility::get_available_builders(),
 			'isPremium'  => $is_premium,
 			'page'       => $page,
 			'proPlugin'  => $is_pro_plugin,
@@ -389,10 +388,6 @@ class Animicro_Admin {
 				)
 			);
 		}
-
-		$clean['active_builders'] = isset( $raw['active_builders'] ) && is_array( $raw['active_builders'] )
-			? array_values( array_map( 'sanitize_text_field', $raw['active_builders'] ) )
-			: $defaults['active_builders'] ?? [ 'none' ];
 
 		$raw_module_settings     = isset( $raw['module_settings'] ) && is_array( $raw['module_settings'] )
 			? $raw['module_settings']

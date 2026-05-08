@@ -41,42 +41,40 @@ class Animicro_Compatibility {
 	/**
 	 * Returns the body selector that targets only the real frontend.
 	 *
-	 * When builders are selected, we chain body:not(.editor-class) for each
-	 * so elements stay visible inside those editors but hide on the live page.
+	 * Chains `:not()` against every known builder editor body class +
+	 * `wp-admin`, so the inline "hide initially" rules apply only on the
+	 * live frontend, never inside an editor preview iframe that happens
+	 * to reuse the same DOM.
 	 *
-	 * When "none" is selected, we chain :not() for ALL known editors + wp-admin.
+	 * Note: this is defence-in-depth — `Animicro_Frontend::is_builder_editor()`
+	 * already short-circuits the entire CSS injection when it detects a
+	 * builder URL param, so this selector is what protects the case where
+	 * URL detection would have missed (e.g. an unusual editor that doesn't
+	 * touch the URL but does add a body class).
+	 *
+	 * Up to v1.12.x this selector was configurable via an "Integrations"
+	 * admin tab where the user picked which builders they used. The toggle
+	 * had no observable effect for normal users (URL detection covered all
+	 * mainstream builders) and was removed in 1.13.0.
 	 */
-	private static function get_frontend_selector( array $active_builders ): string {
-		$active_builders = array_filter( $active_builders, 'is_string' );
-
-		if ( empty( $active_builders ) || in_array( 'none', $active_builders, true ) ) {
-			$nots = ':not(.wp-admin)';
-			foreach ( self::BUILDER_EDITOR_CLASSES as $class ) {
-				$nots .= ':not(.' . $class . ')';
-			}
-			return 'body' . $nots;
+	private static function get_frontend_selector(): string {
+		$nots = ':not(.wp-admin)';
+		foreach ( self::BUILDER_EDITOR_CLASSES as $class ) {
+			$nots .= ':not(.' . $class . ')';
 		}
-
-		$nots = '';
-		foreach ( $active_builders as $id ) {
-			if ( isset( self::BUILDER_EDITOR_CLASSES[ $id ] ) ) {
-				$nots .= ':not(.' . self::BUILDER_EDITOR_CLASSES[ $id ] . ')';
-			}
-		}
-
-		return $nots ? 'body' . $nots : 'body:not(.wp-admin)';
+		return 'body' . $nots;
 	}
 
 	/**
 	 * Generate inline CSS rules for active modules.
 	 * Injected in <head> for instant load (no flicker).
 	 */
-	public static function get_editor_css( array $active_modules, array $active_builders = [] ): string {
+	public static function get_editor_css( array $active_modules ): string {
 		if ( empty( $active_modules ) ) {
 			return '';
 		}
 
-		$prefix = self::get_frontend_selector( $active_builders );
+		$prefix = self::get_frontend_selector();
 		$rules  = [];
 
 		foreach ( $active_modules as $module ) {
@@ -149,15 +147,4 @@ class Animicro_Compatibility {
 		return implode( "\n", $rules ) . "\n";
 	}
 
-	public static function get_available_builders(): array {
-		return [
-			'none'       => __( 'None / Other', 'animicro' ),
-			'elementor'  => 'Elementor',
-			'bricks'     => 'Bricks Builder',
-			'breakdance' => 'Breakdance',
-			'oxygen'     => 'Oxygen Builder',
-			'divi'       => 'Divi',
-			'gutenberg'  => 'Gutenberg',
-		];
-	}
 }

@@ -45,7 +45,6 @@ export interface AdvancedConfig {
 export interface AnimicroSettings {
   active_modules: string[];
   available_modules: string[];
-  active_builders: string[];
   module_settings: Record<string, ModuleConfig>;
   smooth_scroll: SmoothScrollConfig;
   advanced: AdvancedConfig;
@@ -56,7 +55,6 @@ export interface AnimicroData {
   nonce: string;
   settings: AnimicroSettings;
   version: string;
-  builders: Record<string, string>;
   isPremium: boolean;
   page?: string;
   proPlugin: boolean;

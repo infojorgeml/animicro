@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.12.9
+Stable tag: 1.13.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,9 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.13.0 =
+* **Removed the "Integrations" tab from the admin panel.** The toggle never had an observable effect for normal users — URL-based detection (`?bricks=run`, `?elementor-preview`, etc.) already covers all mainstream page builders, and the body-class CSS exclusion is now applied to all known editors by default. One less knob to confuse you, same builder compatibility behaviour. No action needed if you had configured the toggle — your saved value is now ignored.
 
 = 1.12.9 =
 * Hotfix for the new easings shipped in 1.12.8: **Bounce Out** and **Snap Out** were silently falling back to Ease Out (looked identical). The translator missed the hyphenated forms `back-out` / `circ-out` that the dropdown emits, so these values weren't being recognised by the underlying animation engine. Now both work as intended — Bounce Out actually bounces, Snap Out actually snaps.
@@ -204,6 +207,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.13.0 =
+"Integrations" admin tab removed — it had no observable effect because all mainstream builders are already auto-detected. No breaking changes.
 
 = 1.12.9 =
 Hotfix: Bounce Out and Snap Out now actually apply (they were silently falling back to Ease Out in 1.12.8).

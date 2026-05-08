@@ -5,6 +5,28 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.0] - 2026-05-07
+
+### Removed
+
+- **"Integrations" admin tab + the underlying `active_builders` setting.** The tab let users multi-select which page builders they used (Elementor / Bricks / Breakdance / Oxygen / Divi / Gutenberg) — supposedly to control which `:not()` exclusions were chained into the inline "hide initially" selector. Investigation surfaced that the toggle had **no observable effect for normal users**: the URL-detection layer (`?bricks=run`, `?elementor-preview`, `?breakdance=builder`, `?ct_builder=true`, `?et_fb=1` in `Animicro_Frontend::is_builder_editor()` and `frontend/src/main.js::isInBuilder()`) already short-circuits the entire CSS injection inside any mainstream builder editor, and on the live frontend none of the editor body classes are present so the `:not()` chain is satisfied regardless of which combination is configured. The toggle changed the *shape* of the selector but never the *outcome* anyone could see.
+- **`Animicro_Compatibility::get_available_builders()`** removed (was only consumed by the now-deleted React `Integrations.tsx` component).
+- **`active_builders` field from `Animicro::get_default_settings()`** and the legacy `active_builder` (singular, pre-v1.0) → `active_builders` migration in `get_settings()`. Existing `wp_options` rows with `active_builders` set become inert dead data — no active deletion on upgrade, so a hypothetical downgrade to 1.12.x would still find the configured value intact.
+- **`'builders'` field from the `animicroData` localized payload** in `Animicro_Admin::enqueue_assets()`.
+- **`active_builders` from `AnimicroSettings` and `builders` from `AnimicroData`** TypeScript interfaces. `toggleBuilder` removed from the `useSettings` hook return shape.
+- **`'integrations'` from the `TabId` union and `TABS` array** in `admin/src/components/TabNav.tsx`.
+- **`admin/src/components/Integrations.tsx`** deleted (~50 lines).
+
+### Changed
+
+- **`Animicro_Compatibility::get_editor_css()` no longer accepts an `$active_builders` parameter.** The selector is now a fixed `body:not(.wp-admin):not(.elementor-editor-active):not(.bricks-is-builder):not(.breakdance):not(.oxygen-builder-body):not(.et_pb_pagebuilder_layout):not(.block-editor-page)` that excludes every known editor at all times. This was the de-facto behaviour for any user who left the toggle empty or on "None" (which was the default).
+- **`docs/animicro.md` Builder Compatibility section** rewritten to describe the two-layer protection model (URL detection as primary, body-class exclusion as defense in depth) and the historical context for why the admin toggle is gone.
+
+### Notes
+
+- No frontend animation behaviour changes. CSS classes, `data-am-*` attributes, module loading semantics, easing translation — all identical to 1.12.9.
+- For any plugin code that consumed `Animicro_Compatibility::get_editor_css( $modules, $builders )` externally with two arguments: the second argument is now ignored (extra args are tolerated by PHP without error). To future-proof, drop the second arg.
+
 ## [1.12.9] - 2026-05-07
 
 ### Fixed

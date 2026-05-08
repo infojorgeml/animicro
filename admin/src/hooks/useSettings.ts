@@ -8,7 +8,6 @@ interface UseSettingsReturn {
   updateSmoothScroll: <K extends keyof SmoothScrollConfig>(key: K, value: SmoothScrollConfig[K]) => void;
   updateAdvanced: <K extends keyof AdvancedConfig>(key: K, value: AdvancedConfig[K]) => void;
   toggleModule: (moduleId: string) => void;
-  toggleBuilder: (builderId: string) => void;
   save: () => Promise<boolean>;
   isDirty: boolean;
   isSaving: boolean;
@@ -78,17 +77,6 @@ export function useSettings(): UseSettingsReturn {
     setSaveMessage('');
   }, []);
 
-  const toggleBuilder = useCallback((builderId: string) => {
-    setSettings(prev => {
-      const active = prev.active_builders.includes(builderId)
-        ? prev.active_builders.filter(b => b !== builderId)
-        : [...prev.active_builders, builderId];
-      return { ...prev, active_builders: active };
-    });
-    setIsDirty(true);
-    setSaveMessage('');
-  }, []);
-
   const save = useCallback(async (): Promise<boolean> => {
     setIsSaving(true);
     setSaveMessage('');
@@ -103,7 +91,6 @@ export function useSettings(): UseSettingsReturn {
         },
         body: JSON.stringify({
           active_modules:  settings.active_modules,
-          active_builders: settings.active_builders,
           module_settings: settings.module_settings,
           smooth_scroll:   settings.smooth_scroll,
           advanced:        settings.advanced,
@@ -128,5 +115,5 @@ export function useSettings(): UseSettingsReturn {
     }
   }, [settings]);
 
-  return { settings, updateSettings, updateModuleSettings, updateSmoothScroll, updateAdvanced, toggleModule, toggleBuilder, save, isDirty, isSaving, saveMessage };
+  return { settings, updateSettings, updateModuleSettings, updateSmoothScroll, updateAdvanced, toggleModule, save, isDirty, isSaving, saveMessage };
 }

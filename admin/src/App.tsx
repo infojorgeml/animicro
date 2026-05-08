@@ -6,12 +6,11 @@ import Dashboard from './components/Dashboard';
 import CheatSheet from './components/CheatSheet';
 import SmoothScroll from './components/SmoothScroll';
 import AdvancedSettings from './components/AdvancedSettings';
-import Integrations from './components/Integrations';
 import LicensePage from './components/LicensePage';
 
 export default function App() {
   const { version, page, isPremium } = window.animicroData;
-  const { settings, updateModuleSettings, updateSmoothScroll, updateAdvanced, toggleModule, toggleBuilder, save, isDirty, isSaving, saveMessage } = useSettings();
+  const { settings, updateModuleSettings, updateSmoothScroll, updateAdvanced, toggleModule, save, isDirty, isSaving, saveMessage } = useSettings();
   const [activeTab, setActiveTab] = useState<TabId>('modules');
 
   const isLicensePage = page === 'license';
@@ -77,9 +76,6 @@ export default function App() {
             )}
             {activeTab === 'advanced' && (
               <AdvancedSettings config={settings.advanced} onChange={updateAdvanced} />
-            )}
-            {activeTab === 'integrations' && (
-              <Integrations settings={settings} toggleBuilder={toggleBuilder} />
             )}
           </div>
         </>

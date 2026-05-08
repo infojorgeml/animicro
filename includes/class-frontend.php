@@ -96,8 +96,7 @@ class Animicro_Frontend {
 		wp_add_inline_script( 'animicro-front', "window.animicroFrontData = {$data};", 'before' );
 
 		if ( ! empty( $active_modules ) && ! $this->is_builder_editor() ) {
-			$active_builders = $settings['active_builders'] ?? [ 'none' ];
-			$css             = Animicro_Compatibility::get_editor_css( $active_modules, $active_builders );
+			$css = Animicro_Compatibility::get_editor_css( $active_modules );
 
 			if ( ! empty( $css ) ) {
 				wp_register_style( 'animicro-dynamic', false, [], ANIMICRO_VERSION );
