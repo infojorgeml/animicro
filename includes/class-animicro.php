@@ -8,6 +8,7 @@ class Animicro {
 	const PRO_MODULES = [
 		'blur', 'stagger', 'grid-reveal', 'text-fill-scroll',
 		'parallax', 'split', 'text-reveal', 'img-parallax', 'magnet',
+		'scatter',
 	];
 
 	private static ?Animicro $instance = null;
@@ -75,7 +76,7 @@ class Animicro {
 	public static function get_default_settings(): array {
 		return [
 			'active_modules'    => [],
-			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'float', 'pulse', 'hover-zoom', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'img-parallax', 'magnet', 'split', 'text-reveal', 'typewriter', 'page-curtain' ],
+			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'float', 'pulse', 'hover-zoom', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'img-parallax', 'magnet', 'split', 'scatter', 'text-reveal', 'typewriter', 'page-curtain' ],
 			'module_settings'   => [
 				'fade' => [
 					'duration' => 0.6,
@@ -132,6 +133,15 @@ class Animicro {
 					'margin'       => '-50px 0px',
 					'staggerDelay' => 0.05,
 					'distance'     => 15,
+				],
+				'scatter' => [
+					'duration'     => 0.6,
+					'easing'       => 'ease-out',
+					'delay'        => 0.0,
+					'margin'       => '-50px 0px',
+					'staggerDelay' => 0.05,
+					'radius'       => 200.0,
+					'rotateMax'    => 45.0,
 				],
 				'text-reveal' => [
 					'duration'     => 0.6,

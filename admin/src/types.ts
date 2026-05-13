@@ -32,6 +32,8 @@ export interface ModuleConfig {
   strength?: number;
   smoothness?: number;
   axis?: string;
+  radius?: number;
+  rotateMax?: number;
 }
 
 export interface SmoothScrollConfig {
