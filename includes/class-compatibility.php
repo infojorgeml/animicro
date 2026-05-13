@@ -36,10 +36,9 @@ class Animicro_Compatibility {
 		'split-words' => 'opacity:0;will-change:opacity,transform;',
 		'text-reveal' => 'opacity:0;will-change:opacity,transform;',
 		'typewriter'  => 'opacity:0;',
-		// Page-transition modules don't use the regular `.am-NAME` descendant
-		// selector pipeline — they're special-cased in get_editor_css() below
-		// because they target <body> + a globally-injected overlay div.
-		'page-fade'    => '',
+		// page-curtain doesn't use the regular `.am-NAME` descendant selector
+		// pipeline — it's special-cased in get_editor_css() below because it
+		// targets a globally-injected overlay div by ID.
 		'page-curtain' => '',
 	];
 
@@ -132,21 +131,6 @@ class Animicro_Compatibility {
 					$rules[] = "{$prefix} .am-split-chars.is-ready{opacity:1;}";
 					$rules[] = "{$prefix} .am-split-words.is-ready{opacity:1;}";
 				}
-				continue;
-			}
-
-			// Page-fade: target <body> via a one-off body class (added by
-			// class-frontend.php only outside editors). No `:not(editor)`
-			// chain needed because the class never gets added inside an
-			// editor in the first place. The JS module removes both the
-			// class and the inline `opacity` style after the animation.
-			//
-			// `@media (scripting: none)` safety net: if JS is disabled, the
-			// page would stay invisible forever. Force opacity:1 in that
-			// media context.
-			if ( 'page-fade' === $module ) {
-				$rules[] = "body.am-page-fade-init{opacity:0;}";
-				$rules[] = "@media (scripting: none){body.am-page-fade-init{opacity:1!important;}}";
 				continue;
 			}
 

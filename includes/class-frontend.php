@@ -8,11 +8,11 @@ class Animicro_Frontend {
 	public function __construct() {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 
-		// Page Transitions (1.14.0): only wire if we're on the real
-		// frontend (not in a builder editor). Both filters check the
-		// active_modules list to noop early when neither module is on.
+		// Page Curtain (1.14.0): inject the overlay div immediately after
+		// <body> opens, but only on the real frontend — never inside a
+		// builder editor preview where it would cover the canvas the user
+		// is trying to edit.
 		if ( ! $this->is_builder_editor() ) {
-			add_filter( 'body_class',   [ $this, 'add_page_fade_body_class' ] );
 			add_action( 'wp_body_open', [ $this, 'output_page_curtain' ] );
 		}
 	}
@@ -24,23 +24,11 @@ class Animicro_Frontend {
 	}
 
 	/**
-	 * Add the `am-page-fade-init` body class when page-fade is active.
-	 * The critical CSS injected by class-compatibility.php sets that body
-	 * to opacity:0; the page-fade JS module animates it to 1 and removes
-	 * the class.
-	 */
-	public function add_page_fade_body_class( array $classes ): array {
-		if ( $this->is_module_active( 'page-fade' ) ) {
-			$classes[] = 'am-page-fade-init';
-		}
-		return $classes;
-	}
-
-	/**
 	 * Inject the page-curtain overlay div immediately after <body> opens.
 	 * Requires the active theme to call wp_body_open() (mandatory since
-	 * WordPress 5.2). On themes that don't, the curtain simply never
-	 * appears and the plugin degrades cleanly with no error.
+	 * WordPress 5.2). On themes that don't, the JS module falls back to
+	 * injecting the overlay itself (with a small initial flash because
+	 * the page has already painted).
 	 */
 	public function output_page_curtain(): void {
 		if ( ! $this->is_module_active( 'page-curtain' ) ) {

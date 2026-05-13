@@ -2,57 +2,100 @@ import { animate } from 'motion';
 import { parseEasing } from '../core/config.js';
 
 /**
- * Page Curtain — full-screen overlay that covers the viewport at first
- * paint and animates out once DOMContentLoaded fires.
+ * Page Curtain — full-page overlay that animates IN before navigating
+ * away and OUT after the next page loads.
  *
- * Primary path (no-flash): includes/class-frontend.php emits the overlay
- * <div id="am-page-curtain"> on the `wp_body_open` hook (WordPress 5.2+),
- * and includes/class-compatibility.php emits the critical CSS that makes
- * it cover the viewport from the very first paint. This module animates
- * it out and removes it from the DOM.
+ * Two phases:
  *
- * Fallback path: if PHP never emitted the overlay (a legacy theme that
- * doesn't call `wp_body_open()`, or some plugin that swallows that
- * hook), we still try to inject + animate it from JS. The user will see
- * the page content briefly before the overlay drops in, which is
- * uglier than the no-flash path — but it still respects the setting
- * the user enabled rather than silently doing nothing.
+ *   1) ENTRY (on every page load):
+ *      includes/class-frontend.php emits <div id="am-page-curtain"> via the
+ *      `wp_body_open` hook, and includes/class-compatibility.php emits the
+ *      critical CSS that makes it cover the viewport from the very first
+ *      paint. This module animates it OUT and removes it from the DOM.
  *
- * Three directions, read from the overlay's data-am-direction attribute
- * (set by PHP). In the JS-fallback path we fall back to settings:
- *  - fade       — opacity 1 → 0
- *  - slide-up   — y 0 → -100% (overlay slides up off-screen)
- *  - slide-down — y 0 → +100% (overlay slides down off-screen)
+ *   2) EXIT (on internal link click):
+ *      We listen for clicks on <a> tags via a capture-phase document
+ *      listener. For links that pass the safety filters (same-origin,
+ *      no modifier keys, no target="_blank", not a #anchor, etc.) we
+ *      prevent the default navigation, create a fresh overlay, animate
+ *      it IN until it covers the viewport, and only then navigate via
+ *      `window.location.href`. The result is a fluid black/white/branded
+ *      transition between pages instead of the harsh paint-and-flash
+ *      that normal page loads produce.
  *
- * Honors `prefers-reduced-motion: reduce`: removes the overlay (or
- * skips creating it) without animating.
+ * Direction handling — keyframes are mirrored between the two phases so
+ * the cortina feels like it travels in the same direction across the
+ * navigation boundary:
  *
- * Honors builder editors: main.js short-circuits before init() runs.
- * PHP also avoids emitting the overlay inside builders.
+ *   slide-up   entry: y 0   → -100%   (cortina exits upward)
+ *              exit:  y 100 → 0       (cortina enters from below, rises)
+ *   slide-down entry: y 0   → 100%    (cortina exits downward)
+ *              exit:  y -100 → 0      (cortina enters from above, descends)
+ *   fade       entry: opacity 1 → 0   (cortina fades out)
+ *              exit:  opacity 0 → 1   (cortina fades in)
+ *
+ * Builder editors: skipped at main.js level (this init() never runs).
+ *
+ * prefers-reduced-motion: removes any existing overlay immediately and
+ * never registers the click interceptor — the visitor gets normal
+ * browser navigation, no animation, no fancy stuff.
+ *
+ * bfcache safety: when the visitor uses the browser back button, the
+ * page is restored from the disk cache with the (post-click) overlay
+ * still in the DOM. We listen for `pageshow` with `event.persisted`
+ * true and remove it so the cached page is usable again.
+ *
+ * Opt-out per link: any <a> with `data-no-curtain` attribute or the
+ * class `no-curtain` is left alone. Useful for download links, links
+ * that trigger plugin-specific behaviour (lightboxes, ajax cart, etc.),
+ * or anything the site author wants to keep "instant".
  */
 
 const globals = window.animicroFrontData || {};
 
-function createFallbackOverlay(settings) {
+function getCfg() {
+  return (globals.moduleSettings && globals.moduleSettings['page-curtain']) || {};
+}
+
+function getKeyframes(direction, phase) {
+  // phase === 'out' : the cortina is leaving (entry transition).
+  // phase === 'in'  : the cortina is arriving (exit transition).
+  switch (direction) {
+    case 'slide-up':
+      return phase === 'out'
+        ? { y: ['0%', '-100%'] }
+        : { y: ['100%', '0%'] };
+    case 'slide-down':
+      return phase === 'out'
+        ? { y: ['0%', '100%'] }
+        : { y: ['-100%', '0%'] };
+    case 'fade':
+    default:
+      return phase === 'out'
+        ? { opacity: [1, 0] }
+        : { opacity: [0, 1] };
+  }
+}
+
+function buildOverlay(cfg) {
   const overlay = document.createElement('div');
   overlay.id = 'am-page-curtain';
-  overlay.dataset.amDirection = settings.direction || 'fade';
-  // Inline styles only (no CSS variable dance) — the critical CSS isn't
-  // guaranteed to be present in the fallback path, so we hard-code the
-  // styles we need to cover the viewport.
+  overlay.dataset.amDirection = cfg.direction || 'fade';
+  // Hard-coded inline styles so the fallback path works even if the
+  // critical CSS didn't reach the page (theme without wp_head, etc.).
   Object.assign(overlay.style, {
     position:       'fixed',
     inset:          '0',
     zIndex:         '999999',
-    background:     settings.bgColor || '#000000',
+    background:     cfg.bgColor || '#000000',
     pointerEvents:  'none',
     display:        'flex',
     alignItems:     'center',
     justifyContent: 'center',
   });
-  if (settings.logoUrl) {
+  if (cfg.logoUrl) {
     const img = document.createElement('img');
-    img.src = settings.logoUrl;
+    img.src = cfg.logoUrl;
     img.alt = '';
     img.setAttribute('aria-hidden', 'true');
     Object.assign(img.style, {
@@ -63,55 +106,148 @@ function createFallbackOverlay(settings) {
     });
     overlay.appendChild(img);
   }
-  document.body.appendChild(overlay);
   return overlay;
 }
 
-export function init() {
-  const mod = (globals.moduleSettings && globals.moduleSettings['page-curtain']) || {};
+/**
+ * Decide whether a click should be intercepted for the exit transition.
+ * Returns true only for "I want this navigation to feel curtain-y"
+ * clicks; everything else falls through to the browser's default.
+ */
+function shouldInterceptClick(event, link) {
+  if (event.defaultPrevented) return false;
+  // Left click only. Middle/right/aux: user intent is "open elsewhere".
+  if (event.button !== 0) return false;
+  // Modifier keys: user intent is open-in-new-tab / save / etc.
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return false;
 
-  // prefers-reduced-motion: drop or never create the overlay.
+  // Opt-outs.
+  if (link.hasAttribute('data-no-curtain')) return false;
+  if (link.classList.contains('no-curtain')) return false;
+  if (link.hasAttribute('download')) return false;
+
+  // target=_blank / named target: not our concern.
+  const target = link.getAttribute('target');
+  if (target && target !== '' && target !== '_self') return false;
+
+  // Href sanity.
+  const href = link.getAttribute('href');
+  if (!href) return false;
+  const trimmed = href.trim();
+  if (trimmed === '') return false;
+  if (trimmed.startsWith('#')) return false;
+  const lowered = trimmed.toLowerCase();
+  if (lowered.startsWith('mailto:'))     return false;
+  if (lowered.startsWith('tel:'))        return false;
+  if (lowered.startsWith('sms:'))        return false;
+  if (lowered.startsWith('javascript:')) return false;
+
+  // Same-origin check via resolved URL.
+  let url;
+  try {
+    url = new URL(link.href, document.baseURI);
+  } catch {
+    return false;
+  }
+  if (url.origin !== window.location.origin) return false;
+
+  // Same page (hash-only change): treat as in-page anchor, let it through.
+  if (
+    url.pathname === window.location.pathname &&
+    url.search   === window.location.search
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+let exitInProgress = false;
+
+async function performExit(url) {
+  if (exitInProgress) return;
+  exitInProgress = true;
+
+  const cfg     = getCfg();
+  const overlay = buildOverlay(cfg);
+  if (!document.body) {
+    // Defensive — should never happen because click events come after body.
+    window.location.href = url;
+    return;
+  }
+  document.body.appendChild(overlay);
+
+  const duration  = Number.isFinite(+cfg.duration) ? +cfg.duration : 0.8;
+  const delay     = Number.isFinite(+cfg.delay)    ? +cfg.delay    : 0;
+  const ease      = parseEasing(cfg.easing || 'easeOut');
+  const direction = cfg.direction || 'fade';
+  const keyframes = getKeyframes(direction, 'in');
+
+  try {
+    await animate(overlay, keyframes, { duration, delay, ease }).finished;
+  } catch {
+    // Animation interrupted — navigate anyway so the user isn't stuck.
+  }
+
+  window.location.href = url;
+}
+
+function handleClick(event) {
+  // Walk up from the event target to find the nearest <a>, in case the
+  // user clicked on an inner element (icon, image, span).
+  const link = event.target.closest ? event.target.closest('a') : null;
+  if (!link) return;
+  if (!shouldInterceptClick(event, link)) return;
+
+  event.preventDefault();
+  performExit(link.href);
+}
+
+function performEntry() {
+  const overlay = document.getElementById('am-page-curtain');
+  if (!overlay) return;
+
+  const cfg       = getCfg();
+  const duration  = Number.isFinite(+cfg.duration) ? +cfg.duration : 0.8;
+  const delay     = Number.isFinite(+cfg.delay)    ? +cfg.delay    : 0;
+  const ease      = parseEasing(cfg.easing || 'easeOut');
+  // Trust the PHP-set data attribute for entry — falls back to settings.
+  const direction = overlay.dataset.amDirection || cfg.direction || 'fade';
+  const keyframes = getKeyframes(direction, 'out');
+
+  animate(overlay, keyframes, { duration, delay, ease }).finished
+    .then(() => overlay.remove())
+    .catch(() => overlay.remove());
+}
+
+function handlePageShow(event) {
+  if (!event.persisted) return;
+  // Page was restored from bfcache; the exit overlay we attached before
+  // navigating is still in the DOM. Clean it up so the cached page is
+  // visible again.
+  const overlay = document.getElementById('am-page-curtain');
+  if (overlay) overlay.remove();
+  exitInProgress = false;
+}
+
+export function init() {
+  // prefers-reduced-motion: visitor opted out of motion. Skip entry
+  // animation (just drop the overlay) and don't intercept any clicks.
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
-    const existing = document.getElementById('am-page-curtain');
-    if (existing) existing.remove();
+    const overlay = document.getElementById('am-page-curtain');
+    if (overlay) overlay.remove();
     return;
   }
 
-  // Primary path: PHP injected the overlay via wp_body_open. Fallback:
-  // create it from JS (with a small flash because the browser already
-  // painted the page content underneath).
-  let overlay = document.getElementById('am-page-curtain');
-  if (!overlay) {
-    if (!document.body) return;   // page is too early — bail safely
-    overlay = createFallbackOverlay(mod);
-  }
+  // 1) Entry animation — animate the PHP-injected overlay out.
+  performEntry();
 
-  const duration  = Number.isFinite(+mod.duration) ? +mod.duration : 0.8;
-  const delay     = Number.isFinite(+mod.delay)    ? +mod.delay    : 0;
-  const ease      = parseEasing(mod.easing || 'easeOut');
-  const direction = overlay.dataset.amDirection || 'fade';
+  // 2) Exit interceptor — capture-phase listener so we run before any
+  //    other click handlers (smooth-scroll, builder anchor logic, etc.)
+  //    that might call preventDefault on us.
+  document.addEventListener('click', handleClick, { capture: true });
 
-  let keyframes;
-  switch (direction) {
-    case 'slide-up':
-      keyframes = { y: ['0%', '-100%'] };
-      break;
-    case 'slide-down':
-      keyframes = { y: ['0%', '100%'] };
-      break;
-    case 'fade':
-    default:
-      keyframes = { opacity: [1, 0] };
-      break;
-  }
-
-  animate(overlay, keyframes, { duration, delay, ease }).finished
-    .then(() => {
-      overlay.remove();
-    })
-    .catch(() => {
-      // Animation interrupted (rare). Still remove the overlay so the
-      // page stays usable.
-      overlay.remove();
-    });
+  // 3) bfcache safety — strip the exit overlay when the user navigates
+  //    back to a cached page.
+  window.addEventListener('pageshow', handlePageShow);
 }

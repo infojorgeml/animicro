@@ -87,12 +87,12 @@ https://github.com/infojorgeml/animicro
 == Changelog ==
 
 = 1.14.0 =
-* **New "Page Transitions" admin tab** with two new modules:
-  * **Page Fade** — fades the entire page in on load. Animates `<body>` from opacity 0 to 1.
-  * **Page Curtain** — full-screen overlay that covers the screen at first paint and animates away. Three variants: fade, slide-up, slide-down. Configurable background color and optional logo URL.
-* Both modules are builder-safe (they don't run inside Bricks / Elementor / Breakdance / Oxygen / Divi / Gutenberg editor previews) and honor `prefers-reduced-motion`.
-* Graceful degradation: if JavaScript is disabled or the theme doesn't call `wp_body_open()`, the modules don't run and the page is fully usable.
-* The two modules can be enabled simultaneously; they coexist as independent layers (curtain animates over a body that's fading in).
+* **New "Page Transitions" admin tab** with a single new module:
+  * **Page Curtain** — symmetric overlay transition between internal pages. Click a link → cortina covers the screen → page changes → cortina animates away. Three variants: fade, slide-up, slide-down. Configurable background color and optional logo URL.
+* The cortina is mirrored between entry and exit: with `slide-up` it rises across the screen on both legs of the navigation; with `slide-down` it descends; with `fade` it crossfades.
+* Builder-safe (doesn't run inside Bricks / Elementor / Breakdance / Oxygen / Divi / Gutenberg editor previews) and honors `prefers-reduced-motion` (visitors who prefer reduced motion get instant browser navigation, no click interception).
+* Per-link opt-out: add `class="no-curtain"` or `data-no-curtain` to any `<a>` that should navigate instantly (downloads, ajax-driven UIs, etc.). External links, `target="_blank"`, modifier-key clicks, middle-clicks, `#anchor` links and `mailto:`/`tel:` links are never intercepted.
+* Graceful degradation: if JavaScript is disabled or the theme doesn't call `wp_body_open()`, the module falls back cleanly. bfcache-safe (back button works correctly).
 
 = 1.13.0 =
 * **Removed the "Integrations" tab from the admin panel.** The toggle never had an observable effect for normal users — URL-based detection (`?bricks=run`, `?elementor-preview`, etc.) already covers all mainstream page builders, and the body-class CSS exclusion is now applied to all known editors by default. One less knob to confuse you, same builder compatibility behaviour. No action needed if you had configured the toggle — your saved value is now ignored.
@@ -217,7 +217,7 @@ https://github.com/infojorgeml/animicro
 == Upgrade Notice ==
 
 = 1.14.0 =
-New "Page Transitions" tab with two Free modules: Page Fade and Page Curtain. No breaking changes.
+New "Page Transitions" tab with a new Free module: Page Curtain — symmetric overlay transition between internal pages (click → cortina cubre → cambia de página → cortina se va). No breaking changes to existing per-element animations.
 
 = 1.13.0 =
 "Integrations" admin tab removed — it had no observable effect because all mainstream builders are already auto-detected. No breaking changes.

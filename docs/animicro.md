@@ -46,7 +46,7 @@ animicro/
 ## Frontend Modules
 
 - **Entry**: `frontend/src/main.js` → `loadModules(activeModules)` from `core/registry.js`.
-- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `skew-up`, `scale`, `blur`, `float`, `pulse`, `hover-zoom`, `stagger`, `grid-reveal`, `highlight`, `text-fill-scroll`, `parallax`, `img-parallax`, `split`, `text-reveal`, `typewriter`, `page-fade`, `page-curtain`. Each exports `init()`.
+- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `skew-up`, `scale`, `blur`, `float`, `pulse`, `hover-zoom`, `stagger`, `grid-reveal`, `highlight`, `text-fill-scroll`, `parallax`, `img-parallax`, `split`, `text-reveal`, `typewriter`, `page-curtain`. Each exports `init()`.
 - **Config**: `getElementConfig(el, moduleId)` merges `el.dataset.am*` with `moduleSettings[moduleId]` and fallbacks.
 - **Code splitting**: Dynamic `import()` per module; only active modules load. **Smooth scroll** (`frontend/src/smooth-scroll.js`) is loaded only when `animicroFrontData.smoothScroll` is present (Pro + enabled in settings).
 
@@ -58,14 +58,22 @@ animicro/
 
 ## Page Transitions (Free, global — added in 1.14.0)
 
-Two global modules that animate the **whole page** on load, configured from the **Page Transitions** admin tab (not the Modules dashboard, because they aren't per-element). Both are Free.
+One global module that animates a full-page overlay across **navigation**, configured from the **Page Transitions** admin tab (not the Modules dashboard, because it isn't per-element). Free.
 
-- **`page-fade`** — animates `<body>` from `opacity: 0` → `1` on `DOMContentLoaded`. The hidden state is set via critical inline CSS injected by `class-compatibility.php` against the body class `am-page-fade-init` (which `class-frontend.php` adds via `body_class` filter only outside builder editors). The JS module (`frontend/src/modules/page-fade.js`) animates and then removes both the class and the inline opacity style.
-- **`page-curtain`** — a full-screen overlay `<div id="am-page-curtain">` injected via `wp_body_open` hook from `class-frontend.php::output_page_curtain()`. Critical inline CSS in `<head>` makes it cover the viewport from the first paint. The JS module animates it out (3 directions: `fade` / `slide-up` / `slide-down`) and then `remove()`s the element. Supports background color and an optional centered logo image.
+- **`page-curtain`** — symmetric cortina that runs in two phases:
+  - **Entry**: `class-frontend.php::output_page_curtain()` injects `<div id="am-page-curtain">` via the `wp_body_open` hook before the first paint. Critical inline CSS from `class-compatibility.php` makes it cover the viewport immediately. After `DOMContentLoaded`, the JS module (`frontend/src/modules/page-curtain.js`) animates the overlay OUT and `remove()`s it.
+  - **Exit**: the JS module installs a **capture-phase `click` listener on `document`**. For internal-link clicks that pass the safety filter (same-origin, no modifier keys, no `target="_blank"`, not `#anchor` / `mailto:` / `tel:` / `sms:` / `javascript:`, no `download` attr, no `class="no-curtain"` / `data-no-curtain` opt-out, no aux button), it calls `event.preventDefault()`, creates a fresh overlay, animates it IN, awaits `animate(...).finished`, then sets `window.location.href = url`.
+  - **Direction mirroring**: keyframes are mirrored between entry and exit so the cortina feels continuous across the navigation. `slide-up` rises across the screen on both legs (entry: `y 0 → -100%`, exit: `y 100% → 0`); `slide-down` descends (entry: `y 0 → 100%`, exit: `y -100% → 0`); `fade` crossfades (entry: `opacity 1 → 0`, exit: `opacity 0 → 1`).
+  - Settings: `direction`, `bgColor` (defaults `#000000`), `logoUrl` (optional, centered, capped at 200×200), `duration`, `easing`, `delay` (only affects the entry animation; the exit always starts immediately on click for snappy feedback).
 
-Both modules are **builder-safe** (the body class and the overlay are never emitted inside builder editors thanks to the existing `is_builder_editor()` URL detection), respect **`prefers-reduced-motion: reduce`** (revealed immediately, no animation), and degrade gracefully when **JavaScript is disabled** (via a `@media (scripting: none)` safety net in the inline CSS that forces the body visible and hides the curtain). If a (very old) theme doesn't call `wp_body_open()`, the curtain simply never appears — no error, no flash.
-
-The two modules **coexist independently** when both are enabled — the curtain animates over a body that's fading in. Normally users want only one or the other; we don't force exclusivity.
+**Safety layers** (defense in depth — the module never wants to brick a navigation):
+- **Builder editors**: the overlay is never emitted inside builders (`is_builder_editor()` URL detection in PHP), and `main.js::isInBuilder()` skips `init()` entirely on the JS side. No clicks intercepted in the editor.
+- **`prefers-reduced-motion: reduce`**: `init()` removes any existing overlay and **does not register the click interceptor** — visitor gets normal browser navigation, no animation.
+- **`@media (scripting: none)`**: inline CSS hides the curtain when JS is disabled, so the page is usable.
+- **`wp_body_open()` missing**: the JS module creates the overlay element from scratch (`createElement('div')` + inline styles + `document.body.appendChild`). Small initial flash because the body has already painted, but the transition runs.
+- **bfcache**: `window.addEventListener('pageshow', e => e.persisted && removeOverlay())` strips the exit overlay from cached pages so the back button works.
+- **Double-click guard**: an `exitInProgress` flag prevents a second click from spawning a second animation.
+- **Cross-origin links**: never intercepted. SEO/security/analytics unaffected.
 
 ## Advanced (global, Free)
 

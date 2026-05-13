@@ -174,13 +174,6 @@ export const DEFAULT_IMG_PARALLAX_CONFIG: ModuleConfig = {
   speed: 0.2,
 };
 
-export const DEFAULT_PAGE_FADE_CONFIG: ModuleConfig = {
-  duration: 0.6,
-  easing:   'ease-out',
-  delay:    0,
-  margin:   '-50px 0px',
-};
-
 export const DEFAULT_PAGE_CURTAIN_CONFIG: ModuleConfig = {
   duration:  0.8,
   easing:    'ease-out',
@@ -193,8 +186,8 @@ export const DEFAULT_PAGE_CURTAIN_CONFIG: ModuleConfig = {
 
 // The `page` category is intentionally NOT added to MODULE_CATEGORIES — page
 // transitions live in their own admin tab (Page Transitions), so Dashboard.tsx
-// doesn't render them. The category tag here exists purely to identify them
-// in MODULE_INFO when PageTransitions.tsx filters by it.
+// doesn't render them. The category tag here exists purely to identify the
+// page-curtain entry when PageTransitions.tsx filters by it.
 export type ModuleCategory = 'entry' | 'text' | 'group' | 'scroll' | 'continuous' | 'media' | 'page';
 
 export interface ModuleInfo {
@@ -248,9 +241,10 @@ export const MODULE_INFO: ModuleInfo[] = [
   { id: 'hover-zoom',   name: 'Zoom Hover',     description: 'Image scales up on hover within an overflow:hidden parent', cssClass: '.am-hover-zoom',   isPro: false, category: 'media' },
   { id: 'img-parallax', name: 'Image Parallax', description: 'Window effect — inner image translates on scroll inside an overflow:hidden frame', cssClass: '.am-img-parallax', isPro: true,  category: 'media' },
 
-  // Page Transitions (rendered in their own tab, not on the Modules dashboard)
-  { id: 'page-fade',    name: 'Page Fade',    description: 'Fades the entire page in on load (body opacity 0 → 1).',                  cssClass: '',                 isPro: false, category: 'page' },
-  { id: 'page-curtain', name: 'Page Curtain', description: 'Overlay that covers the screen at load, then slides or fades out.',       cssClass: '',                 isPro: false, category: 'page' },
+  // Page Transitions (rendered in their own tab, not on the Modules dashboard).
+  // Single module that intercepts navigation clicks to animate an overlay IN
+  // before changing pages and OUT after the next page loads.
+  { id: 'page-curtain', name: 'Page Curtain', description: 'Click → cortina cubre → cambia de página → cortina se va. Symmetric overlay transition between internal pages.', cssClass: '', isPro: false, category: 'page' },
 ];
 
 export interface DataAttribute {
