@@ -24,6 +24,7 @@ const MODULES = {
   'skew-up':     () => import('../modules/skew-up.js'),
   'hover-zoom':   () => import('../modules/hover-zoom.js'),
   'img-parallax': () => import('../modules/img-parallax.js'),
+  'magnet':       () => import('../modules/magnet.js'),
   'page-curtain': () => import('../modules/page-curtain.js'),
 };
 

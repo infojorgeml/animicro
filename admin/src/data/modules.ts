@@ -174,6 +174,19 @@ export const DEFAULT_IMG_PARALLAX_CONFIG: ModuleConfig = {
   speed: 0.2,
 };
 
+export const DEFAULT_MAGNET_CONFIG: ModuleConfig = {
+  // duration/easing/delay/margin are inert for magnet (mouse-driven, no
+  // Motion animate()), but kept to satisfy the shared ModuleConfig shape
+  // and the PHP REST loop that expects every entry to carry them.
+  duration:   0.6,
+  easing:     'ease-out',
+  delay:      0,
+  margin:     '-50px 0px',
+  strength:   15,
+  smoothness: 0.08,
+  axis:       'both',
+};
+
 export const DEFAULT_PAGE_CURTAIN_CONFIG: ModuleConfig = {
   duration:  0.8,
   easing:    'ease-out',
@@ -222,6 +235,7 @@ export const MODULE_INFO: ModuleInfo[] = [
   // Continuous (Infinite)
   { id: 'float',       name: 'Float',       description: 'Infinite soft up/down floating motion',     cssClass: '.am-float',       isPro: false, category: 'continuous' },
   { id: 'pulse',       name: 'Pulse',       description: 'Infinite gentle scale pulse — breathing-like', cssClass: '.am-pulse',    isPro: false, category: 'continuous' },
+  { id: 'magnet',      name: 'Magnet',      description: 'Element drifts smoothly toward the mouse with inertia', cssClass: '.am-magnet', isPro: true,  category: 'continuous' },
 
   // Text
   { id: 'split',        name: 'Split Text',   description: 'Splits and animates text by letters/words', cssClass: '.am-split-chars .am-split-words', isPro: true, category: 'text' },
@@ -287,6 +301,9 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-scale-max',          type: 'float',        defaultValue: '1.05',    usedBy: 'pulse' },
   { attribute: 'data-am-skew',               type: 'float (deg)',  defaultValue: '5',       usedBy: 'skew-up' },
   { attribute: 'data-am-zoom-scale',         type: 'float',        defaultValue: '1.08',    usedBy: 'hover-zoom' },
+  { attribute: 'data-am-strength',           type: 'float (1–100)',  defaultValue: '15',    usedBy: 'magnet' },
+  { attribute: 'data-am-smoothness',         type: 'float (0.01–1)', defaultValue: '0.08',  usedBy: 'magnet — lerp factor; lower = more inertia' },
+  { attribute: 'data-am-axis',               type: 'enum',           defaultValue: 'both',  usedBy: 'magnet — `x` / `y` / `both`' },
 ];
 
 export interface EasingOption {

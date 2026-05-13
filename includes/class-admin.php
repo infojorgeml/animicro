@@ -496,6 +496,24 @@ class Animicro_Admin {
 				$entry['zoomScale'] = $this->clamp_float( $raw_mod['zoomScale'] ?? null, 1.01, 2, (float) $module_defaults['zoomScale'] );
 			}
 
+			// Magnet (1.15.0): three module-specific fields. Strength is the
+			// percentage of the mouse-to-centre offset the element travels;
+			// smoothness is the per-frame lerp factor; axis restricts the
+			// translation to one cardinal direction.
+			if ( isset( $module_defaults['strength'] ) ) {
+				$entry['strength'] = $this->clamp_float( $raw_mod['strength'] ?? null, 1, 100, (float) $module_defaults['strength'] );
+			}
+			if ( isset( $module_defaults['smoothness'] ) ) {
+				$entry['smoothness'] = $this->clamp_float( $raw_mod['smoothness'] ?? null, 0.01, 1, (float) $module_defaults['smoothness'] );
+			}
+			if ( isset( $module_defaults['axis'] ) ) {
+				$allowed_axes = [ 'x', 'y', 'both' ];
+				$raw_axis     = isset( $raw_mod['axis'] ) ? (string) $raw_mod['axis'] : (string) $module_defaults['axis'];
+				$entry['axis'] = in_array( $raw_axis, $allowed_axes, true )
+					? $raw_axis
+					: (string) $module_defaults['axis'];
+			}
+
 			// Page Transitions (1.14.0): page-curtain has three module-specific
 			// fields that the generic loop above doesn't know about. Without
 			// these branches the user's settings for direction / bgColor /

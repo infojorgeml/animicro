@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.14.2
+Stable tag: 1.15.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,10 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.15.0 =
+* **New `magnet` module (Pro)** — `.am-magnet` elements drift smoothly toward the mouse with LERP-based inertia. Three attributes: `data-am-strength` (1–100), `data-am-smoothness` (0.01–1), `data-am-axis` (`x` / `y` / `both`). One global rAF loop + one mousemove listener regardless of how many elements you mark — cost scales linearly with element count.
+* **Safety**: skipped on touch-only devices (no fine pointer signal), honors `prefers-reduced-motion: reduce`, never runs inside Bricks / Elementor / Breakdance / Oxygen / Divi editor previews.
 
 = 1.14.2 =
 * **Plugin icon in the WP "Update Plugins" screen.** Bundled `assets/icon-128x128.png` so the standard WP-admin update list now shows the Animicro logo instead of the generic gray plug icon. Works automatically — no settings needed.
@@ -223,6 +227,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.15.0 =
+New Pro module `magnet`: mouse-following micro-animation with LERP inertia, configured via `data-am-strength`, `data-am-smoothness` and `data-am-axis`. No breaking changes to existing modules.
 
 = 1.14.2 =
 Adds the Animicro logo to the WP "Update Plugins" screen (no more gray plug icon on future updates). Internal build toolchain switched from npm to pnpm — no effect on installed sites.

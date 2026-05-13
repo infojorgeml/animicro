@@ -32,6 +32,9 @@ class Animicro_Compatibility {
 		'parallax'         => '',
 		'hover-zoom'       => '',
 		'img-parallax'     => '',
+		// Magnet doesn't need an initial-hide rule — the element starts
+		// at its natural position and only translates from there.
+		'magnet'           => '',
 		'split-chars' => 'opacity:0;will-change:opacity,transform;',
 		'split-words' => 'opacity:0;will-change:opacity,transform;',
 		'text-reveal' => 'opacity:0;will-change:opacity,transform;',

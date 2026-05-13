@@ -1,6 +1,6 @@
 # Animicro — Development Reference
 
-**Release:** 1.14.2 (2026-05-13). See CHANGELOG for history.
+**Release:** 1.15.0 (2026-05-13). See CHANGELOG for history.
 
 Utility-first micro-animations for WordPress powered by [Motion One](https://motion.dev/). This document describes the architecture and conventions for developers and AI assistants.
 
@@ -46,7 +46,7 @@ animicro/
 ## Frontend Modules
 
 - **Entry**: `frontend/src/main.js` → `loadModules(activeModules)` from `core/registry.js`.
-- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `skew-up`, `scale`, `blur`, `float`, `pulse`, `hover-zoom`, `stagger`, `grid-reveal`, `highlight`, `text-fill-scroll`, `parallax`, `img-parallax`, `split`, `text-reveal`, `typewriter`, `page-curtain`. Each exports `init()`.
+- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `skew-up`, `scale`, `blur`, `float`, `pulse`, `hover-zoom`, `stagger`, `grid-reveal`, `highlight`, `text-fill-scroll`, `parallax`, `img-parallax`, `magnet`, `split`, `text-reveal`, `typewriter`, `page-curtain`. Each exports `init()`.
 - **Config**: `getElementConfig(el, moduleId)` merges `el.dataset.am*` with `moduleSettings[moduleId]` and fallbacks.
 - **Code splitting**: Dynamic `import()` per module; only active modules load. **Smooth scroll** (`frontend/src/smooth-scroll.js`) is loaded only when `animicroFrontData.smoothScroll` is present (Pro + enabled in settings).
 

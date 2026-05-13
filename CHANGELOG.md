@@ -5,6 +5,31 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.15.0] - 2026-05-13
+
+### Added
+
+- **`magnet` module (Pro)** — `.am-magnet` elements drift smoothly toward the mouse position using LERP interpolation. A single global `requestAnimationFrame` loop ticks every active element each frame, lerping their `currentX/Y` toward a target derived from the mouse offset to the viewport centre. One mousemove listener total regardless of element count.
+  - Three module-specific attributes, all per-element-overridable:
+    - `data-am-strength` (float `1`–`100`, default `15`): travel distance as a percentage of the mouse-to-centre offset.
+    - `data-am-smoothness` (float `0.01`–`1`, default `0.08`): per-frame lerp factor. Lower = more inertia / drag, higher = more snappy.
+    - `data-am-axis` (enum `x` / `y` / `both`, default `both`): restrict translation to one axis.
+  - Why a manual rAF loop instead of Motion's `animate()`: Motion needs a target known at call time; here the target changes every frame (follows cursor). Same precedent as `parallax` which uses Motion's `scroll()` helper instead of `animate()`.
+  - `will-change: transform` applied so each magnet element gets its own compositor layer — keeps the per-frame transform writes off the main thread.
+
+### Safety / graceful degradation
+
+- **Touch-only devices** (`(pointer: coarse)` matches AND `(pointer: fine)` does NOT): the module's `init()` bails out completely — no listener, no rAF. Hybrid laptops with both trackpad and touchscreen still get the effect.
+- **`prefers-reduced-motion: reduce`**: double-gated. The global `main.js` short-circuit already prevents `loadModules()` from running when reduced motion is on, and `init()` checks again for defence in depth (no transform writes, element stays where its CSS placed it).
+- **Builder editors** (Bricks / Elementor / Breakdance / Oxygen / Divi): never run because `main.js::isInBuilder()` short-circuits before module loading.
+- **Single global state**: one `mousemove` listener, one rAF loop, one shared `items[]` array — no per-element timers/listeners, no duplicate inits (`data-am-magnet-init="1"` deduplication flag per element).
+
+### Wiring (where things landed)
+
+- Frontend: `frontend/src/modules/magnet.js` (new, ~120 lines), entry in `frontend/src/core/registry.js`.
+- PHP: `'magnet'` added to `Animicro::PRO_MODULES` and `available_modules` in `class-animicro.php`; module settings defaults declared there too (`strength: 15`, `smoothness: 0.08`, `axis: 'both'`). `Animicro_License_Manager::PRO_MODULES` also lists `'magnet'`. `class-compatibility.php::MODULE_INITIAL_CSS` has an empty entry — magnet doesn't need an initial-hide rule (element starts in its natural position). `class-admin.php::update_settings()` REST handler gained three sanitizer branches: `clamp_float` 1–100 for `strength`, `clamp_float` 0.01–1 for `smoothness`, and an allow-list check (`x` / `y` / `both`) for `axis`.
+- Admin React: `ModuleConfig` interface extended with `strength?: number; smoothness?: number; axis?: string;`. `admin/src/data/modules.ts` ships `DEFAULT_MAGNET_CONFIG` plus a new `MODULE_INFO` entry under `category: 'continuous'` and three new `DATA_ATTRIBUTES` rows for the cheat sheet. `admin/src/components/ModuleSettings.tsx` renders three new controls (Strength range slider, Smoothness range slider, Axis 3-button selector) and excludes `magnet` from the generic Duration / Delay / Easing / Margin sliders — they're inert for this module.
+
 ## [1.14.2] - 2026-05-13
 
 ### Added
