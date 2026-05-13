@@ -30,9 +30,13 @@ jobs:
           fetch-depth: 0
 
       - name: Setup pnpm
+        # No `version:` here on purpose — pnpm/action-setup@v4 errors out
+        # ("Multiple versions of pnpm specified") if both this and the
+        # `packageManager` field in package.json declare a version. The
+        # package.json `packageManager` field is the source of truth for
+        # the whole repo (used by Corepack locally too), so the action
+        # picks it up automatically.
         uses: pnpm/action-setup@v4
-        with:
-          version: 11
 
       - name: Setup Node
         uses: actions/setup-node@v4
