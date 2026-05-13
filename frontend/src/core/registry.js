@@ -17,6 +17,7 @@ const MODULES = {
   'text-fill-scroll': () => import('../modules/text-fill-scroll.js'),
   'parallax':         () => import('../modules/parallax.js'),
   'split':       () => import('../modules/split-text.js'),
+  'scatter':     () => import('../modules/scatter.js'),
   'text-reveal': () => import('../modules/text-reveal.js'),
   'typewriter':  () => import('../modules/typewriter.js'),
   'float':       () => import('../modules/float.js'),

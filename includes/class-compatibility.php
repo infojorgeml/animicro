@@ -37,6 +37,10 @@ class Animicro_Compatibility {
 		'magnet'           => '',
 		'split-chars' => 'opacity:0;will-change:opacity,transform;',
 		'split-words' => 'opacity:0;will-change:opacity,transform;',
+		// Scatter mirrors split's two variants. Initial hide rules are
+		// identical; the per-span random transform comes from JS at init.
+		'scatter-chars' => 'opacity:0;will-change:opacity,transform;',
+		'scatter-words' => 'opacity:0;will-change:opacity,transform;',
 		'text-reveal' => 'opacity:0;will-change:opacity,transform;',
 		'typewriter'  => 'opacity:0;',
 		// page-curtain doesn't use the regular `.am-NAME` descendant selector
@@ -133,6 +137,17 @@ class Animicro_Compatibility {
 					$rules[] = "{$prefix} .am-split-words{{$split_css}}";
 					$rules[] = "{$prefix} .am-split-chars.is-ready{opacity:1;}";
 					$rules[] = "{$prefix} .am-split-words.is-ready{opacity:1;}";
+				}
+				continue;
+			}
+
+			if ( 'scatter' === $module ) {
+				$sc_css = self::MODULE_INITIAL_CSS['scatter-chars'] ?? '';
+				if ( $sc_css ) {
+					$rules[] = "{$prefix} .am-scatter-chars{{$sc_css}}";
+					$rules[] = "{$prefix} .am-scatter-words{{$sc_css}}";
+					$rules[] = "{$prefix} .am-scatter-chars.is-ready{opacity:1;}";
+					$rules[] = "{$prefix} .am-scatter-words.is-ready{opacity:1;}";
 				}
 				continue;
 			}

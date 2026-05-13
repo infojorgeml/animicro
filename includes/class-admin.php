@@ -496,6 +496,17 @@ class Animicro_Admin {
 				$entry['zoomScale'] = $this->clamp_float( $raw_mod['zoomScale'] ?? null, 1.01, 2, (float) $module_defaults['zoomScale'] );
 			}
 
+			// Scatter (1.16.0): radius controls how far each span starts from
+			// its final position; rotateMax sets the max random rotation
+			// (0 disables rotation entirely). staggerDelay reuses the
+			// shared branch above.
+			if ( isset( $module_defaults['radius'] ) ) {
+				$entry['radius'] = $this->clamp_float( $raw_mod['radius'] ?? null, 50, 500, (float) $module_defaults['radius'] );
+			}
+			if ( isset( $module_defaults['rotateMax'] ) ) {
+				$entry['rotateMax'] = $this->clamp_float( $raw_mod['rotateMax'] ?? null, 0, 90, (float) $module_defaults['rotateMax'] );
+			}
+
 			// Magnet (1.15.0): three module-specific fields. Strength is the
 			// percentage of the mouse-to-centre offset the element travels;
 			// smoothness is the per-frame lerp factor; axis restricts the

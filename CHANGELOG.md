@@ -5,6 +5,27 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.16.0] - 2026-05-13
+
+### Added
+
+- **`scatter` module (Pro)** — random-origin text reveal. `.am-scatter-chars` splits the element's text into per-character spans, `.am-scatter-words` does it per-word. At init time, each span gets an inline `transform: translate(rand_x, rand_y) rotate(rand_deg)` placing it at a random offset from its final position (±radius px on both axes, ±rotateMax degrees). When the parent element enters the viewport (gated by Motion's `inView()` with `cfg.margin`), every span animates back to `(x: 0, y: 0, rotate: 0, opacity: 1)` with a staggered per-span delay (`i * cfg.staggerDelay + cfg.delay`).
+  - **Why per-span `animate()` instead of a single collective call**: `split-text.js` can use `animate(spans, ...)` + Motion's `stagger()` because every span shares the same keyframes. Scatter needs DIFFERENT initial transforms per span, so we loop and call `animate()` once per span with manually computed delays. Cost: N calls instead of 1 — trivial for typical text (50–200 spans). Motion manages each as an independent timeline.
+  - **Utility-first API by design**: there are NO module-specific `data-am-*` attributes for `radius` or `rotateMax`. Those are configured **globally** from the admin panel and apply to every `.am-scatter-*` element on the site. Same mental model as `.am-fade` / `.am-pulse` / `.am-float`. Per-element `data-am-duration`, `-easing`, `-delay`, `-stagger`, `-margin` still work via the shared `getElementConfig()` API. Rationale: per-element numeric attributes for two physics parameters (radius + rotation) were judged to be more friction than they were worth — most sites only need one scatter "vibe", and the admin panel slider is faster than memorising a clamp range.
+
+### Wiring
+
+- Frontend: `frontend/src/modules/scatter.js` (new, ~95 lines) — copies `splitIntoSpans()` algorithm from `split-text.js` and adds the per-span random-start + lerp-to-final logic. Registry entry in `frontend/src/core/registry.js`.
+- PHP: `'scatter'` added to `Animicro::PRO_MODULES`, `available_modules`, and `module_settings` defaults (with `radius: 200.0`, `rotateMax: 45.0`, plus the standard duration/easing/delay/margin/staggerDelay). `Animicro_License_Manager::PRO_MODULES` also lists `'scatter'`. `class-compatibility.php::MODULE_INITIAL_CSS` has new entries for `'scatter-chars'` and `'scatter-words'` (both `opacity:0;will-change:opacity,transform;`), plus a special-case in `get_editor_css()` that emits the four standard rules (.am-scatter-chars, .am-scatter-words, both with `.is-ready` overrides) mirroring the existing split block. `class-admin.php::update_settings()` REST handler gained two sanitizer branches: `clamp_float` 50..500 for `radius`, `clamp_float` 0..90 for `rotateMax`.
+- Admin React: `ModuleConfig` extended with `radius?: number; rotateMax?: number;`. `DEFAULT_SCATTER_CONFIG` added to `admin/src/data/modules.ts`, plus a `MODULE_INFO` entry under `category: 'text'` with `cssClass: '.am-scatter-chars .am-scatter-words'`. `ModuleSettings.tsx` adds two new controls (Scatter distance slider 50–500px, Rotation slider 0–90°) and includes `scatter` in the existing Stagger delay block.
+
+### Safety / graceful degradation
+
+- **Pre-set inline transforms before `inView`**: each span's random start state is applied immediately at split time (via `style.transform`), so there's no first-paint flash of un-scattered text. Critical CSS keeps the parent `.am-scatter-*` at `opacity: 0` until JS adds `.is-ready` (which `splitIntoSpans` does synchronously). Each span itself also starts at `opacity: 0` inline.
+- **`prefers-reduced-motion: reduce`**: gated upstream by `main.js` — the module's `init()` never runs when the global toggle is on. Net effect: `splitIntoSpans()` doesn't fire, so the text stays in its original (untouched) DOM. No invisible-text risk.
+- **Builder editors** (Bricks / Elementor / Breakdance / Oxygen / Divi): never run because `main.js::isInBuilder()` short-circuits before module loading.
+- **`aria-label`** is set on the parent element to preserve the original text for screen readers before the DOM is rewritten. Each generated span carries `aria-hidden="true"`. Same accessibility model as `split-text.js`.
+
 ## [1.15.0] - 2026-05-13
 
 ### Added

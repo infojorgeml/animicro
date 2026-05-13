@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_SCATTER_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 import ColorField from './ColorField';
@@ -34,6 +34,7 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   'hover-zoom': DEFAULT_HOVER_ZOOM_CONFIG,
   'img-parallax': DEFAULT_IMG_PARALLAX_CONFIG,
   magnet: DEFAULT_MAGNET_CONFIG,
+  scatter: DEFAULT_SCATTER_CONFIG,
 };
 
 const hasDistance = (id: string) => id.startsWith('slide-') || id === 'skew-up' || id === 'split' || id === 'stagger' || id === 'grid-reveal';
@@ -614,8 +615,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Stagger delay (split, text-reveal, stagger, grid-reveal) */}
-        {(moduleId === 'split' || moduleId === 'text-reveal' || moduleId === 'stagger' || moduleId === 'grid-reveal') && (
+        {/* Stagger delay (split, text-reveal, stagger, grid-reveal, scatter) */}
+        {(moduleId === 'split' || moduleId === 'text-reveal' || moduleId === 'stagger' || moduleId === 'grid-reveal' || moduleId === 'scatter') && (
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
               Stagger delay
@@ -628,6 +629,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
                 ? 'Time between each child element starting its animation.'
                 : moduleId === 'grid-reveal'
                 ? 'Controls how spread out the ripple wave feels across all items.'
+                : moduleId === 'scatter'
+                ? 'Time between each letter or word starting its convergence.'
                 : 'Time between each letter or word starting its animation.'}
             </p>
             <input
@@ -642,6 +645,58 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>{moduleId === 'text-reveal' ? '0.05s — Quick' : moduleId === 'stagger' ? '0.03s — Fast cascade' : moduleId === 'grid-reveal' ? '0.03s — Tight ripple' : '0.01s — Fast cascade'}</span>
               <span>{moduleId === 'text-reveal' ? '0.3s — Dramatic' : moduleId === 'stagger' ? '0.5s — Slow sequence' : moduleId === 'grid-reveal' ? '0.3s — Wide wave' : '0.2s — Slow reveal'}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Scatter — Radius */}
+        {moduleId === 'scatter' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Scatter distance
+              <span className="font-mono text-brand-500">{config.radius ?? 200}px</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              How far each character/word starts from its final position. Spans are placed at a random offset within ± this value on both axes.
+            </p>
+            <input
+              type="range"
+              min="50"
+              max="500"
+              step="10"
+              value={config.radius ?? 200}
+              onChange={e => onUpdate({ radius: parseInt(e.target.value, 10) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>50px — Tight</span>
+              <span>500px — Chaos</span>
+            </div>
+          </div>
+        )}
+
+        {/* Scatter — Rotation max */}
+        {moduleId === 'scatter' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Rotation
+              <span className="font-mono text-brand-500">{config.rotateMax ?? 45}°</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Maximum random rotation applied to each span at the starting position. Spans rotate back to 0° as they converge. Set to 0° to disable rotation entirely.
+            </p>
+            <input
+              type="range"
+              min="0"
+              max="90"
+              step="5"
+              value={config.rotateMax ?? 45}
+              onChange={e => onUpdate({ rotateMax: parseInt(e.target.value, 10) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0° — Off</span>
+              <span>90° — Heavy spin</span>
             </div>
           </div>
         )}
