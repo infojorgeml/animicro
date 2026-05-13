@@ -89,8 +89,37 @@ export interface LicenseStatus {
   connect_error: { reason: string; message: string } | null;
 }
 
+/**
+ * Minimal typing for the slice of `window.wp.media` we touch from the
+ * PageTransitions Logo URL picker. The full surface is far larger
+ * (Backbone-based, models, collections, frame events) — we only narrow
+ * down to what we actually call, so TypeScript stops at "the field
+ * exists" rather than imposing a Backbone dependency on this project.
+ */
+interface WPMediaFrame {
+  on(event: 'select' | 'close', callback: () => void): void;
+  open(): void;
+  state(): {
+    get(name: 'selection'): {
+      first(): {
+        toJSON(): { id: number; url: string; alt?: string; title?: string; mime?: string };
+      };
+    };
+  };
+}
+
+interface WPMediaOptions {
+  title?: string;
+  button?: { text?: string };
+  library?: { type?: string };
+  multiple?: boolean;
+}
+
 declare global {
   interface Window {
     animicroData: AnimicroData;
+    wp?: {
+      media?: ((options?: WPMediaOptions) => WPMediaFrame) & Record<string, unknown>;
+    };
   }
 }

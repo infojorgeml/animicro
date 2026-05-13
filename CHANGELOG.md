@@ -5,6 +5,22 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.1] - 2026-05-12
+
+### Changed
+
+- **Page Curtain — theatre-curtain direction semantics.** Slide-up and slide-down now enter and leave through OPPOSITE sides, matching the real-world metaphor of a stage curtain falling from above to cover the scene and then rising away to reveal the next one. Previous behaviour (both halves moving in the same direction) felt mechanical and repetitive. New keyframes:
+  - `slide-up`   — exit: cortina FALLS from above (`y -100% → 0`). entry: cortina RISES upward (`y 0 → -100%`).
+  - `slide-down` — exit: cortina RISES from below (`y 100% → 0`).  entry: cortina FALLS downward (`y 0 → 100%`).
+  - `fade` is symmetric and unchanged.
+
+### Added
+
+- **Logo picker uses the WordPress media library.** The plain text input for `logoUrl` in the Page Curtain settings has been replaced with a "Select image…" button that opens the standard WP media frame via `window.wp.media()`. Once an image is chosen, the picker shows a thumbnail preview plus "Change" / "Remove" controls. The URL is still shown beneath the preview in monospace so power users can verify what's saved.
+  - `Animicro_Admin::enqueue_assets()` now calls `wp_enqueue_media()` on the main settings page (not on the License screen) so the React component can rely on `window.wp.media` being available.
+  - `admin/src/types.ts` declares a narrow TypeScript interface for `window.wp.media` covering only the methods we actually call (`on`, `open`, `state().get('selection').first().toJSON()`). Avoids pulling Backbone types into the project.
+  - Graceful fallback: if `wp.media` is unavailable for any reason (script error, restricted environment), the picker falls back to `window.prompt()` so the user can still paste a URL by hand.
+
 ## [1.14.0] - 2026-05-12
 
 ### Added

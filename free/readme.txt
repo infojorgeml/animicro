@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.14.0
+Stable tag: 1.14.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,10 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.14.1 =
+* **Page Curtain: theatre-curtain directions.** Slide-up and slide-down now feel natural — the cortina ENTERS from one side and LEAVES through the OPPOSITE side, like a real stage curtain (falls from above to cover, rises away to reveal). Previously both halves moved in the same direction which felt repetitive.
+* **Page Curtain: WordPress media library for logo.** The Logo URL field is now a "Select image…" button that opens the standard WP media picker, with a thumbnail preview, "Change" and "Remove" actions. Plain URLs still work as a fallback if the media script can't be loaded.
 
 = 1.14.0 =
 * **New "Page Transitions" admin tab** with a single new module:
@@ -215,6 +219,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.14.1 =
+Page Curtain refinements: theatre-curtain directions (slide-up / slide-down now enter and leave through opposite sides, like a real stage curtain) and a WordPress media-library picker for the logo. No breaking changes — existing settings keep working, just feels nicer.
 
 = 1.14.0 =
 New "Page Transitions" tab with a new Free module: Page Curtain — symmetric overlay transition between internal pages (click → cortina cubre → cambia de página → cortina se va). No breaking changes to existing per-element animations.

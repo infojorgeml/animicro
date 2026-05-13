@@ -1,6 +1,6 @@
 # Animicro — Development Reference
 
-**Release:** 1.14.0 (2026-05-09). See CHANGELOG for history.
+**Release:** 1.14.1 (2026-05-12). See CHANGELOG for history.
 
 Utility-first micro-animations for WordPress powered by [Motion One](https://motion.dev/). This document describes the architecture and conventions for developers and AI assistants.
 
@@ -63,7 +63,7 @@ One global module that animates a full-page overlay across **navigation**, confi
 - **`page-curtain`** — symmetric cortina that runs in two phases:
   - **Entry**: `class-frontend.php::output_page_curtain()` injects `<div id="am-page-curtain">` via the `wp_body_open` hook before the first paint. Critical inline CSS from `class-compatibility.php` makes it cover the viewport immediately. After `DOMContentLoaded`, the JS module (`frontend/src/modules/page-curtain.js`) animates the overlay OUT and `remove()`s it.
   - **Exit**: the JS module installs a **capture-phase `click` listener on `document`**. For internal-link clicks that pass the safety filter (same-origin, no modifier keys, no `target="_blank"`, not `#anchor` / `mailto:` / `tel:` / `sms:` / `javascript:`, no `download` attr, no `class="no-curtain"` / `data-no-curtain` opt-out, no aux button), it calls `event.preventDefault()`, creates a fresh overlay, animates it IN, awaits `animate(...).finished`, then sets `window.location.href = url`.
-  - **Direction mirroring**: keyframes are mirrored between entry and exit so the cortina feels continuous across the navigation. `slide-up` rises across the screen on both legs (entry: `y 0 → -100%`, exit: `y 100% → 0`); `slide-down` descends (entry: `y 0 → 100%`, exit: `y -100% → 0`); `fade` crossfades (entry: `opacity 1 → 0`, exit: `opacity 0 → 1`).
+  - **Direction semantics (theatre-curtain, 1.14.1+)**: keyframes enter from one side and leave through the OPPOSITE side, like a real stage curtain falling from above to cover the scene and rising away to reveal it. `slide-up` exit falls from above (`y -100% → 0`), entry rises upward (`y 0 → -100%`). `slide-down` exit rises from below (`y 100% → 0`), entry falls downward (`y 0 → 100%`). `fade` is symmetric (exit `opacity 0 → 1`, entry `opacity 1 → 0`).
   - Settings: `direction`, `bgColor` (defaults `#000000`), `logoUrl` (optional, centered, capped at 200×200), `duration`, `easing`, `delay` (only affects the entry animation; the exit always starts immediately on click for snappy feedback).
 
 **Safety layers** (defense in depth — the module never wants to brick a navigation):

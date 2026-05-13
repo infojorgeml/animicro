@@ -22,6 +22,34 @@ interface PageTransitionsProps {
 const DURATION_PRESET = { min: 0.1, max: 3, step: 0.05 };
 const DELAY_PRESET    = { min: 0,   max: 2, step: 0.05 };
 
+/**
+ * Open the WordPress media library picker and resolve to the selected
+ * image URL. Uses `window.wp.media()` which is loaded server-side via
+ * `wp_enqueue_media()` (see Animicro_Admin::enqueue_assets). If for any
+ * reason `wp.media` isn't available (script not loaded, browser
+ * restriction, etc.), falls back to a `prompt()` so the user can still
+ * paste a URL manually.
+ */
+function openMediaPicker(onSelect: (url: string) => void) {
+  const media = window.wp?.media;
+  if (typeof media !== 'function') {
+    const url = window.prompt('Logo URL:');
+    if (url) onSelect(url);
+    return;
+  }
+  const frame = media({
+    title:    'Select logo',
+    button:   { text: 'Use this image' },
+    library:  { type: 'image' },
+    multiple: false,
+  });
+  frame.on('select', () => {
+    const attachment = frame.state().get('selection').first().toJSON();
+    if (attachment?.url) onSelect(attachment.url);
+  });
+  frame.open();
+}
+
 export default function PageTransitions({ settings, onToggleModule, onUpdateModuleSettings }: PageTransitionsProps) {
   const pageModules = MODULE_INFO.filter(m => m.category === 'page');
 
@@ -105,19 +133,50 @@ export default function PageTransitions({ settings, onToggleModule, onUpdateModu
                     </div>
                   </div>
 
-                  {/* Logo URL (optional) */}
+                  {/* Logo (optional) — WordPress media-library picker */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL (optional)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Logo (optional)</label>
                     <p className="text-xs text-gray-400 mb-2">
-                      If provided, the image is centered inside the overlay. Capped at 200×200px. Leave empty for a plain color overlay.
+                      Image centered inside the overlay during the transition. Capped at 200×200px. Leave empty for a plain color overlay.
                     </p>
-                    <input
-                      type="text"
-                      value={cfg.logoUrl ?? ''}
-                      placeholder="https://example.com/logo.svg"
-                      onChange={e => onUpdateModuleSettings(mod.id, { logoUrl: e.target.value })}
-                      className="w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm font-mono"
-                    />
+                    <div className="flex items-center gap-3">
+                      {cfg.logoUrl ? (
+                        <div className="flex items-center gap-2">
+                          <div className="h-12 w-12 rounded border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden">
+                            <img
+                              src={cfg.logoUrl}
+                              alt=""
+                              className="max-h-full max-w-full object-contain"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => openMediaPicker(url => onUpdateModuleSettings(mod.id, { logoUrl: url }))}
+                            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                          >
+                            Change
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onUpdateModuleSettings(mod.id, { logoUrl: '' })}
+                            className="rounded-md border border-transparent px-2 py-1.5 text-sm text-gray-500 hover:text-red-600"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => openMediaPicker(url => onUpdateModuleSettings(mod.id, { logoUrl: url }))}
+                          className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        >
+                          Select image…
+                        </button>
+                      )}
+                    </div>
+                    {cfg.logoUrl && (
+                      <p className="mt-2 text-xs text-gray-400 font-mono break-all">{cfg.logoUrl}</p>
+                    )}
                   </div>
 
                   {/* Duration */}

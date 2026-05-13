@@ -23,16 +23,17 @@ import { parseEasing } from '../core/config.js';
  *      transition between pages instead of the harsh paint-and-flash
  *      that normal page loads produce.
  *
- * Direction handling — keyframes are mirrored between the two phases so
- * the cortina feels like it travels in the same direction across the
- * navigation boundary:
+ * Direction handling — keyframes follow the theatre-curtain metaphor:
+ * the cortina enters from one side, then leaves through the OPPOSITE side
+ * once the new page is ready (just like a stage curtain falls from above
+ * to cover the scene, then rises away to reveal the next one).
  *
- *   slide-up   entry: y 0   → -100%   (cortina exits upward)
- *              exit:  y 100 → 0       (cortina enters from below, rises)
- *   slide-down entry: y 0   → 100%    (cortina exits downward)
- *              exit:  y -100 → 0      (cortina enters from above, descends)
- *   fade       entry: opacity 1 → 0   (cortina fades out)
- *              exit:  opacity 0 → 1   (cortina fades in)
+ *   slide-up   exit:  y -100% → 0      (cortina FALLS from above to cover)
+ *              entry: y    0% → -100%  (cortina RISES upward to reveal)
+ *   slide-down exit:  y  100% → 0      (cortina RISES from below to cover)
+ *              entry: y    0% → 100%   (cortina FALLS downward to reveal)
+ *   fade       exit:  opacity 0 → 1    (cortina fades in)
+ *              entry: opacity 1 → 0    (cortina fades out)
  *
  * Builder editors: skipped at main.js level (this init() never runs).
  *
@@ -58,17 +59,24 @@ function getCfg() {
 }
 
 function getKeyframes(direction, phase) {
-  // phase === 'out' : the cortina is leaving (entry transition).
-  // phase === 'in'  : the cortina is arriving (exit transition).
+  // phase === 'out' : the cortina is leaving (entry transition — reveal).
+  // phase === 'in'  : the cortina is arriving (exit transition — cover).
+  //
+  // Theatre-curtain semantics: the cortina enters from one side and leaves
+  // through the OPPOSITE side, so the two halves of the transition feel
+  // like a continuous "drop then lift" gesture instead of two parallel
+  // slides in the same direction.
   switch (direction) {
     case 'slide-up':
+      // cortina falls from above to cover, then rises upward to reveal.
       return phase === 'out'
-        ? { y: ['0%', '-100%'] }
-        : { y: ['100%', '0%'] };
+        ? { y: ['0%', '-100%'] }     // entry: rise away upward
+        : { y: ['-100%', '0%'] };    // exit:  fall from above
     case 'slide-down':
+      // cortina rises from below to cover, then falls downward to reveal.
       return phase === 'out'
-        ? { y: ['0%', '100%'] }
-        : { y: ['-100%', '0%'] };
+        ? { y: ['0%', '100%'] }      // entry: fall away downward
+        : { y: ['100%', '0%'] };     // exit:  rise from below
     case 'fade':
     default:
       return phase === 'out'

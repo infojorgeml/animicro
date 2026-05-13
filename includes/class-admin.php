@@ -257,6 +257,14 @@ class Animicro_Admin {
 		$current_page = isset( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : 'animicro'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page routing
 		$page         = ( 'animicro-license' === $current_page ) ? 'license' : 'modules';
 
+		// Page Curtain (1.14.1+): the React admin needs `wp.media()` to power
+		// the Logo URL media-library picker. wp_enqueue_media() loads the
+		// thickbox/backbone bundle that exposes window.wp.media. Only needed
+		// on the main settings page, not the License screen.
+		if ( 'animicro' === $current_page && function_exists( 'wp_enqueue_media' ) ) {
+			wp_enqueue_media();
+		}
+
 		$is_pro_plugin = Animicro::is_pro_plugin();
 		$is_premium    = false;
 
