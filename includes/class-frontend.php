@@ -7,6 +7,58 @@ class Animicro_Frontend {
 
 	public function __construct() {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+
+		// Page Curtain (1.14.0): inject the overlay div immediately after
+		// <body> opens, but only on the real frontend — never inside a
+		// builder editor preview where it would cover the canvas the user
+		// is trying to edit.
+		if ( ! $this->is_builder_editor() ) {
+			add_action( 'wp_body_open', [ $this, 'output_page_curtain' ] );
+		}
+	}
+
+	private function is_module_active( string $module_id ): bool {
+		$settings = Animicro::get_settings();
+		$active   = $settings['active_modules'] ?? [];
+		return is_array( $active ) && in_array( $module_id, $active, true );
+	}
+
+	/**
+	 * Inject the page-curtain overlay div immediately after <body> opens.
+	 * Requires the active theme to call wp_body_open() (mandatory since
+	 * WordPress 5.2). On themes that don't, the JS module falls back to
+	 * injecting the overlay itself (with a small initial flash because
+	 * the page has already painted).
+	 */
+	public function output_page_curtain(): void {
+		if ( ! $this->is_module_active( 'page-curtain' ) ) {
+			return;
+		}
+
+		$settings = Animicro::get_settings();
+		$cfg      = $settings['module_settings']['page-curtain'] ?? [];
+
+		$direction_raw = isset( $cfg['direction'] ) ? (string) $cfg['direction'] : 'fade';
+		$direction     = in_array( $direction_raw, [ 'fade', 'slide-up', 'slide-down' ], true )
+			? $direction_raw
+			: 'fade';
+
+		$bg_raw = isset( $cfg['bgColor'] ) ? (string) $cfg['bgColor'] : '#000000';
+		$bg     = sanitize_hex_color( $bg_raw );
+		if ( ! $bg ) {
+			$bg = '#000000';
+		}
+
+		$logo = isset( $cfg['logoUrl'] ) ? esc_url( (string) $cfg['logoUrl'] ) : '';
+
+		printf(
+			'<div id="am-page-curtain" data-am-direction="%s" style="--am-curtain-bg:%s">%s</div>',
+			esc_attr( $direction ),
+			esc_attr( $bg ),
+			$logo
+				? sprintf( '<img src="%s" alt="" aria-hidden="true">', esc_url( $logo ) )
+				: ''
+		);
 	}
 
 	private function is_premium(): bool {

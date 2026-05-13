@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import CheatSheet from './components/CheatSheet';
 import SmoothScroll from './components/SmoothScroll';
 import AdvancedSettings from './components/AdvancedSettings';
+import PageTransitions from './components/PageTransitions';
 import LicensePage from './components/LicensePage';
 
 export default function App() {
@@ -66,6 +67,13 @@ export default function App() {
               <Dashboard
                 settings={settings}
                 isPremium={isPremium}
+                onToggleModule={toggleModule}
+                onUpdateModuleSettings={updateModuleSettings}
+              />
+            )}
+            {activeTab === 'page-transitions' && (
+              <PageTransitions
+                settings={settings}
                 onToggleModule={toggleModule}
                 onUpdateModuleSettings={updateModuleSettings}
               />

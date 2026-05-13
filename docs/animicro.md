@@ -1,6 +1,6 @@
 # Animicro — Development Reference
 
-**Release:** 1.13.0 (2026-05-07). See CHANGELOG for history.
+**Release:** 1.14.0 (2026-05-09). See CHANGELOG for history.
 
 Utility-first micro-animations for WordPress powered by [Motion One](https://motion.dev/). This document describes the architecture and conventions for developers and AI assistants.
 
@@ -46,7 +46,7 @@ animicro/
 ## Frontend Modules
 
 - **Entry**: `frontend/src/main.js` → `loadModules(activeModules)` from `core/registry.js`.
-- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `skew-up`, `scale`, `blur`, `float`, `pulse`, `hover-zoom`, `stagger`, `grid-reveal`, `highlight`, `text-fill-scroll`, `parallax`, `img-parallax`, `split`, `text-reveal`, `typewriter`. Each exports `init()`.
+- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `skew-up`, `scale`, `blur`, `float`, `pulse`, `hover-zoom`, `stagger`, `grid-reveal`, `highlight`, `text-fill-scroll`, `parallax`, `img-parallax`, `split`, `text-reveal`, `typewriter`, `page-curtain`. Each exports `init()`.
 - **Config**: `getElementConfig(el, moduleId)` merges `el.dataset.am*` with `moduleSettings[moduleId]` and fallbacks.
 - **Code splitting**: Dynamic `import()` per module; only active modules load. **Smooth scroll** (`frontend/src/smooth-scroll.js`) is loaded only when `animicroFrontData.smoothScroll` is present (Pro + enabled in settings).
 
@@ -55,6 +55,25 @@ animicro/
 - Not a per-element module: no CSS class on content. Enable in **Animicro → Smooth Scroll** (Pro tab).
 - **Frontend**: `main.js` dynamically imports `./smooth-scroll.js`, which initializes Lenis with the options from PHP and imports `lenis/dist/lenis.css` in that chunk.
 - **Builder detection**: Same URL checks as `main.js` — Lenis does not start inside Bricks, Elementor, Breakdance, Oxygen, or Divi builder previews.
+
+## Page Transitions (Free, global — added in 1.14.0)
+
+One global module that animates a full-page overlay across **navigation**, configured from the **Page Transitions** admin tab (not the Modules dashboard, because it isn't per-element). Free.
+
+- **`page-curtain`** — symmetric cortina that runs in two phases:
+  - **Entry**: `class-frontend.php::output_page_curtain()` injects `<div id="am-page-curtain">` via the `wp_body_open` hook before the first paint. Critical inline CSS from `class-compatibility.php` makes it cover the viewport immediately. After `DOMContentLoaded`, the JS module (`frontend/src/modules/page-curtain.js`) animates the overlay OUT and `remove()`s it.
+  - **Exit**: the JS module installs a **capture-phase `click` listener on `document`**. For internal-link clicks that pass the safety filter (same-origin, no modifier keys, no `target="_blank"`, not `#anchor` / `mailto:` / `tel:` / `sms:` / `javascript:`, no `download` attr, no `class="no-curtain"` / `data-no-curtain` opt-out, no aux button), it calls `event.preventDefault()`, creates a fresh overlay, animates it IN, awaits `animate(...).finished`, then sets `window.location.href = url`.
+  - **Direction mirroring**: keyframes are mirrored between entry and exit so the cortina feels continuous across the navigation. `slide-up` rises across the screen on both legs (entry: `y 0 → -100%`, exit: `y 100% → 0`); `slide-down` descends (entry: `y 0 → 100%`, exit: `y -100% → 0`); `fade` crossfades (entry: `opacity 1 → 0`, exit: `opacity 0 → 1`).
+  - Settings: `direction`, `bgColor` (defaults `#000000`), `logoUrl` (optional, centered, capped at 200×200), `duration`, `easing`, `delay` (only affects the entry animation; the exit always starts immediately on click for snappy feedback).
+
+**Safety layers** (defense in depth — the module never wants to brick a navigation):
+- **Builder editors**: the overlay is never emitted inside builders (`is_builder_editor()` URL detection in PHP), and `main.js::isInBuilder()` skips `init()` entirely on the JS side. No clicks intercepted in the editor.
+- **`prefers-reduced-motion: reduce`**: `init()` removes any existing overlay and **does not register the click interceptor** — visitor gets normal browser navigation, no animation.
+- **`@media (scripting: none)`**: inline CSS hides the curtain when JS is disabled, so the page is usable.
+- **`wp_body_open()` missing**: the JS module creates the overlay element from scratch (`createElement('div')` + inline styles + `document.body.appendChild`). Small initial flash because the body has already painted, but the transition runs.
+- **bfcache**: `window.addEventListener('pageshow', e => e.persisted && removeOverlay())` strips the exit overlay from cached pages so the back button works.
+- **Double-click guard**: an `exitInProgress` flag prevents a second click from spawning a second animation.
+- **Cross-origin links**: never intercepted. SEO/security/analytics unaffected.
 
 ## Advanced (global, Free)
 

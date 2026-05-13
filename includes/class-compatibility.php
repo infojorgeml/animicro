@@ -36,6 +36,10 @@ class Animicro_Compatibility {
 		'split-words' => 'opacity:0;will-change:opacity,transform;',
 		'text-reveal' => 'opacity:0;will-change:opacity,transform;',
 		'typewriter'  => 'opacity:0;',
+		// page-curtain doesn't use the regular `.am-NAME` descendant selector
+		// pipeline — it's special-cased in get_editor_css() below because it
+		// targets a globally-injected overlay div by ID.
+		'page-curtain' => '',
 	];
 
 	/**
@@ -127,6 +131,26 @@ class Animicro_Compatibility {
 					$rules[] = "{$prefix} .am-split-chars.is-ready{opacity:1;}";
 					$rules[] = "{$prefix} .am-split-words.is-ready{opacity:1;}";
 				}
+				continue;
+			}
+
+			// Page-curtain: the overlay div #am-page-curtain is injected by
+			// PHP via wp_body_open hook. The critical CSS here makes it
+			// cover the viewport from the first paint. The JS module
+			// animates it out and removes it from the DOM.
+			//
+			// `@media (scripting: none)` safety net: if JS is disabled, the
+			// overlay would never animate away. Hide it entirely in that
+			// media context so the page stays usable.
+			if ( 'page-curtain' === $module ) {
+				$rules[] = '#am-page-curtain{'
+					. 'position:fixed;inset:0;z-index:999999;'
+					. 'background:var(--am-curtain-bg,#000);'
+					. 'pointer-events:none;'
+					. 'display:flex;align-items:center;justify-content:center;'
+					. '}';
+				$rules[] = '#am-page-curtain img{max-width:200px;max-height:200px;width:auto;height:auto;}';
+				$rules[] = '@media (scripting: none){#am-page-curtain{display:none!important;}}';
 				continue;
 			}
 

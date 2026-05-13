@@ -5,6 +5,41 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.0] - 2026-05-12
+
+### Added
+
+- **New "Page Transitions" admin tab** (`admin/src/components/PageTransitions.tsx`) with a single new Free module that animates an overlay across navigations. Lives between the Modules tab and Cheat Sheet in the tab navigation. Added to `FREE_MODULES` in `class-license-manager.php` and to `available_modules` + `module_settings` defaults in `class-animicro.php`.
+- **`page-curtain` module — symmetric entry + exit transition.** When active, the module does two things:
+  - **Entry**: includes/class-frontend.php injects `<div id="am-page-curtain">` via the `wp_body_open` hook before the first paint (covered by critical CSS from `class-compatibility.php`). The JS module animates the overlay OUT once `DOMContentLoaded` fires.
+  - **Exit**: the JS module installs a capture-phase document `click` listener. When the visitor clicks an internal link that passes the safety filter (same-origin, no modifier keys, no `target="_blank"`, not a `#anchor`, no `download` attr, no `mailto:`/`tel:`/`sms:`/`javascript:`, no `class="no-curtain"` / `data-no-curtain` opt-out), the module prevents the default navigation, creates a fresh overlay, animates it IN until it covers the viewport, and **only then** does `window.location.href = url`. The new page paints, the entry animation runs, and the cycle continues.
+  - Three directions, mirrored between entry and exit so the cortina appears to keep moving in the same direction across the navigation boundary: `fade` (opacity), `slide-up` (cortina rises), `slide-down` (cortina descends).
+  - Configurable background color (defaults to `#000000`) and optional logo URL (centered, capped at 200×200).
+- **Three new fields on `ModuleConfig`** TypeScript interface: `direction?`, `bgColor?`, `logoUrl?`. New default `DEFAULT_PAGE_CURTAIN_CONFIG` in `admin/src/data/modules.ts`. New module-category value `'page'` added to `ModuleCategory` (intentionally NOT added to `MODULE_CATEGORIES` array — page transitions live in their own tab, the category exists only so `PageTransitions.tsx` can filter `MODULE_INFO`).
+- **TabNav**: `'page-transitions'` added to `TabId` union and `TABS` array (between modules and cheatsheet). No Pro gating — the module is Free.
+
+### Safety / graceful degradation
+
+- **Builder editors**: the module detects via the existing URL-detection layer (`?bricks=run`, `?elementor-preview`, etc.) — PHP doesn't output the overlay inside any builder editor, and the JS module's `init()` doesn't run there either. Editor stays clean, no clicks are intercepted.
+- **`prefers-reduced-motion: reduce`**: the JS module removes any existing overlay immediately and **never registers the click interceptor** — the visitor gets normal browser navigation, no animation.
+- **`@media (scripting: none)`** safety net in the inline CSS hides the curtain if JavaScript is disabled — page stays usable instead of being permanently hidden behind an overlay.
+- **`wp_body_open()` missing in old themes**: the JS module falls back to creating the overlay element itself (small initial flash because the page paints once before being covered, but the configured transition still runs).
+- **bfcache (browser back button)**: a `pageshow` listener with `event.persisted === true` strips any post-click exit overlay that was cached with the page, so the restored page is immediately usable.
+- **Double-click guard**: an `exitInProgress` flag prevents a second click from spawning a second overlay animation while one is already running.
+- **Per-link opt-out**: `<a class="no-curtain">` or `<a data-no-curtain>` skips interception — useful for download links, ajax-driven UIs, or anything that wants to stay "instant".
+- **Cross-origin links, `target="_blank"`, modifier-key clicks, middle/right clicks**: never intercepted. Default browser behaviour preserved.
+
+### Design notes
+
+- **Replaces what an earlier draft of 1.14.0 shipped as two separate modules** (`page-fade` + `page-curtain`). The `page-fade` module was removed entirely (file deleted, registry entry removed, body_class filter removed, MODULE_INFO entry removed, DEFAULT_PAGE_FADE_CONFIG removed, critical CSS special-case removed) because the symmetric curtain covers both use cases: with `direction: 'fade'` and your site's background color as `bgColor`, you get a fade-in effect on page entry plus a matching fade-out on exit. If the user wants only the entry fade, they can configure it identically and accept that internal navigation also triggers the symmetric exit — that's an explicit design choice, not a bug.
+- **Why intercept clicks instead of using the View Transitions API**: VT is Chromium/Safari-only and Firefox is still implementing it (as of 2026-05). A JS-based interceptor works in every modern browser without polyfill or capability detection.
+- **Why animate to completion BEFORE navigating**: if we kicked off `window.location.href` in parallel with the animation, the browser would tear down the page mid-animation and the cortina would look choppy. Awaiting `animate(...).finished` first costs `duration` seconds of perceived delay but produces a clean, deliberate motion.
+
+### Notes for future iterations
+
+- View Transitions API enhancement (browser-native cross-fade for Chromium/Safari, falls back to JS for the others) is a potential future addition.
+- Persistent overlay across navigations (rather than create-on-click + remove-on-finish) could be a smoother experience on slow connections — but it requires deeper coordination with the new page's first-paint cycle.
+
 ## [1.13.0] - 2026-05-07
 
 ### Removed
