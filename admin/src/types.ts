@@ -34,6 +34,7 @@ export interface ModuleConfig {
   axis?: string;
   radius?: number;
   rotateMax?: number;
+  scrambleSpeed?: number;
 }
 
 export interface SmoothScrollConfig {

@@ -41,6 +41,9 @@ class Animicro_Compatibility {
 		// identical; the per-span random transform comes from JS at init.
 		'scatter-chars' => 'opacity:0;will-change:opacity,transform;',
 		'scatter-words' => 'opacity:0;will-change:opacity,transform;',
+		// Scramble doesn't need an initial-hide — the text is already
+		// rendered by the theme and we mutate textContent in place.
+		'scramble'      => '',
 		'text-reveal' => 'opacity:0;will-change:opacity,transform;',
 		'typewriter'  => 'opacity:0;',
 		// page-curtain doesn't use the regular `.am-NAME` descendant selector

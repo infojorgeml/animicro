@@ -4,7 +4,7 @@
 **Tags:** animation, motion, css, performance, page-builder
 **Requires at least:** 6.0
 **Tested up to:** 6.9
-**Stable tag:** 1.16.0
+**Stable tag:** 1.17.0
 **Requires PHP:** 7.4
 **License:** GPLv2 or later
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
@@ -49,6 +49,7 @@ Under **Animicro → Advanced** you can enable **Respect Reduced Motion** (skips
 | Zoom Hover | `.am-hover-zoom` | Image scales up on hover (parent needs `overflow: hidden`) |
 | Magnet (Pro) | `.am-magnet` | Element drifts smoothly toward the mouse with LERP inertia |
 | Scatter Text (Pro) | `.am-scatter-chars` / `.am-scatter-words` | Characters or words fly in from random positions and converge |
+| Scramble Text (Pro) | `.am-scramble` | Text decodes character by character with a glitch wave |
 
 Additional modules are available with [Animicro Pro](https://animicro.com).
 

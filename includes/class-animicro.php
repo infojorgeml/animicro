@@ -8,7 +8,7 @@ class Animicro {
 	const PRO_MODULES = [
 		'blur', 'stagger', 'grid-reveal', 'text-fill-scroll',
 		'parallax', 'split', 'text-reveal', 'img-parallax', 'magnet',
-		'scatter',
+		'scatter', 'scramble',
 	];
 
 	private static ?Animicro $instance = null;
@@ -76,7 +76,7 @@ class Animicro {
 	public static function get_default_settings(): array {
 		return [
 			'active_modules'    => [],
-			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'float', 'pulse', 'hover-zoom', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'img-parallax', 'magnet', 'split', 'scatter', 'text-reveal', 'typewriter', 'page-curtain' ],
+			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'float', 'pulse', 'hover-zoom', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'img-parallax', 'magnet', 'split', 'scatter', 'scramble', 'text-reveal', 'typewriter', 'page-curtain' ],
 			'module_settings'   => [
 				'fade' => [
 					'duration' => 0.6,
@@ -142,6 +142,17 @@ class Animicro {
 					'staggerDelay' => 0.05,
 					'radius'       => 200.0,
 					'rotateMax'    => 45.0,
+				],
+				'scramble' => [
+					// duration/easing are inert (this module is discrete-tick,
+					// not a Motion animate() call). Kept in defaults so the
+					// REST loop in class-admin.php doesn't trip on missing keys.
+					'duration'       => 0.6,
+					'easing'         => 'ease-out',
+					'delay'          => 0.0,
+					'margin'         => '-50px 0px',
+					'staggerDelay'   => 0.04,
+					'scrambleSpeed'  => 0.05,
 				],
 				'text-reveal' => [
 					'duration'     => 0.6,
