@@ -5,6 +5,31 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.17.0] - 2026-05-13
+
+### Added
+
+- **`scramble` module (Pro)** — Matrix/cyberpunk "decoding" text reveal. Each character cycles through random symbols from a hardcoded charset (mix of ASCII glitch + alphanumeric: `!@#$%^&*()_+-=[]{}|;:,.<>?/~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ`) and locks to its final value left-to-right when the element enters the viewport.
+  - **Algorithm**: `init()` captures `textContent` as the source of truth, sets `aria-label` on the parent (so screen readers announce the final phrase once instead of spamming mutations), splits with `[...text]` so multi-codepoint glyphs survive as units, computes `revealAt[i] = nonSpaceIndex(i) * staggerDelay` per non-whitespace character (LTR wave; spaces always show as spaces and never scramble — preserves layout), then ticks every `scrambleSpeed` seconds via `setTimeout`. On each tick: characters past their `revealAt` show their real value, others show a random symbol from `CHARSET`. The loop stops when every character is past its `revealAt`.
+  - **Class**: `.am-scramble` (no variant suffix — text-decoding by word doesn't have a sensible visual interpretation).
+  - **Per-element attributes** (via `getElementConfig`): `data-am-delay`, `data-am-stagger`, `data-am-margin`.
+  - **Module-level settings** (admin panel global, NO per-element overrides — same utility-first pattern as scatter): `scrambleSpeed` (0.02–0.5s, default 0.05s) for the random-char swap rate. The charset is hardcoded and not exposed via UI in v1.
+
+### Wiring
+
+- Frontend: `frontend/src/modules/scramble.js` (new, ~135 lines). Registry entry in `frontend/src/core/registry.js`.
+- PHP: `'scramble'` added to `Animicro::PRO_MODULES`, `available_modules`, and `module_settings` defaults (`staggerDelay: 0.04`, `scrambleSpeed: 0.05`; `duration`/`easing` kept as inert keys to satisfy the REST loop shape). `Animicro_License_Manager::PRO_MODULES` lists `'scramble'`. `class-compatibility.php::MODULE_INITIAL_CSS` has a single empty entry — no initial-hide CSS needed because the text starts visible in the DOM and we mutate `textContent` in place. `class-admin.php::update_settings()` REST handler gained one sanitizer branch (`clamp_float` 0.02–0.5 for `scrambleSpeed`); `staggerDelay`/`delay`/`margin` reuse the shared branches.
+- Admin React: `ModuleConfig` extended with `scrambleSpeed?: number`. `DEFAULT_SCRAMBLE_CONFIG` and a new `MODULE_INFO` entry under `category: 'text'` in `admin/src/data/modules.ts`. `ModuleSettings.tsx`: `scramble` added to the existing Stagger delay block (with a scramble-specific copy: "controls how fast the decode wave races across"), and a new Scramble speed slider (0.02–0.2s, step 0.01). Duration and easing controls are hidden for this module — they don't apply to a discrete-tick reveal.
+
+### Safety / accessibility
+
+- **`aria-label`** set on the parent at init time so screen readers see the final phrase, not the noise.
+- **`prefers-reduced-motion: reduce`**: the module renders the original text immediately, no ticking, no scrambling. Same behaviour as typewriter.
+- **Builder editors** (Bricks / Elementor / Breakdance / Oxygen / Divi): `main.js::isInBuilder()` short-circuits before `init()` runs.
+- **Init dedup**: `data-am-scramble-ready="1"` flag prevents double-init on hot reload / re-enqueue.
+- **Cancel hook**: `el._amScrambleStop()` is exposed for tests / HMR / programmatic control. Sets the cancel flag, clears the pending timeout, and restores the original text in place.
+- **Whitespace preservation**: spaces are never scrambled (they always show as the actual space character), which keeps the visual layout stable through the entire reveal and prevents the "swimming" effect of a random character occupying a space position.
+
 ## [1.16.0] - 2026-05-13
 
 ### Added

@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_SCATTER_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_SCATTER_CONFIG, DEFAULT_SCRAMBLE_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 import ColorField from './ColorField';
@@ -35,6 +35,7 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   'img-parallax': DEFAULT_IMG_PARALLAX_CONFIG,
   magnet: DEFAULT_MAGNET_CONFIG,
   scatter: DEFAULT_SCATTER_CONFIG,
+  scramble: DEFAULT_SCRAMBLE_CONFIG,
 };
 
 const hasDistance = (id: string) => id.startsWith('slide-') || id === 'skew-up' || id === 'split' || id === 'stagger' || id === 'grid-reveal';
@@ -511,8 +512,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse, img-parallax, magnet) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && (
+        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse, img-parallax, magnet, scramble) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Duration
@@ -615,12 +616,12 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Stagger delay (split, text-reveal, stagger, grid-reveal, scatter) */}
-        {(moduleId === 'split' || moduleId === 'text-reveal' || moduleId === 'stagger' || moduleId === 'grid-reveal' || moduleId === 'scatter') && (
+        {/* Stagger delay (split, text-reveal, stagger, grid-reveal, scatter, scramble) */}
+        {(moduleId === 'split' || moduleId === 'text-reveal' || moduleId === 'stagger' || moduleId === 'grid-reveal' || moduleId === 'scatter' || moduleId === 'scramble') && (
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
               Stagger delay
-              <span className="font-mono text-brand-500">{config.staggerDelay ?? (moduleId === 'text-reveal' ? 0.12 : moduleId === 'stagger' ? 0.1 : moduleId === 'grid-reveal' ? 0.08 : 0.05)}s</span>
+              <span className="font-mono text-brand-500">{config.staggerDelay ?? (moduleId === 'text-reveal' ? 0.12 : moduleId === 'stagger' ? 0.1 : moduleId === 'grid-reveal' ? 0.08 : moduleId === 'scramble' ? 0.04 : 0.05)}s</span>
             </label>
             <p className="text-xs text-gray-400 mb-2">
               {moduleId === 'text-reveal'
@@ -631,20 +632,48 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
                 ? 'Controls how spread out the ripple wave feels across all items.'
                 : moduleId === 'scatter'
                 ? 'Time between each letter or word starting its convergence.'
+                : moduleId === 'scramble'
+                ? 'Time between each character locking to its final value (controls how fast the decode wave races across).'
                 : 'Time between each letter or word starting its animation.'}
             </p>
             <input
               type="range"
-              min={moduleId === 'text-reveal' ? '0.05' : moduleId === 'stagger' ? '0.03' : moduleId === 'grid-reveal' ? '0.03' : '0.01'}
-              max={moduleId === 'text-reveal' ? '0.3' : moduleId === 'stagger' ? '0.5' : moduleId === 'grid-reveal' ? '0.3' : '0.2'}
+              min={moduleId === 'text-reveal' ? '0.05' : moduleId === 'stagger' ? '0.03' : moduleId === 'grid-reveal' ? '0.03' : moduleId === 'scramble' ? '0.01' : '0.01'}
+              max={moduleId === 'text-reveal' ? '0.3' : moduleId === 'stagger' ? '0.5' : moduleId === 'grid-reveal' ? '0.3' : moduleId === 'scramble' ? '0.2' : '0.2'}
               step="0.01"
-              value={config.staggerDelay ?? (moduleId === 'text-reveal' ? 0.12 : moduleId === 'stagger' ? 0.1 : moduleId === 'grid-reveal' ? 0.08 : 0.05)}
+              value={config.staggerDelay ?? (moduleId === 'text-reveal' ? 0.12 : moduleId === 'stagger' ? 0.1 : moduleId === 'grid-reveal' ? 0.08 : moduleId === 'scramble' ? 0.04 : 0.05)}
               onChange={e => onUpdate({ staggerDelay: parseFloat(e.target.value) })}
               className="w-full accent-brand-500"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
-              <span>{moduleId === 'text-reveal' ? '0.05s — Quick' : moduleId === 'stagger' ? '0.03s — Fast cascade' : moduleId === 'grid-reveal' ? '0.03s — Tight ripple' : '0.01s — Fast cascade'}</span>
-              <span>{moduleId === 'text-reveal' ? '0.3s — Dramatic' : moduleId === 'stagger' ? '0.5s — Slow sequence' : moduleId === 'grid-reveal' ? '0.3s — Wide wave' : '0.2s — Slow reveal'}</span>
+              <span>{moduleId === 'text-reveal' ? '0.05s — Quick' : moduleId === 'stagger' ? '0.03s — Fast cascade' : moduleId === 'grid-reveal' ? '0.03s — Tight ripple' : moduleId === 'scramble' ? '0.01s — Snappy decode' : '0.01s — Fast cascade'}</span>
+              <span>{moduleId === 'text-reveal' ? '0.3s — Dramatic' : moduleId === 'stagger' ? '0.5s — Slow sequence' : moduleId === 'grid-reveal' ? '0.3s — Wide wave' : moduleId === 'scramble' ? '0.2s — Slow reveal' : '0.2s — Slow reveal'}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Scramble — Scramble speed */}
+        {moduleId === 'scramble' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Scramble speed
+              <span className="font-mono text-brand-500">{config.scrambleSpeed ?? 0.05}s</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              How often each unrevealed character swaps to a new random symbol. Lower values feel jittery and "live"; higher values feel like a slow flicker.
+            </p>
+            <input
+              type="range"
+              min="0.02"
+              max="0.2"
+              step="0.01"
+              value={config.scrambleSpeed ?? 0.05}
+              onChange={e => onUpdate({ scrambleSpeed: parseFloat(e.target.value) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0.02s — Jittery</span>
+              <span>0.2s — Slow flicker</span>
             </div>
           </div>
         )}
@@ -911,8 +940,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Easing (hidden for typewriter, parallax, text-fill-scroll, img-parallax, magnet) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && (
+        {/* Easing (hidden for typewriter, parallax, text-fill-scroll, img-parallax, magnet, scramble) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Easing curve

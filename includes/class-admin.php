@@ -496,6 +496,13 @@ class Animicro_Admin {
 				$entry['zoomScale'] = $this->clamp_float( $raw_mod['zoomScale'] ?? null, 1.01, 2, (float) $module_defaults['zoomScale'] );
 			}
 
+			// Scramble (1.17.0): scrambleSpeed controls the interval between
+			// random-char rolls (lower = jittery, higher = slow flicker).
+			// staggerDelay reuses the shared branch above (text-cascade modules).
+			if ( isset( $module_defaults['scrambleSpeed'] ) ) {
+				$entry['scrambleSpeed'] = $this->clamp_float( $raw_mod['scrambleSpeed'] ?? null, 0.02, 0.5, (float) $module_defaults['scrambleSpeed'] );
+			}
+
 			// Scatter (1.16.0): radius controls how far each span starts from
 			// its final position; rotateMax sets the max random rotation
 			// (0 disables rotation entirely). staggerDelay reuses the

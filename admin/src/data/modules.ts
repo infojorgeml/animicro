@@ -74,6 +74,18 @@ export const DEFAULT_SCATTER_CONFIG: ModuleConfig = {
   rotateMax:    45,
 };
 
+export const DEFAULT_SCRAMBLE_CONFIG: ModuleConfig = {
+  // duration / easing are inert for scramble (discrete-tick reveal, not a
+  // Motion animate() call). Kept to satisfy the ModuleConfig shape +
+  // the PHP REST loop.
+  duration:       0.6,
+  easing:         'ease-out',
+  delay:          0,
+  margin:         '-50px 0px',
+  staggerDelay:   0.04,
+  scrambleSpeed:  0.05,
+};
+
 export const DEFAULT_TEXT_REVEAL_CONFIG: ModuleConfig = {
   duration: 0.6,
   easing: 'ease-out',
@@ -250,6 +262,7 @@ export const MODULE_INFO: ModuleInfo[] = [
   // Text
   { id: 'split',        name: 'Split Text',   description: 'Splits and animates text by letters/words', cssClass: '.am-split-chars .am-split-words', isPro: true, category: 'text' },
   { id: 'scatter',      name: 'Scatter Text', description: 'Characters or words fly in from random positions and converge', cssClass: '.am-scatter-chars .am-scatter-words', isPro: true, category: 'text' },
+  { id: 'scramble',     name: 'Scramble Text',description: 'Text decodes character by character with a left-to-right glitch wave',  cssClass: '.am-scramble',                       isPro: true, category: 'text' },
   { id: 'text-reveal',  name: 'Text Reveal',  description: 'Reveals text line by line with a sliding mask', cssClass: '.am-text-reveal',  isPro: true, category: 'text' },
   { id: 'highlight',    name: 'Highlight',    description: 'Animated marker highlight behind text',                    cssClass: '.am-highlight',  isPro: false, category: 'text' },
   { id: 'typewriter',   name: 'Typewriter',   description: 'Types text character by character with a blinking cursor', cssClass: '.am-typewriter', isPro: false, category: 'text' },

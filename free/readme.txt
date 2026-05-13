@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.16.0
+Stable tag: 1.17.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,11 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.17.0 =
+* **New `scramble` module (Pro)** — `.am-scramble` cycles each character through random symbols (ASCII glitch + alphanumeric mix) and stabilises them left-to-right when the element enters the viewport. Cinema / cyberpunk decoding look.
+* Utility-first: only the class is needed. Stagger delay (how fast the decode wave races across) and scramble speed (how often each unrevealed char swaps to a new random symbol) are configured globally from the admin panel. Per-element `data-am-delay`, `-stagger`, `-margin` still work.
+* Preserves the original text as `aria-label` on the parent so screen readers announce the final phrase once instead of spamming character-by-character mutations. Honors `prefers-reduced-motion: reduce` (text renders immediately without decoding). Builder-safe.
 
 = 1.16.0 =
 * **New `scatter` module (Pro)** — `.am-scatter-chars` and `.am-scatter-words` make characters or words fly in from random offset positions (translate ± radius, rotate ± rotateMax) and converge to their final position when the element enters the viewport.
@@ -232,6 +237,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.17.0 =
+New Pro module `scramble`: text decodes character by character with a left-to-right glitch wave (Matrix / cyberpunk look). Class `.am-scramble`, configured globally from the admin. No breaking changes.
 
 = 1.16.0 =
 New Pro module `scatter`: characters or words fly in from random positions and converge when entering the viewport. Two classes (`.am-scatter-chars` and `.am-scatter-words`), configuration is global from the admin panel — no per-element attributes to learn. No breaking changes.
