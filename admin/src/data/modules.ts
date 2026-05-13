@@ -174,7 +174,28 @@ export const DEFAULT_IMG_PARALLAX_CONFIG: ModuleConfig = {
   speed: 0.2,
 };
 
-export type ModuleCategory = 'entry' | 'text' | 'group' | 'scroll' | 'continuous' | 'media';
+export const DEFAULT_PAGE_FADE_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing:   'ease-out',
+  delay:    0,
+  margin:   '-50px 0px',
+};
+
+export const DEFAULT_PAGE_CURTAIN_CONFIG: ModuleConfig = {
+  duration:  0.8,
+  easing:    'ease-out',
+  delay:     0,
+  margin:    '-50px 0px',
+  direction: 'fade',
+  bgColor:   '#000000',
+  logoUrl:   '',
+};
+
+// The `page` category is intentionally NOT added to MODULE_CATEGORIES — page
+// transitions live in their own admin tab (Page Transitions), so Dashboard.tsx
+// doesn't render them. The category tag here exists purely to identify them
+// in MODULE_INFO when PageTransitions.tsx filters by it.
+export type ModuleCategory = 'entry' | 'text' | 'group' | 'scroll' | 'continuous' | 'media' | 'page';
 
 export interface ModuleInfo {
   id: string;
@@ -226,6 +247,10 @@ export const MODULE_INFO: ModuleInfo[] = [
   // Media & Images
   { id: 'hover-zoom',   name: 'Zoom Hover',     description: 'Image scales up on hover within an overflow:hidden parent', cssClass: '.am-hover-zoom',   isPro: false, category: 'media' },
   { id: 'img-parallax', name: 'Image Parallax', description: 'Window effect — inner image translates on scroll inside an overflow:hidden frame', cssClass: '.am-img-parallax', isPro: true,  category: 'media' },
+
+  // Page Transitions (rendered in their own tab, not on the Modules dashboard)
+  { id: 'page-fade',    name: 'Page Fade',    description: 'Fades the entire page in on load (body opacity 0 → 1).',                  cssClass: '',                 isPro: false, category: 'page' },
+  { id: 'page-curtain', name: 'Page Curtain', description: 'Overlay that covers the screen at load, then slides or fades out.',       cssClass: '',                 isPro: false, category: 'page' },
 ];
 
 export interface DataAttribute {

@@ -1,6 +1,6 @@
 # Animicro — Development Reference
 
-**Release:** 1.13.0 (2026-05-07). See CHANGELOG for history.
+**Release:** 1.14.0 (2026-05-09). See CHANGELOG for history.
 
 Utility-first micro-animations for WordPress powered by [Motion One](https://motion.dev/). This document describes the architecture and conventions for developers and AI assistants.
 
@@ -46,7 +46,7 @@ animicro/
 ## Frontend Modules
 
 - **Entry**: `frontend/src/main.js` → `loadModules(activeModules)` from `core/registry.js`.
-- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `skew-up`, `scale`, `blur`, `float`, `pulse`, `hover-zoom`, `stagger`, `grid-reveal`, `highlight`, `text-fill-scroll`, `parallax`, `img-parallax`, `split`, `text-reveal`, `typewriter`. Each exports `init()`.
+- **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `skew-up`, `scale`, `blur`, `float`, `pulse`, `hover-zoom`, `stagger`, `grid-reveal`, `highlight`, `text-fill-scroll`, `parallax`, `img-parallax`, `split`, `text-reveal`, `typewriter`, `page-fade`, `page-curtain`. Each exports `init()`.
 - **Config**: `getElementConfig(el, moduleId)` merges `el.dataset.am*` with `moduleSettings[moduleId]` and fallbacks.
 - **Code splitting**: Dynamic `import()` per module; only active modules load. **Smooth scroll** (`frontend/src/smooth-scroll.js`) is loaded only when `animicroFrontData.smoothScroll` is present (Pro + enabled in settings).
 
@@ -55,6 +55,17 @@ animicro/
 - Not a per-element module: no CSS class on content. Enable in **Animicro → Smooth Scroll** (Pro tab).
 - **Frontend**: `main.js` dynamically imports `./smooth-scroll.js`, which initializes Lenis with the options from PHP and imports `lenis/dist/lenis.css` in that chunk.
 - **Builder detection**: Same URL checks as `main.js` — Lenis does not start inside Bricks, Elementor, Breakdance, Oxygen, or Divi builder previews.
+
+## Page Transitions (Free, global — added in 1.14.0)
+
+Two global modules that animate the **whole page** on load, configured from the **Page Transitions** admin tab (not the Modules dashboard, because they aren't per-element). Both are Free.
+
+- **`page-fade`** — animates `<body>` from `opacity: 0` → `1` on `DOMContentLoaded`. The hidden state is set via critical inline CSS injected by `class-compatibility.php` against the body class `am-page-fade-init` (which `class-frontend.php` adds via `body_class` filter only outside builder editors). The JS module (`frontend/src/modules/page-fade.js`) animates and then removes both the class and the inline opacity style.
+- **`page-curtain`** — a full-screen overlay `<div id="am-page-curtain">` injected via `wp_body_open` hook from `class-frontend.php::output_page_curtain()`. Critical inline CSS in `<head>` makes it cover the viewport from the first paint. The JS module animates it out (3 directions: `fade` / `slide-up` / `slide-down`) and then `remove()`s the element. Supports background color and an optional centered logo image.
+
+Both modules are **builder-safe** (the body class and the overlay are never emitted inside builder editors thanks to the existing `is_builder_editor()` URL detection), respect **`prefers-reduced-motion: reduce`** (revealed immediately, no animation), and degrade gracefully when **JavaScript is disabled** (via a `@media (scripting: none)` safety net in the inline CSS that forces the body visible and hides the curtain). If a (very old) theme doesn't call `wp_body_open()`, the curtain simply never appears — no error, no flash.
+
+The two modules **coexist independently** when both are enabled — the curtain animates over a body that's fading in. Normally users want only one or the other; we don't force exclusivity.
 
 ## Advanced (global, Free)
 

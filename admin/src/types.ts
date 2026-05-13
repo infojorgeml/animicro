@@ -26,6 +26,9 @@ export interface ModuleConfig {
   scaleMax?: number;
   skew?: number;
   zoomScale?: number;
+  direction?: string;
+  bgColor?: string;
+  logoUrl?: string;
 }
 
 export interface SmoothScrollConfig {

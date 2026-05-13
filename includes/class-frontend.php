@@ -7,6 +7,70 @@ class Animicro_Frontend {
 
 	public function __construct() {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+
+		// Page Transitions (1.14.0): only wire if we're on the real
+		// frontend (not in a builder editor). Both filters check the
+		// active_modules list to noop early when neither module is on.
+		if ( ! $this->is_builder_editor() ) {
+			add_filter( 'body_class',   [ $this, 'add_page_fade_body_class' ] );
+			add_action( 'wp_body_open', [ $this, 'output_page_curtain' ] );
+		}
+	}
+
+	private function is_module_active( string $module_id ): bool {
+		$settings = Animicro::get_settings();
+		$active   = $settings['active_modules'] ?? [];
+		return is_array( $active ) && in_array( $module_id, $active, true );
+	}
+
+	/**
+	 * Add the `am-page-fade-init` body class when page-fade is active.
+	 * The critical CSS injected by class-compatibility.php sets that body
+	 * to opacity:0; the page-fade JS module animates it to 1 and removes
+	 * the class.
+	 */
+	public function add_page_fade_body_class( array $classes ): array {
+		if ( $this->is_module_active( 'page-fade' ) ) {
+			$classes[] = 'am-page-fade-init';
+		}
+		return $classes;
+	}
+
+	/**
+	 * Inject the page-curtain overlay div immediately after <body> opens.
+	 * Requires the active theme to call wp_body_open() (mandatory since
+	 * WordPress 5.2). On themes that don't, the curtain simply never
+	 * appears and the plugin degrades cleanly with no error.
+	 */
+	public function output_page_curtain(): void {
+		if ( ! $this->is_module_active( 'page-curtain' ) ) {
+			return;
+		}
+
+		$settings = Animicro::get_settings();
+		$cfg      = $settings['module_settings']['page-curtain'] ?? [];
+
+		$direction_raw = isset( $cfg['direction'] ) ? (string) $cfg['direction'] : 'fade';
+		$direction     = in_array( $direction_raw, [ 'fade', 'slide-up', 'slide-down' ], true )
+			? $direction_raw
+			: 'fade';
+
+		$bg_raw = isset( $cfg['bgColor'] ) ? (string) $cfg['bgColor'] : '#000000';
+		$bg     = sanitize_hex_color( $bg_raw );
+		if ( ! $bg ) {
+			$bg = '#000000';
+		}
+
+		$logo = isset( $cfg['logoUrl'] ) ? esc_url( (string) $cfg['logoUrl'] ) : '';
+
+		printf(
+			'<div id="am-page-curtain" data-am-direction="%s" style="--am-curtain-bg:%s">%s</div>',
+			esc_attr( $direction ),
+			esc_attr( $bg ),
+			$logo
+				? sprintf( '<img src="%s" alt="" aria-hidden="true">', esc_url( $logo ) )
+				: ''
+		);
 	}
 
 	private function is_premium(): bool {
