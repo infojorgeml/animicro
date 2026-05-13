@@ -5,39 +5,87 @@ import { parseEasing } from '../core/config.js';
  * Page Curtain — full-screen overlay that covers the viewport at first
  * paint and animates out once DOMContentLoaded fires.
  *
- * The overlay <div id="am-page-curtain"> is injected by PHP via the
- * wp_body_open hook (see includes/class-frontend.php::output_page_curtain).
- * Its critical CSS (position, z-index, background, layout for the optional
- * logo) is in the inline stylesheet emitted by class-compatibility.php so
- * it covers the screen from the very first paint with no flash.
+ * Primary path (no-flash): includes/class-frontend.php emits the overlay
+ * <div id="am-page-curtain"> on the `wp_body_open` hook (WordPress 5.2+),
+ * and includes/class-compatibility.php emits the critical CSS that makes
+ * it cover the viewport from the very first paint. This module animates
+ * it out and removes it from the DOM.
+ *
+ * Fallback path: if PHP never emitted the overlay (a legacy theme that
+ * doesn't call `wp_body_open()`, or some plugin that swallows that
+ * hook), we still try to inject + animate it from JS. The user will see
+ * the page content briefly before the overlay drops in, which is
+ * uglier than the no-flash path — but it still respects the setting
+ * the user enabled rather than silently doing nothing.
  *
  * Three directions, read from the overlay's data-am-direction attribute
- * (which PHP set based on the admin setting):
+ * (set by PHP). In the JS-fallback path we fall back to settings:
  *  - fade       — opacity 1 → 0
  *  - slide-up   — y 0 → -100% (overlay slides up off-screen)
  *  - slide-down — y 0 → +100% (overlay slides down off-screen)
  *
- * On finish, the overlay is removed from the DOM so it can't intercept
- * any future event or layout.
+ * Honors `prefers-reduced-motion: reduce`: removes the overlay (or
+ * skips creating it) without animating.
  *
- * Honors `prefers-reduced-motion: reduce` by removing the overlay
- * immediately without animating. Honors builder editors via PHP not
- * emitting the overlay at all inside them.
+ * Honors builder editors: main.js short-circuits before init() runs.
+ * PHP also avoids emitting the overlay inside builders.
  */
 
 const globals = window.animicroFrontData || {};
 
-export function init() {
-  const overlay = document.getElementById('am-page-curtain');
-  if (!overlay) return;   // PHP didn't emit it — module inactive or builder editor
+function createFallbackOverlay(settings) {
+  const overlay = document.createElement('div');
+  overlay.id = 'am-page-curtain';
+  overlay.dataset.amDirection = settings.direction || 'fade';
+  // Inline styles only (no CSS variable dance) — the critical CSS isn't
+  // guaranteed to be present in the fallback path, so we hard-code the
+  // styles we need to cover the viewport.
+  Object.assign(overlay.style, {
+    position:       'fixed',
+    inset:          '0',
+    zIndex:         '999999',
+    background:     settings.bgColor || '#000000',
+    pointerEvents:  'none',
+    display:        'flex',
+    alignItems:     'center',
+    justifyContent: 'center',
+  });
+  if (settings.logoUrl) {
+    const img = document.createElement('img');
+    img.src = settings.logoUrl;
+    img.alt = '';
+    img.setAttribute('aria-hidden', 'true');
+    Object.assign(img.style, {
+      maxWidth:  '200px',
+      maxHeight: '200px',
+      width:     'auto',
+      height:    'auto',
+    });
+    overlay.appendChild(img);
+  }
+  document.body.appendChild(overlay);
+  return overlay;
+}
 
-  // prefers-reduced-motion: drop the overlay, no animation.
+export function init() {
+  const mod = (globals.moduleSettings && globals.moduleSettings['page-curtain']) || {};
+
+  // prefers-reduced-motion: drop or never create the overlay.
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
-    overlay.remove();
+    const existing = document.getElementById('am-page-curtain');
+    if (existing) existing.remove();
     return;
   }
 
-  const mod = (globals.moduleSettings && globals.moduleSettings['page-curtain']) || {};
+  // Primary path: PHP injected the overlay via wp_body_open. Fallback:
+  // create it from JS (with a small flash because the browser already
+  // painted the page content underneath).
+  let overlay = document.getElementById('am-page-curtain');
+  if (!overlay) {
+    if (!document.body) return;   // page is too early — bail safely
+    overlay = createFallbackOverlay(mod);
+  }
+
   const duration  = Number.isFinite(+mod.duration) ? +mod.duration : 0.8;
   const delay     = Number.isFinite(+mod.delay)    ? +mod.delay    : 0;
   const ease      = parseEasing(mod.easing || 'easeOut');

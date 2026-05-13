@@ -23,6 +23,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`wp_body_open()` missing in old themes**: the curtain simply never appears. No error, no flash. Plugin degrades cleanly.
 - **Both modules active simultaneously**: they coexist as independent layers (curtain animates over a body that's fading in). Documented as "normally only one is wanted" but not forced exclusive.
 
+### Fixed (during 1.14.0 dev cycle)
+
+- **`update_settings` REST handler in `class-admin.php` was silently dropping `direction`, `bgColor` and `logoUrl` on every save.** The generic loop over `$default_module_settings` only knew about the universally-shared fields (`duration`, `easing`, `delay`, `margin`) plus a hardcoded list of per-module fields (`distance`, `scale`, etc.). page-curtain's three module-specific fields had no branches, so anything the user configured was reset to defaults the next time `Animicro::get_settings()` ran. Added explicit `isset()` / `array_key_exists()` branches for `direction` (allow-list `fade|slide-up|slide-down`), `bgColor` (validated via `sanitize_hex_color`), and `logoUrl` (validated via `esc_url_raw`).
+- **`margin` is no longer force-injected into modules that don't declare it.** The same loop unconditionally built `'margin' => sanitize_margin(...)` for every module, which triggered an "Undefined index: margin" PHP notice for `page-fade` and `page-curtain` (neither carries a margin in its defaults) and persisted a spurious `margin` field into their saved settings. The line is now wrapped in `if ( isset( $module_defaults['margin'] ) )`.
+- **`page-fade` JS module now degrades gracefully** when the body class `am-page-fade-init` never reaches `<body>` (theme that hard-codes its own `<body class="...">` instead of calling `body_class()`, or output-buffering plugin that strips classes). Previously it would silently no-op — the animation just didn't happen and there was no console error. Now it sets `opacity: 0` from JS, forces a reflow, and animates in. There's a tiny initial flash because the body was already painted, but the configured transition still runs.
+- **`page-curtain` JS module now creates the overlay element itself** if PHP's `wp_body_open` hook didn't fire (some legacy themes don't call `wp_body_open()`). Same flash trade-off as page-fade's fallback — the page paints once before the overlay covers it — but the user's setting is honored instead of silently doing nothing.
+
 ### Notes for future iterations
 
 - This is Phase 1 of page transitions. Phase 2 (click-intercepted outgoing animation, where the curtain covers the screen BEFORE the next page loads) would be a Pro feature. Out of scope for 1.14.0.

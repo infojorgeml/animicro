@@ -402,8 +402,15 @@ class Animicro_Admin {
 				'duration' => $this->clamp_float( $raw_mod['duration'] ?? null, 0, 10, (float) $module_defaults['duration'] ),
 				'easing'   => $this->sanitize_easing( $raw_mod['easing'] ?? null, (string) $module_defaults['easing'] ),
 				'delay'    => $this->clamp_float( $raw_mod['delay'] ?? null, 0, 10, (float) $module_defaults['delay'] ),
-				'margin'   => $this->sanitize_margin( $raw_mod['margin'] ?? null, (string) $module_defaults['margin'] ),
 			];
+
+			// Only sanitize margin if the module actually uses it. Page-level
+			// transitions (page-fade, page-curtain) don't carry a margin in
+			// their defaults — including one for them was triggering an
+			// "Undefined index: margin" notice on save.
+			if ( isset( $module_defaults['margin'] ) ) {
+				$entry['margin'] = $this->sanitize_margin( $raw_mod['margin'] ?? null, (string) $module_defaults['margin'] );
+			}
 
 			if ( isset( $module_defaults['distance'] ) ) {
 				$entry['distance'] = $this->clamp_float( $raw_mod['distance'] ?? null, -500, 500, (float) $module_defaults['distance'] );
@@ -479,6 +486,28 @@ class Animicro_Admin {
 			}
 			if ( isset( $module_defaults['zoomScale'] ) ) {
 				$entry['zoomScale'] = $this->clamp_float( $raw_mod['zoomScale'] ?? null, 1.01, 2, (float) $module_defaults['zoomScale'] );
+			}
+
+			// Page Transitions (1.14.0): page-curtain has three module-specific
+			// fields that the generic loop above doesn't know about. Without
+			// these branches the user's settings for direction / bgColor /
+			// logoUrl were silently dropped on every save and the curtain
+			// always rendered with the defaults.
+			if ( isset( $module_defaults['direction'] ) ) {
+				$allowed_directions = [ 'fade', 'slide-up', 'slide-down' ];
+				$raw_direction      = isset( $raw_mod['direction'] ) ? (string) $raw_mod['direction'] : (string) $module_defaults['direction'];
+				$entry['direction'] = in_array( $raw_direction, $allowed_directions, true )
+					? $raw_direction
+					: (string) $module_defaults['direction'];
+			}
+			if ( array_key_exists( 'bgColor', $module_defaults ) ) {
+				$raw_bg          = isset( $raw_mod['bgColor'] ) ? (string) $raw_mod['bgColor'] : (string) $module_defaults['bgColor'];
+				$sanitized_bg    = sanitize_hex_color( $raw_bg );
+				$entry['bgColor'] = $sanitized_bg ?: (string) $module_defaults['bgColor'];
+			}
+			if ( array_key_exists( 'logoUrl', $module_defaults ) ) {
+				$raw_logo         = isset( $raw_mod['logoUrl'] ) ? (string) $raw_mod['logoUrl'] : '';
+				$entry['logoUrl'] = '' === $raw_logo ? '' : esc_url_raw( $raw_logo );
 			}
 
 			$clean_module_settings[ $module_id ] = $entry;
