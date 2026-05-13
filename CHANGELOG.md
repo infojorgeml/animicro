@@ -5,6 +5,18 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.2] - 2026-05-13
+
+### Added
+
+- **Plugin icon for the WP-admin "Update Plugins" screen** (`assets/icon-128x128.png`). The vendored plugin-update-checker library (PUC v5p6) auto-discovers files in `assets/` matching its naming convention (`icon-128x128.png` / `icon-256x256.png` / `icon.svg` / `banner-*.png`) and injects their URLs into WordPress's `update_plugins` site transient via `setIconsFromLocalAssets()`. WP then renders our logo in `/wp-admin/update-core.php` instead of the generic gray plug placeholder. Zero changes to `class-updater.php` required — the support was already there, we just needed to ship an icon file.
+- **`scripts/build.sh::copy_shared()`** now copies the `assets/` directory into both the Free and Pro ZIPs (`cp -r "$ROOT/assets" "$TARGET/assets"`) so the icon actually reaches installed sites. `scripts/build_release_zip.py` already walked the directory by default, no change needed.
+
+### Changed
+
+- **Toolchain migrated from npm to pnpm** (no product changes; build output is byte-equivalent). `package-lock.json` deleted, `pnpm-lock.yaml` committed. `package.json` now pins `packageManager: pnpm@11.1.1` plus `engines: { node: ">=20", pnpm: ">=11" }` and declares `pnpm.onlyBuiltDependencies: ["esbuild"]` so esbuild's postinstall (which downloads its native binary) is allowed under pnpm 11's strict default. A `pnpm-workspace.yaml` was also added with `allowBuilds: { esbuild: true }` for compatibility with pnpm's preferred modern format. CI workflow (`.github/workflows/release-pro.yml`) now uses `pnpm/action-setup@v4` and `pnpm install --frozen-lockfile` / `pnpm run build` instead of npm equivalents. Local hooks (`.githooks/pre-push`), the build script and the Python release script all migrated to `pnpm`. Docs (README.md, docs/animicro.md, docs/release-checklist.md) updated with a "pnpm only — do not use npm/npx" notice.
+- **`.distignore`**: `package-lock.json` swapped for `pnpm-lock.yaml`, `.npmrc` added defensively.
+
 ## [1.14.1] - 2026-05-12
 
 ### Changed

@@ -59,6 +59,17 @@ copy_shared() {
     if [[ -f "$ROOT/README.md" ]]; then
         cp "$ROOT/README.md" "$TARGET/"
     fi
+
+    # Plugin icons / banners. PUC (vendored in the Pro build) auto-discovers
+    # `assets/icon-128x128.png`, `assets/icon-256x256.png`, `assets/icon.svg`,
+    # `assets/banner-*.png` and feeds them to WP's update_plugins transient so
+    # the WP admin "Update Plugins" screen renders our logo instead of the
+    # generic placeholder. Same files also surface in the "View details"
+    # lightbox. Free build benefits too (WP.org serves icons from SVN, but
+    # bundling them locally is harmless).
+    if [[ -d "$ROOT/assets" ]]; then
+        cp -r "$ROOT/assets" "$TARGET/assets"
+    fi
 }
 
 # ---------------------------------------------------------------------------

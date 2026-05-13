@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.14.1
+Stable tag: 1.14.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,10 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.14.2 =
+* **Plugin icon in the WP "Update Plugins" screen.** Bundled `assets/icon-128x128.png` so the standard WP-admin update list now shows the Animicro logo instead of the generic gray plug icon. Works automatically — no settings needed.
+* **Internal: toolchain migrated from npm to pnpm.** No product changes; only affects how the build is run locally and in CI. Existing settings, animations and styling are unchanged.
 
 = 1.14.1 =
 * **Page Curtain: theatre-curtain directions.** Slide-up and slide-down now feel natural — the cortina ENTERS from one side and LEAVES through the OPPOSITE side, like a real stage curtain (falls from above to cover, rises away to reveal). Previously both halves moved in the same direction which felt repetitive.
@@ -219,6 +223,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.14.2 =
+Adds the Animicro logo to the WP "Update Plugins" screen (no more gray plug icon on future updates). Internal build toolchain switched from npm to pnpm — no effect on installed sites.
 
 = 1.14.1 =
 Page Curtain refinements: theatre-curtain directions (slide-up / slide-down now enter and leave through opposite sides, like a real stage curtain) and a WordPress media-library picker for the logo. No breaking changes — existing settings keep working, just feels nicer.
