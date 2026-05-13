@@ -39,9 +39,13 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Setup Node
+        # Node 22 LTS — required by pnpm 11.1.1+ (which needs Node >= 22.13
+        # because pnpm started importing the built-in `node:sqlite` module
+        # that doesn't exist in Node 20). Keep this in sync with
+        # package.json `engines.node`.
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'pnpm'
 
       - name: Install dependencies
