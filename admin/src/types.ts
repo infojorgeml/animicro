@@ -29,6 +29,9 @@ export interface ModuleConfig {
   direction?: string;
   bgColor?: string;
   logoUrl?: string;
+  strength?: number;
+  smoothness?: number;
+  axis?: string;
 }
 
 export interface SmoothScrollConfig {

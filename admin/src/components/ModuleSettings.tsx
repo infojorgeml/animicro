@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 import ColorField from './ColorField';
@@ -33,6 +33,7 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   'skew-up': DEFAULT_SKEW_UP_CONFIG,
   'hover-zoom': DEFAULT_HOVER_ZOOM_CONFIG,
   'img-parallax': DEFAULT_IMG_PARALLAX_CONFIG,
+  magnet: DEFAULT_MAGNET_CONFIG,
 };
 
 const hasDistance = (id: string) => id.startsWith('slide-') || id === 'skew-up' || id === 'split' || id === 'stagger' || id === 'grid-reveal';
@@ -395,6 +396,94 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
+        {/* Magnet — Strength */}
+        {moduleId === 'magnet' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Strength
+              <span className="font-mono text-brand-500">{config.strength ?? 15}</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              How far the element drifts toward the cursor, as a percentage of the mouse-to-centre offset. Higher values make the element follow the mouse more dramatically.
+            </p>
+            <input
+              type="range"
+              min="1"
+              max="100"
+              step="1"
+              value={config.strength ?? 15}
+              onChange={e => onUpdate({ strength: parseInt(e.target.value, 10) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>1 — Whisper</span>
+              <span>100 — Sticky</span>
+            </div>
+          </div>
+        )}
+
+        {/* Magnet — Smoothness */}
+        {moduleId === 'magnet' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Smoothness
+              <span className="font-mono text-brand-500">{config.smoothness ?? 0.08}</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Per-frame interpolation factor (LERP). Lower values feel heavy with inertia and drag; higher values feel light and snappy.
+            </p>
+            <input
+              type="range"
+              min="0.01"
+              max="1"
+              step="0.01"
+              value={config.smoothness ?? 0.08}
+              onChange={e => onUpdate({ smoothness: parseFloat(e.target.value) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0.01 — Heavy</span>
+              <span>1 — Instant</span>
+            </div>
+          </div>
+        )}
+
+        {/* Magnet — Axis */}
+        {moduleId === 'magnet' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Axis
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Restrict the element's movement to a single axis. Useful for headlines (horizontal only) or sidebars (vertical only).
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {([
+                { value: 'both', label: 'Both',       icon: '✛' },
+                { value: 'x',    label: 'Horizontal', icon: '↔' },
+                { value: 'y',    label: 'Vertical',   icon: '↕' },
+              ] as const).map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => onUpdate({ axis: opt.value })}
+                  className={`
+                    rounded-lg border px-3 py-2.5 text-left transition-colors
+                    ${(config.axis ?? 'both') === opt.value
+                      ? 'border-brand-500 bg-brand-50 text-brand-700'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'}
+                  `}
+                >
+                  <span className="block text-sm font-medium">{opt.icon}</span>
+                  <span className="block text-xs text-gray-400 mt-0.5">{opt.label}</span>
+                </button>
+              ))}
+            </div>
+            <p className="mt-1.5 text-xs text-gray-400">
+              Current: <span className="font-mono text-brand-500">{config.axis ?? 'both'}</span>
+            </p>
+          </div>
+        )}
+
         {/* Skew angle (skew-up only) */}
         {moduleId === 'skew-up' && (
           <div>
@@ -421,8 +510,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse, img-parallax) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && moduleId !== 'img-parallax' && (
+        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse, img-parallax, magnet) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Duration
@@ -447,8 +536,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
         )}
 
-        {/* Delay (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom) */}
-        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && (
+        {/* Delay (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet) */}
+        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Delay
@@ -767,8 +856,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Easing (hidden for typewriter, parallax, text-fill-scroll, img-parallax) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && (
+        {/* Easing (hidden for typewriter, parallax, text-fill-scroll, img-parallax, magnet) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Easing curve
@@ -794,8 +883,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
         )}
 
-        {/* Activation margin (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom) */}
-        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && (
+        {/* Activation margin (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet) */}
+        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Activation margin
