@@ -27,7 +27,7 @@ Under **Animicro → Advanced** you can enable **Respect Reduced Motion** (skips
 ## Installation
 
 1. Download or clone the plugin to `wp-content/plugins/animicro/`
-2. Run `npm install` and `npm run build` in the plugin root
+2. Run `pnpm install` and `pnpm run build` in the plugin root
 3. Activate the plugin from the WordPress dashboard
 4. Go to **Animicro** in the sidebar menu to configure modules
 
@@ -90,11 +90,13 @@ Works with Elementor, Bricks, Breakdance, Oxygen, Divi and Gutenberg. Dynamic in
 ## Development
 
 ```bash
-npm install
-npm run build          # Build admin + frontend
-npm run dev:admin      # Watch mode admin
-npm run dev:frontend   # Watch mode frontend
+pnpm install
+pnpm run build          # Build admin + frontend
+pnpm run dev:admin      # Watch mode admin
+pnpm run dev:frontend   # Watch mode frontend
 ```
+
+> This project uses **pnpm exclusively** (pinned via `packageManager` in `package.json`). Do not use `npm` or `npx` — there is no `package-lock.json`, only `pnpm-lock.yaml`.
 
 ### Release build
 

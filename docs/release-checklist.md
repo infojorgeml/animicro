@@ -46,7 +46,7 @@
 
 - **Pro en local:** si el flujo Pro vuelve a usar `ANIMICRO_PRO` en `animicro.php`, puedes poner temporalmente `define( 'ANIMICRO_PRO', true );` para pruebas (sin commit). En la rama actual el free no define esa constante; ajusta según el estado del script de build.
 
-- **`npm run build`:** `scripts/build.sh` ejecuta `npm run build` automáticamente si faltan `admin/dist/.vite/manifest.json` o `frontend/dist/.vite/manifest.json`. Si ya compilaste, reutiliza los `dist` existentes.
+- **`pnpm run build`:** `scripts/build.sh` ejecuta `pnpm run build` automáticamente si faltan `admin/dist/.vite/manifest.json` o `frontend/dist/.vite/manifest.json`. Si ya compilaste, reutiliza los `dist` existentes. El proyecto usa **pnpm exclusivamente** (no usar `npm`/`npx`).
 
 - **ZIPs en `release/`:** en `.gitignore`. Distribución manual: SVN de WordPress.org (free), tu web (Pro).
 

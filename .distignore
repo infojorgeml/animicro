@@ -17,7 +17,8 @@ includes/class-license-manager.php
 *.md
 !README.md
 package.json
-package-lock.json
+pnpm-lock.yaml
+.npmrc
 vite.config.ts
 tailwind.config.js
 postcss.config.js

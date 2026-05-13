@@ -19,9 +19,9 @@ echo ""
 # 1. Frontend build (Vite)
 # ---------------------------------------------------------------------------
 if [[ ! -f "$ROOT/admin/dist/.vite/manifest.json" ]] || [[ ! -f "$ROOT/frontend/dist/.vite/manifest.json" ]]; then
-    echo "==> Running npm run build ..."
+    echo "==> Running pnpm run build ..."
     cd "$ROOT"
-    npm run build
+    pnpm run build
     echo ""
 fi
 

@@ -53,7 +53,7 @@ def should_skip(rel: Path) -> bool:
     if name.startswith(".") and name != ".vite":
         return True
     if name in {
-        ".gitignore", ".distignore", ".DS_Store", "package.json", "package-lock.json",
+        ".gitignore", ".distignore", ".DS_Store", "package.json", "pnpm-lock.yaml", ".npmrc",
         "vite.config.ts", "tailwind.config.js", "postcss.config.js", "skills-lock.json",
         "CHANGELOG.md",
     }:
@@ -69,7 +69,7 @@ def should_skip(rel: Path) -> bool:
 
 def main() -> None:
     if not (ROOT / "frontend/dist/.vite/manifest.json").exists() or not (ROOT / "admin/dist/.vite/manifest.json").exists():
-        print("Warning: run `npm run build` first so admin/dist and frontend/dist exist.", file=sys.stderr)
+        print("Warning: run `pnpm run build` first so admin/dist and frontend/dist exist.", file=sys.stderr)
 
     ver = version_from_php()
     out_dir = ROOT / "release"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Animicro pre-push hook: rebuild both free + pro release ZIPs before push.
-# Configure once with: git config core.hooksPath .githooks  (handled by npm postinstall)
+# Configure once with: git config core.hooksPath .githooks  (handled by pnpm postinstall)
 
 set -e
 
