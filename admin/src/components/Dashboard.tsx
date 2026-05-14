@@ -68,7 +68,7 @@ export default function Dashboard({ settings, isPremium, onToggleModule, onUpdat
                         ${isLocked
                           ? 'border-gray-200 bg-gray-50 opacity-60'
                           : isActive
-                            ? 'border-brand-200 bg-brand-50/50'
+                            ? 'border-white bg-[#f6f6f6]'
                             : 'border-gray-200 bg-white'}
                       `}
                     >
@@ -80,7 +80,7 @@ export default function Dashboard({ settings, isPremium, onToggleModule, onUpdat
                             </span>
                             {(mod.cssClass ?? '').trim().split(/\s+/).filter(Boolean).map((cls, i) => (
                               <span key={i} className="inline-flex items-center gap-1">
-                                <code className="rounded bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-600">{cls}</code>
+                                <code className="rounded bg-white px-1.5 py-0.5 text-[11px] text-gray-600">{cls}</code>
                                 <CopyClassButton text={cls} label={`Copy ${cls}`} />
                               </span>
                             ))}

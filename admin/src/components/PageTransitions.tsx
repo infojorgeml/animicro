@@ -76,7 +76,7 @@ export default function PageTransitions({ settings, onToggleModule, onUpdateModu
               key={mod.id}
               className={`
                 rounded-lg border p-4 transition-colors
-                ${isActive ? 'border-brand-200 bg-brand-50/50' : 'border-gray-200 bg-white'}
+                ${isActive ? 'border-white bg-[#f6f6f6]' : 'border-gray-200 bg-white'}
               `}
             >
               {/* Header: name + description + toggle */}
@@ -93,7 +93,7 @@ export default function PageTransitions({ settings, onToggleModule, onUpdateModu
 
               {/* Inline settings, only when active */}
               {isActive && (
-                <div className="mt-4 pt-4 border-t border-brand-100 space-y-4">
+                <div className="mt-4 pt-4 border-t border-white space-y-4">
                   {/* Direction */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Direction</label>

@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 
 const BTN_IDLE =
-  'rounded-md p-1.5 bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 transition-colors shrink-0';
+  'rounded-md p-1.5 bg-white text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-colors shrink-0';
 const BTN_COPIED =
   'rounded-md p-1.5 bg-emerald-50 text-emerald-700 transition-colors shrink-0';
 
