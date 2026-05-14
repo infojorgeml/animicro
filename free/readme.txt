@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.21.0
+Stable tag: 1.22.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,12 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.22.0 =
+* **New `ken-burns` module (Free)** — Slow infinite zoom for hero images. Apply `.am-ken-burns` to any image / element and it cycles between scale 1 and 1.15 over 15 seconds (configurable), giving static backgrounds the cinematic documentary feel.
+* Per-element overrides: `data-am-duration` (cycle length), `data-am-scale` (zoom amount), `data-am-easing`, `data-am-delay`.
+* Tip: the parent of the image should have `overflow: hidden` so the zoomed-in image stays clipped to its frame. Most hero sections in builders already ship with that.
+* Honors `prefers-reduced-motion: reduce`. Skipped inside Bricks / Elementor / Breakdance / Oxygen / Divi editor previews.
 
 = 1.21.0 =
 * **New `cursor` module (Pro)** — Replaces the system cursor with a custom circle that follows the mouse with smooth lerp interpolation. When the visitor hovers any element carrying `.am-cursor-expand`, the cursor grows, applies a glassmorphism style (backdrop-filter blur + semi-transparent background), and optionally shows text via `data-am-cursor-text="View"`.
@@ -259,6 +265,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.22.0 =
+New Free module `ken-burns`: slow infinite zoom for hero images. Class `.am-ken-burns`, per-element `data-am-scale` / `data-am-duration` for fine-tuning. No breaking changes.
 
 = 1.21.0 =
 New Pro module `cursor`: custom cursor replacement with smooth lerp follow + expand-on-hover for elements marked with `.am-cursor-expand`. Per-element text and size overrides via `data-am-cursor-text` / `data-am-cursor-size`. Mobile-safe (auto-disables below 992px and on touch-only devices). No breaking changes.

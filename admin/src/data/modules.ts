@@ -86,6 +86,14 @@ export const DEFAULT_SCRAMBLE_CONFIG: ModuleConfig = {
   scrambleSpeed:  0.05,
 };
 
+export const DEFAULT_KEN_BURNS_CONFIG: ModuleConfig = {
+  duration: 15,
+  easing:   'ease-in-out',
+  delay:    0,
+  margin:   '-50px 0px',
+  scale:    1.15,
+};
+
 export const DEFAULT_CURSOR_CONFIG: ModuleConfig = {
   // duration/easing/delay/margin are inert (rAF loop, no viewport gate).
   duration:     0.6,
@@ -333,6 +341,7 @@ export const MODULE_INFO: ModuleInfo[] = [
   { id: 'hover-zoom',   name: 'Zoom Hover',     description: 'Image scales up on hover within an overflow:hidden parent', cssClass: '.am-hover-zoom',   isPro: false, category: 'media' },
   { id: 'img-parallax', name: 'Image Parallax', description: 'Window effect — inner image translates on scroll inside an overflow:hidden frame', cssClass: '.am-img-parallax', isPro: true,  category: 'media' },
   { id: 'clip-reveal',  name: 'Clip Reveal',    description: 'Premium image reveal via clip-path: curtains, center split, expanding circle', cssClass: '.am-clip-reveal', isPro: true, category: 'media' },
+  { id: 'ken-burns',    name: 'Ken Burns',      description: 'Slow infinite zoom for hero images — gives static backgrounds a cinematic feel', cssClass: '.am-ken-burns',   isPro: false, category: 'media' },
 
   // Page Transitions (rendered in their own tab, not on the Modules dashboard).
   // Single module that intercepts navigation clicks to animate an overlay IN
@@ -356,7 +365,7 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-loop-mode',  type: 'string',        defaultValue: 'pingpong',  usedBy: 'fade, scale, slide-*, blur — pingpong | restart' },
   { attribute: 'data-am-loop-delay', type: 'float (s)',     defaultValue: '0',         usedBy: 'fade, scale, slide-*, blur — pause between iterations' },
   { attribute: 'data-am-distance',  type: 'float (px)',    defaultValue: '30',        usedBy: 'slide-up, slide-down, slide-right, slide-left, split, stagger, grid-reveal' },
-  { attribute: 'data-am-scale',     type: 'float',         defaultValue: '0.95',      usedBy: 'scale' },
+  { attribute: 'data-am-scale',     type: 'float',         defaultValue: '0.95 (scale) / 1.15 (ken-burns)', usedBy: 'scale, ken-burns' },
   { attribute: 'data-am-blur',      type: 'float (px)',    defaultValue: '4',         usedBy: 'blur' },
   { attribute: 'data-am-stagger',   type: 'float (s)',     defaultValue: '0.05',      usedBy: 'stagger, split, text-reveal, grid-reveal' },
   { attribute: 'data-am-speed',     type: 'float',         defaultValue: '0.5 (parallax) / 0.2 (img-parallax) / 30 (spin, deg/sec)', usedBy: 'parallax, img-parallax, spin' },

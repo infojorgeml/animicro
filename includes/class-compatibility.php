@@ -56,6 +56,10 @@ class Animicro_Compatibility {
 		// `body.am-cursor-active { cursor: none }` rule that hides the
 		// native cursor while the module is active.
 		'cursor'        => '',
+		// Ken Burns: no initial-hide. The image starts at scale 1 and
+		// Motion drives the continuous keyframe [1, scale, 1, repeat:
+		// Infinity]. Same pattern as pulse.
+		'ken-burns'     => '',
 		// Clip-reveal: critical inline rule clips the element entirely
 		// (inset 100% = nothing visible) until Motion's animate() writes
 		// the first inline clip-path frame, sliding from the variant's
