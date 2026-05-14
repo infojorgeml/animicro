@@ -27,6 +27,7 @@ const MODULES = {
   'hover-zoom':   () => import('../modules/hover-zoom.js'),
   'img-parallax': () => import('../modules/img-parallax.js'),
   'magnet':       () => import('../modules/magnet.js'),
+  'spin':         () => import('../modules/spin.js'),
   'page-curtain': () => import('../modules/page-curtain.js'),
 };
 

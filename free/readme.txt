@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.17.0
+Stable tag: 1.18.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,11 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.18.0 =
+* **New `spin` module (Pro)** — `.am-spin` elements rotate continuously and accelerate momentarily when the visitor scrolls. Perfect for circular badges ("Award winning", "100% Quality", brand seals) that you see on Awwwards-style sites.
+* Per-element `data-am-direction="left|right"` (CW / CCW) and `data-am-speed` (degrees per second, 1–360). Default direction / speed / scroll-boost configured globally from the admin panel.
+* Performance: single global rAF loop + single scroll listener + IntersectionObserver, so 20 spinning badges off-screen cost zero CPU until they enter the viewport. Honors `prefers-reduced-motion: reduce` (no animation), respects builder editor previews (no rotation inside Bricks / Elementor / etc.).
 
 = 1.17.0 =
 * **New `scramble` module (Pro)** — `.am-scramble` cycles each character through random symbols (ASCII glitch + alphanumeric mix) and stabilises them left-to-right when the element enters the viewport. Cinema / cyberpunk decoding look.
@@ -237,6 +242,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.18.0 =
+New Pro module `spin`: continuous rotation with scroll-velocity boost. Per-element direction (left / right) and speed. Class `.am-spin`. No breaking changes.
 
 = 1.17.0 =
 New Pro module `scramble`: text decodes character by character with a left-to-right glitch wave (Matrix / cyberpunk look). Class `.am-scramble`, configured globally from the admin. No breaking changes.
