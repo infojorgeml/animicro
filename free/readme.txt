@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.23.0
+Stable tag: 1.24.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,13 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.24.0 =
+* **Two new Free modules: `scroll-slide-left` and `scroll-slide-right`** — scroll-linked horizontal drift. As the visitor scrolls vertically, the element translates horizontally across the viewport. Classic "newspaper strip" / "ticker tape" effect for Hero headlines and section dividers.
+* `.am-scroll-slide-left` — element travels right → left (classic).
+* `.am-scroll-slide-right` — element travels left → right (inverse).
+* Per-element `data-am-speed` (default 1, range 0.1–3): travel multiplier. 0.5× is a subtle drift, 3× is a wild sweep that pushes the element fully off-screen.
+* Free tier — first scroll-linked module in the Free build (parallax + text-fill-scroll remain Pro). Honors `prefers-reduced-motion: reduce` and never runs inside builder editor previews. IntersectionObserver-gated for performance on long pages.
 
 = 1.23.0 =
 * **New `flip-x` and `flip-y` modules (Pro)** — 3D card-flip entry animation, the classic AOS-style effect. Elements appear rotating on their X axis (`.am-flip-x`, like opening a book top-to-bottom) or Y axis (`.am-flip-y`, like turning a page left-to-right) from a configurable angle back to 0°. Perfect for pricing grids, testimonial cards, feature blocks.
@@ -271,6 +278,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.24.0 =
+Two new Free modules — `scroll-slide-left` and `scroll-slide-right`: scroll-linked horizontal drift for Hero headlines. As you scroll down, the element crosses the viewport horizontally. Configurable travel speed. No breaking changes.
 
 = 1.23.0 =
 New Pro modules `flip-x` and `flip-y`: 3D card-flip entry animation on the X or Y axis. Classic AOS-style effect for pricing grids and feature cards. Configurable rotation angle (`data-am-angle`, default 180°). No breaking changes.

@@ -77,7 +77,7 @@ class Animicro {
 	public static function get_default_settings(): array {
 		return [
 			'active_modules'    => [],
-			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'flip-x', 'flip-y', 'float', 'pulse', 'hover-zoom', 'spin', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'img-parallax', 'clip-reveal', 'ken-burns', 'magnet', 'magnetic', 'cursor', 'split', 'scatter', 'scramble', 'text-reveal', 'typewriter', 'page-curtain' ],
+			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'flip-x', 'flip-y', 'float', 'pulse', 'hover-zoom', 'spin', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'scroll-slide-left', 'scroll-slide-right', 'img-parallax', 'clip-reveal', 'ken-burns', 'magnet', 'magnetic', 'cursor', 'split', 'scatter', 'scramble', 'text-reveal', 'typewriter', 'page-curtain' ],
 			'module_settings'   => [
 				'fade' => [
 					'duration' => 0.6,
@@ -231,6 +231,23 @@ class Animicro {
 					'delay'    => 0.0,
 					'margin'   => '-50px 0px',
 					'speed'    => 0.5,
+				],
+				'scroll-slide-left' => [
+					// duration/easing/delay/margin are inert (scroll-linked,
+					// no Motion animate()). Kept for REST loop shape.
+					'duration' => 0.6,
+					'easing'   => 'linear',
+					'delay'    => 0.0,
+					'margin'   => '-50px 0px',
+					'speed'    => 1.0,
+				],
+				'scroll-slide-right' => [
+					// Inverse direction; same shape, same defaults.
+					'duration' => 0.6,
+					'easing'   => 'linear',
+					'delay'    => 0.0,
+					'margin'   => '-50px 0px',
+					'speed'    => 1.0,
 				],
 				'float' => [
 					'duration'  => 3.0,

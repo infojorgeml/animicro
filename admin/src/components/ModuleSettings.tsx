@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_MAGNETIC_CONFIG, DEFAULT_SCATTER_CONFIG, DEFAULT_SCRAMBLE_CONFIG, DEFAULT_SPIN_CONFIG, DEFAULT_CLIP_REVEAL_CONFIG, DEFAULT_CURSOR_CONFIG, DEFAULT_KEN_BURNS_CONFIG, DEFAULT_FLIP_X_CONFIG, DEFAULT_FLIP_Y_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_MAGNETIC_CONFIG, DEFAULT_SCATTER_CONFIG, DEFAULT_SCRAMBLE_CONFIG, DEFAULT_SPIN_CONFIG, DEFAULT_CLIP_REVEAL_CONFIG, DEFAULT_CURSOR_CONFIG, DEFAULT_KEN_BURNS_CONFIG, DEFAULT_FLIP_X_CONFIG, DEFAULT_FLIP_Y_CONFIG, DEFAULT_SCROLL_SLIDE_LEFT_CONFIG, DEFAULT_SCROLL_SLIDE_RIGHT_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 import ColorField from './ColorField';
@@ -43,6 +43,8 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   'ken-burns': DEFAULT_KEN_BURNS_CONFIG,
   'flip-x': DEFAULT_FLIP_X_CONFIG,
   'flip-y': DEFAULT_FLIP_Y_CONFIG,
+  'scroll-slide-left':  DEFAULT_SCROLL_SLIDE_LEFT_CONFIG,
+  'scroll-slide-right': DEFAULT_SCROLL_SLIDE_RIGHT_CONFIG,
 };
 
 const hasDistance = (id: string) => id.startsWith('slide-') || id === 'skew-up' || id === 'split' || id === 'stagger' || id === 'grid-reveal';
@@ -89,6 +91,35 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-8 items-start">
 
       <div className="space-y-8 max-w-lg">
+
+        {/* Scroll Slide — Travel speed (multiplier) */}
+        {(moduleId === 'scroll-slide-left' || moduleId === 'scroll-slide-right') && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Travel speed
+              <span className="font-mono text-brand-500">{config.speed ?? 1}×</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Multiplier of the horizontal travel as you scroll. <strong>1×</strong> is the default sweep (from +100% to -60% on the viewport for {moduleId === 'scroll-slide-right' ? 'left → right' : 'right → left'}). <strong>0.5×</strong> halves the journey for a subtle drift; <strong>3×</strong> pushes the element well off-screen for a dramatic full sweep. Per-element override via <code className="bg-gray-100 px-1 py-0.5 rounded">data-am-speed</code>.
+            </p>
+            <input
+              type="range"
+              min="0.1"
+              max="3"
+              step="0.1"
+              value={config.speed ?? 1}
+              onChange={e => onUpdate({ speed: parseFloat(e.target.value) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0.1× — Subtle drift</span>
+              <span>3× — Wild sweep</span>
+            </div>
+            <p className="mt-2 text-[11px] text-gray-500">
+              Tip: full-width Hero headlines and section dividers work great with this. If you wrap the element in a contained section, consider <code className="rounded bg-gray-100 px-1 py-0.5">overflow: hidden</code> on the parent so the slide stays clipped to the container.
+            </p>
+          </div>
+        )}
 
         {/* Image Parallax speed (img-parallax only) */}
         {moduleId === 'img-parallax' && (
@@ -947,8 +978,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse, img-parallax, magnet, scramble, spin, magnetic, cursor, ken-burns) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && moduleId !== 'spin' && moduleId !== 'magnetic' && moduleId !== 'cursor' && moduleId !== 'ken-burns' && (
+        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse, img-parallax, magnet, scramble, spin, magnetic, cursor, ken-burns, scroll-slide-*) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && moduleId !== 'spin' && moduleId !== 'magnetic' && moduleId !== 'cursor' && moduleId !== 'ken-burns' && moduleId !== 'scroll-slide-left' && moduleId !== 'scroll-slide-right' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Duration
@@ -973,8 +1004,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
         )}
 
-        {/* Delay (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet, spin, magnetic, cursor) */}
-        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && moduleId !== 'spin' && moduleId !== 'magnetic' && moduleId !== 'cursor' && (
+        {/* Delay (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet, spin, magnetic, cursor, scroll-slide-*) */}
+        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && moduleId !== 'spin' && moduleId !== 'magnetic' && moduleId !== 'cursor' && moduleId !== 'scroll-slide-left' && moduleId !== 'scroll-slide-right' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Delay
@@ -1401,8 +1432,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Easing (hidden for typewriter, parallax, text-fill-scroll, img-parallax, magnet, scramble, spin, magnetic, cursor) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && moduleId !== 'spin' && moduleId !== 'magnetic' && moduleId !== 'cursor' && (
+        {/* Easing (hidden for typewriter, parallax, text-fill-scroll, img-parallax, magnet, scramble, spin, magnetic, cursor, scroll-slide-*) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && moduleId !== 'spin' && moduleId !== 'magnetic' && moduleId !== 'cursor' && moduleId !== 'scroll-slide-left' && moduleId !== 'scroll-slide-right' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Easing curve
@@ -1428,8 +1459,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
         )}
 
-        {/* Activation margin (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet, spin, magnetic, cursor) */}
-        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && moduleId !== 'spin' && moduleId !== 'magnetic' && moduleId !== 'cursor' && (
+        {/* Activation margin (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet, spin, magnetic, cursor, scroll-slide-*) */}
+        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && moduleId !== 'spin' && moduleId !== 'magnetic' && moduleId !== 'cursor' && moduleId !== 'scroll-slide-left' && moduleId !== 'scroll-slide-right' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Activation margin

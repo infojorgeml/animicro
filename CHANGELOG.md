@@ -5,6 +5,32 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.24.0] - 2026-05-14
+
+### Added
+
+- **`scroll-slide-left` and `scroll-slide-right` modules (Free)** — scroll-linked horizontal drift. Two sibling classes that dispatch to a single `scroll-slide.js` implementation (same pattern as flip-x/flip-y → flip.js, slide-up/down/left/right → slide.js).
+  - **`.am-scroll-slide-left`**: as you scroll down, `translateX` goes from `+100%` (off-screen right) to `-60%` (off-screen left). Classic "newspaper strip" sweep.
+  - **`.am-scroll-slide-right`**: inverse direction. translateX from `-100%` to `+60%`. For zig-zag layouts.
+  - **Per-element attribute**: `data-am-speed` (float, default 1, clamp 0.1..3). Multiplies the travel distance. `0.5×` = subtle drift, `3×` = wild sweep that pushes the element fully off-screen.
+  - **Tier: Free** — added to `Animicro_License_Manager::FREE_MODULES`. First Free entry in the **Scroll & Continuous** category (until now exclusively Pro: `parallax` + `text-fill-scroll`).
+  - **Naming rationale**: the user originally proposed `.am-scroll-slide` with a direction attribute, but we went with two sibling classes (mirroring flip-x/flip-y and slide-up/down/left/right) for utility-first consistency.
+
+### Wiring
+
+- Frontend: `frontend/src/modules/scroll-slide.js` (new, ~125 lines). One global passive `scroll` + `resize` listener with rAF throttle (`ticking` flag) so multiple scroll events in the same frame collapse to one DOM read+write. One module-scoped IntersectionObserver maintains a `visible` Set so off-screen items don't get processed. `init(name)` dispatches by module id to pick the direction. Two registry entries in `frontend/src/core/registry.js` both import the same file.
+- PHP: `'scroll-slide-left'` and `'scroll-slide-right'` added to `Animicro::available_modules` and to two separate `module_settings` defaults entries (same shape: `duration: 0.6, easing: 'linear', delay: 0.0, margin: '-50px 0px', speed: 1.0`; `duration/easing/delay/margin` are inert because the module is scroll-linked, not Motion-driven). **NOT** in `PRO_MODULES` (Free). `Animicro_License_Manager::FREE_MODULES` includes both. `class-compatibility.php::MODULE_INITIAL_CSS` has entries with just `will-change: transform;` (no `opacity: 0` initial-hide — the element stays in its natural CSS position until JS writes the first transform). **`class-admin.php` unchanged**: the `speed` sanitizer already exists from `parallax` (`clamp_float -5..5`); our range `0.1..3` is fully covered.
+- Admin React: **`admin/src/types.ts` unchanged** — `speed` is already in `ModuleConfig`. `DEFAULT_SCROLL_SLIDE_LEFT_CONFIG` and `DEFAULT_SCROLL_SLIDE_RIGHT_CONFIG` added in `admin/src/data/modules.ts`; two new `MODULE_INFO` entries under `category: 'scroll'` with `isPro: false`. `data-am-speed` row in `DATA_ATTRIBUTES` extended to list both scroll-slide modules in `usedBy`. `ModuleSettings.tsx`: a single "Travel speed" control (range 0.1–3, step 0.1, default 1) fires for both module IDs with an axis-specific description. Both modules excluded from the generic Duration / Delay / Easing / Margin blocks (all inert for scroll-linked).
+
+### Safety / accessibility
+
+- **`prefers-reduced-motion: reduce`**: `init()` bails out — the element stays at its natural CSS position with no transform applied. Naturally readable if the layout placed it on-screen.
+- **Builder editors** (Bricks / Elementor / etc.): `main.js::isInBuilder()` short-circuit. No transform inside the editor.
+- **Page hidden**: `requestAnimationFrame` is auto-paused by the browser while the tab is inactive.
+- **Resize**: triggers the same rAF tick path; rects re-read.
+- **IntersectionObserver `rootMargin: '50% 0px'`**: gives a buffer so transforms update slightly before the element fully enters/exits the viewport, avoiding visible "snap" at the edge.
+- **Init dedup** via `data-am-scroll-slide-init="1"` flag.
+
 ## [1.23.0] - 2026-05-13
 
 ### Added

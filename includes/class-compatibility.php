@@ -62,6 +62,13 @@ class Animicro_Compatibility {
 		// Motion drives the continuous keyframe [1, scale, 1, repeat:
 		// Infinity]. Same pattern as pulse.
 		'ken-burns'     => '',
+		// Scroll-slide: no initial-hide (element stays in its natural
+		// CSS position until JS writes the first transform). Only
+		// `will-change: transform` hint so the browser promotes the
+		// element to its own compositor layer for the per-scroll
+		// translateX writes.
+		'scroll-slide-left'  => 'will-change:transform;',
+		'scroll-slide-right' => 'will-change:transform;',
 		// Clip-reveal: critical inline rule clips the element entirely
 		// (inset 100% = nothing visible) until Motion's animate() writes
 		// the first inline clip-path frame, sliding from the variant's
