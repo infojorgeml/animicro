@@ -503,6 +503,13 @@ class Animicro_Admin {
 				$entry['scrambleSpeed'] = $this->clamp_float( $raw_mod['scrambleSpeed'] ?? null, 0.02, 0.5, (float) $module_defaults['scrambleSpeed'] );
 			}
 
+			// Magnetic (1.20.0): only `range` is new. `strength`, `smoothness`
+			// and `axis` reuse the sanitizer branches from magnet — same
+			// semantics, same clamp ranges, same whitelist for axis.
+			if ( isset( $module_defaults['range'] ) ) {
+				$entry['range'] = $this->clamp_float( $raw_mod['range'] ?? null, 20, 600, (float) $module_defaults['range'] );
+			}
+
 			// Clip-reveal (1.19.0): whitelist for `shape`. Seven valid values
 			// covering the supported clip-path presets. Falls back to the
 			// stored default if the incoming value isn't recognised.

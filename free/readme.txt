@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.19.0
+Stable tag: 1.20.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,12 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.20.0 =
+* **New `magnetic` module (Pro)** — `.am-magnetic` buttons / icons / links are pulled toward the cursor when it enters their proximity, and snap elastically back when the cursor leaves. Awwwards-style "premium feel" interaction for hero CTAs and nav links.
+* Per-element attributes: `data-am-range` (attraction radius), `data-am-strength`, `data-am-smoothness`, `data-am-axis` (`x`/`y`/`both`).
+* **New admin category "Mouse Interactions"** that groups cursor-driven effects. The existing **Magnet** module has been moved into this category (from "Continuous"). No settings or behaviour changed for Magnet — only its placement in the Modules dashboard.
+* Both magnetic and magnet skip touch-only devices, honor `prefers-reduced-motion: reduce`, and never run inside Bricks / Elementor / etc. editor previews.
 
 = 1.19.0 =
 * **New `clip-reveal` module (Pro)** — `.am-clip-reveal` images (or any element) get a premium reveal via clip-path. Seven shapes: `curtain-down`, `curtain-up`, `curtain-left`, `curtain-right`, `center-h`, `center-v`, `circle`. Per-element via `data-am-shape="..."`, default configurable from the admin panel.
@@ -247,6 +253,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.20.0 =
+New Pro module `magnetic`: local pull-to-cursor effect for buttons and icons. Also adds a new "Mouse Interactions" admin category that groups the existing Magnet module with the new Magnetic. No breaking changes to your saved settings.
 
 = 1.19.0 =
 New Pro module `clip-reveal`: premium image reveal via clip-path with 7 shape presets (curtains in 4 directions, center split horizontal/vertical, expanding circle). Class `.am-clip-reveal` + `data-am-shape`. No breaking changes.

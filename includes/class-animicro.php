@@ -8,7 +8,7 @@ class Animicro {
 	const PRO_MODULES = [
 		'blur', 'stagger', 'grid-reveal', 'text-fill-scroll',
 		'parallax', 'split', 'text-reveal', 'img-parallax', 'magnet',
-		'scatter', 'scramble', 'spin', 'clip-reveal',
+		'scatter', 'scramble', 'spin', 'clip-reveal', 'magnetic',
 	];
 
 	private static ?Animicro $instance = null;
@@ -76,7 +76,7 @@ class Animicro {
 	public static function get_default_settings(): array {
 		return [
 			'active_modules'    => [],
-			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'float', 'pulse', 'hover-zoom', 'spin', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'img-parallax', 'clip-reveal', 'magnet', 'split', 'scatter', 'scramble', 'text-reveal', 'typewriter', 'page-curtain' ],
+			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'float', 'pulse', 'hover-zoom', 'spin', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'img-parallax', 'clip-reveal', 'magnet', 'magnetic', 'split', 'scatter', 'scramble', 'text-reveal', 'typewriter', 'page-curtain' ],
 			'module_settings'   => [
 				'fade' => [
 					'duration' => 0.6,
@@ -285,6 +285,20 @@ class Animicro {
 					'margin'     => '-50px 0px',
 					'strength'   => 15.0,
 					'smoothness' => 0.08,
+					'axis'       => 'both',
+				],
+				'magnetic' => [
+					// duration/easing/delay/margin are inert (no viewport
+					// trigger, no Motion animate() — local rAF lerp loop).
+					// Reuses the existing `strength`/`smoothness`/`axis`
+					// sanitizers from magnet; only `range` is new.
+					'duration'   => 0.6,
+					'easing'     => 'ease-out',
+					'delay'      => 0.0,
+					'margin'     => '-50px 0px',
+					'range'      => 100.0,
+					'strength'   => 30.0,
+					'smoothness' => 0.15,
 					'axis'       => 'both',
 				],
 				'page-curtain' => [

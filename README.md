@@ -4,7 +4,7 @@
 **Tags:** animation, motion, css, performance, page-builder
 **Requires at least:** 6.0
 **Tested up to:** 6.9
-**Stable tag:** 1.19.0
+**Stable tag:** 1.20.0
 **Requires PHP:** 7.4
 **License:** GPLv2 or later
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
@@ -52,6 +52,7 @@ Under **Animicro → Advanced** you can enable **Respect Reduced Motion** (skips
 | Scramble Text (Pro) | `.am-scramble` | Text decodes character by character with a glitch wave |
 | Spin (Pro) | `.am-spin` | Continuous rotation that speeds up momentarily with scroll |
 | Clip Reveal (Pro) | `.am-clip-reveal` | Premium image reveal via clip-path: curtains, center split, expanding circle |
+| Magnetic (Pro) | `.am-magnetic` | Buttons and icons are pulled toward the cursor when it gets close (local effect) |
 
 Additional modules are available with [Animicro Pro](https://animicro.com).
 
