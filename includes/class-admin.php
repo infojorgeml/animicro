@@ -510,6 +510,35 @@ class Animicro_Admin {
 				$entry['range'] = $this->clamp_float( $raw_mod['range'] ?? null, 20, 600, (float) $module_defaults['range'] );
 			}
 
+			// Custom Cursor (1.21.0): 6 new sanitizers. `smoothness` reuses
+			// the magnet/magnetic branch. `color` collides lexically with
+			// nothing in the current loop (no other module exposes a
+			// generic `color` field — text-fill-scroll uses colorBase /
+			// colorFill, highlight uses highlightColor, page-curtain uses
+			// bgColor). Adding `color` here is safe.
+			if ( isset( $module_defaults['size'] ) ) {
+				$entry['size'] = (int) $this->clamp_float( $raw_mod['size'] ?? null, 4, 40, (float) $module_defaults['size'] );
+			}
+			if ( isset( $module_defaults['color'] ) ) {
+				$raw_color    = isset( $raw_mod['color'] ) ? (string) $raw_mod['color'] : (string) $module_defaults['color'];
+				$sanitized    = sanitize_hex_color( $raw_color );
+				$entry['color'] = $sanitized ?: (string) $module_defaults['color'];
+			}
+			if ( isset( $module_defaults['hoverSize'] ) ) {
+				$entry['hoverSize'] = (int) $this->clamp_float( $raw_mod['hoverSize'] ?? null, 20, 200, (float) $module_defaults['hoverSize'] );
+			}
+			if ( isset( $module_defaults['hoverColor'] ) ) {
+				$raw_color    = isset( $raw_mod['hoverColor'] ) ? (string) $raw_mod['hoverColor'] : (string) $module_defaults['hoverColor'];
+				$sanitized    = sanitize_hex_color( $raw_color );
+				$entry['hoverColor'] = $sanitized ?: (string) $module_defaults['hoverColor'];
+			}
+			if ( isset( $module_defaults['hoverOpacity'] ) ) {
+				$entry['hoverOpacity'] = $this->clamp_float( $raw_mod['hoverOpacity'] ?? null, 0, 1, (float) $module_defaults['hoverOpacity'] );
+			}
+			if ( isset( $module_defaults['hoverBlur'] ) ) {
+				$entry['hoverBlur'] = (int) $this->clamp_float( $raw_mod['hoverBlur'] ?? null, 0, 30, (float) $module_defaults['hoverBlur'] );
+			}
+
 			// Clip-reveal (1.19.0): whitelist for `shape`. Seven valid values
 			// covering the supported clip-path presets. Falls back to the
 			// stored default if the incoming value isn't recognised.

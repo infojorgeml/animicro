@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_MAGNETIC_CONFIG, DEFAULT_SCATTER_CONFIG, DEFAULT_SCRAMBLE_CONFIG, DEFAULT_SPIN_CONFIG, DEFAULT_CLIP_REVEAL_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_MAGNETIC_CONFIG, DEFAULT_SCATTER_CONFIG, DEFAULT_SCRAMBLE_CONFIG, DEFAULT_SPIN_CONFIG, DEFAULT_CLIP_REVEAL_CONFIG, DEFAULT_CURSOR_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 import ColorField from './ColorField';
@@ -35,6 +35,7 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   'img-parallax': DEFAULT_IMG_PARALLAX_CONFIG,
   magnet: DEFAULT_MAGNET_CONFIG,
   magnetic: DEFAULT_MAGNETIC_CONFIG,
+  cursor: DEFAULT_CURSOR_CONFIG,
   scatter: DEFAULT_SCATTER_CONFIG,
   scramble: DEFAULT_SCRAMBLE_CONFIG,
   spin: DEFAULT_SPIN_CONFIG,
@@ -523,6 +524,170 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
+        {/* Custom Cursor — Base size */}
+        {moduleId === 'cursor' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Base size
+              <span className="font-mono text-brand-500">{config.size ?? 12}px</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Diameter of the cursor dot when it's NOT hovering an expand target.
+            </p>
+            <input
+              type="range"
+              min="4"
+              max="40"
+              step="1"
+              value={config.size ?? 12}
+              onChange={e => onUpdate({ size: parseInt(e.target.value, 10) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>4px — Tiny dot</span>
+              <span>40px — Bold circle</span>
+            </div>
+          </div>
+        )}
+
+        {/* Custom Cursor — Base color */}
+        {moduleId === 'cursor' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Base color
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Background color of the cursor dot at rest.
+            </p>
+            <ColorField
+              value={config.color ?? '#000000'}
+              onChange={next => onUpdate({ color: next })}
+              fallbackHex="#000000"
+            />
+          </div>
+        )}
+
+        {/* Custom Cursor — Hover size */}
+        {moduleId === 'cursor' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Hover size
+              <span className="font-mono text-brand-500">{config.hoverSize ?? 90}px</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Diameter of the cursor when hovering elements with the <code className="bg-gray-100 px-1 py-0.5 rounded">.am-cursor-expand</code> class. Per-element override via <code className="bg-gray-100 px-1 py-0.5 rounded">data-am-cursor-size</code>.
+            </p>
+            <input
+              type="range"
+              min="20"
+              max="200"
+              step="5"
+              value={config.hoverSize ?? 90}
+              onChange={e => onUpdate({ hoverSize: parseInt(e.target.value, 10) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>20px — Subtle</span>
+              <span>200px — Bold pill</span>
+            </div>
+          </div>
+        )}
+
+        {/* Custom Cursor — Hover color */}
+        {moduleId === 'cursor' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Hover color
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Background of the expanded cursor. Combined with Hover opacity + Hover blur produces the glassmorphism effect.
+            </p>
+            <ColorField
+              value={config.hoverColor ?? '#0a0a0a'}
+              onChange={next => onUpdate({ hoverColor: next })}
+              fallbackHex="#0a0a0a"
+            />
+          </div>
+        )}
+
+        {/* Custom Cursor — Hover opacity */}
+        {moduleId === 'cursor' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Hover opacity
+              <span className="font-mono text-brand-500">{config.hoverOpacity ?? 0.75}</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Alpha of the expanded cursor background. Lower values + a non-zero blur produce a stronger glassmorphism look.
+            </p>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={config.hoverOpacity ?? 0.75}
+              onChange={e => onUpdate({ hoverOpacity: parseFloat(e.target.value) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0 — Transparent</span>
+              <span>1 — Solid</span>
+            </div>
+          </div>
+        )}
+
+        {/* Custom Cursor — Hover blur */}
+        {moduleId === 'cursor' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Hover blur
+              <span className="font-mono text-brand-500">{config.hoverBlur ?? 8}px</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Strength of the <code className="bg-gray-100 px-1 py-0.5 rounded">backdrop-filter: blur()</code> applied to the expanded cursor. Set to 0 to disable the glass effect entirely.
+            </p>
+            <input
+              type="range"
+              min="0"
+              max="30"
+              step="1"
+              value={config.hoverBlur ?? 8}
+              onChange={e => onUpdate({ hoverBlur: parseInt(e.target.value, 10) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0px — No glass</span>
+              <span>30px — Heavy frost</span>
+            </div>
+          </div>
+        )}
+
+        {/* Custom Cursor — Smoothness */}
+        {moduleId === 'cursor' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Smoothness
+              <span className="font-mono text-brand-500">{config.smoothness ?? 0.15}</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Per-frame interpolation factor (LERP). Lower values feel heavy with cinematic drag; higher values feel light and snappy.
+            </p>
+            <input
+              type="range"
+              min="0.01"
+              max="1"
+              step="0.01"
+              value={config.smoothness ?? 0.15}
+              onChange={e => onUpdate({ smoothness: parseFloat(e.target.value) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0.01 — Heavy</span>
+              <span>1 — Instant</span>
+            </div>
+          </div>
+        )}
+
         {/* Magnetic — Range */}
         {moduleId === 'magnetic' && (
           <div>
@@ -751,8 +916,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse, img-parallax, magnet, scramble, spin, magnetic) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && moduleId !== 'spin' && moduleId !== 'magnetic' && (
+        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse, img-parallax, magnet, scramble, spin, magnetic, cursor) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && moduleId !== 'spin' && moduleId !== 'magnetic' && moduleId !== 'cursor' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Duration
@@ -777,8 +942,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
         )}
 
-        {/* Delay (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet, spin, magnetic) */}
-        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && moduleId !== 'spin' && moduleId !== 'magnetic' && (
+        {/* Delay (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet, spin, magnetic, cursor) */}
+        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && moduleId !== 'spin' && moduleId !== 'magnetic' && moduleId !== 'cursor' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Delay
@@ -1179,8 +1344,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Easing (hidden for typewriter, parallax, text-fill-scroll, img-parallax, magnet, scramble, spin, magnetic) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && moduleId !== 'spin' && moduleId !== 'magnetic' && (
+        {/* Easing (hidden for typewriter, parallax, text-fill-scroll, img-parallax, magnet, scramble, spin, magnetic, cursor) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && moduleId !== 'spin' && moduleId !== 'magnetic' && moduleId !== 'cursor' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Easing curve
@@ -1206,8 +1371,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
         )}
 
-        {/* Activation margin (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet, spin, magnetic) */}
-        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && moduleId !== 'spin' && moduleId !== 'magnetic' && (
+        {/* Activation margin (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet, spin, magnetic, cursor) */}
+        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && moduleId !== 'spin' && moduleId !== 'magnetic' && moduleId !== 'cursor' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Activation margin

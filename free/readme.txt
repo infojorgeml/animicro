@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.20.0
+Stable tag: 1.21.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,12 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.21.0 =
+* **New `cursor` module (Pro)** — Replaces the system cursor with a custom circle that follows the mouse with smooth lerp interpolation. When the visitor hovers any element carrying `.am-cursor-expand`, the cursor grows, applies a glassmorphism style (backdrop-filter blur + semi-transparent background), and optionally shows text via `data-am-cursor-text="View"`.
+* Configurable from the admin panel: base size + color, hover size + color + opacity + blur, smoothness (lerp factor). Per-element overrides for size (`data-am-cursor-size`) and text (`data-am-cursor-text`).
+* Auto-active globally if the module is enabled (no `.am-cursor` class on body needed). The native cursor is hidden via critical CSS while the module is active, with explicit exceptions for text inputs so the I-beam stays usable in forms.
+* Auto-disables on touch-only devices, screens narrower than 992px, when the visitor prefers reduced motion, and inside builder editor previews. Reactive to resize — re-evaluates the breakpoint with a debounced listener.
 
 = 1.20.0 =
 * **New `magnetic` module (Pro)** — `.am-magnetic` buttons / icons / links are pulled toward the cursor when it enters their proximity, and snap elastically back when the cursor leaves. Awwwards-style "premium feel" interaction for hero CTAs and nav links.
@@ -253,6 +259,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.21.0 =
+New Pro module `cursor`: custom cursor replacement with smooth lerp follow + expand-on-hover for elements marked with `.am-cursor-expand`. Per-element text and size overrides via `data-am-cursor-text` / `data-am-cursor-size`. Mobile-safe (auto-disables below 992px and on touch-only devices). No breaking changes.
 
 = 1.20.0 =
 New Pro module `magnetic`: local pull-to-cursor effect for buttons and icons. Also adds a new "Mouse Interactions" admin category that groups the existing Magnet module with the new Magnetic. No breaking changes to your saved settings.

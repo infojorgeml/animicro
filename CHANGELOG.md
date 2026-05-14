@@ -5,6 +5,40 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.21.0] - 2026-05-13
+
+### Added
+
+- **`cursor` module (Pro)** — custom global cursor that replaces the system cursor. A `<div id="am-cursor">` is injected into `<body>` and follows the mouse with LERP-smoothed `requestAnimationFrame` interpolation. On hover over any element carrying `.am-cursor-expand`, the cursor grows to a configurable size, applies a glassmorphism style (`backdrop-filter: blur(N)px` + semi-transparent background), and optionally shows text from `data-am-cursor-text="View"`.
+  - **Class**: `.am-cursor-expand` (the trigger class on hover targets).
+  - **Per-element attributes**: `data-am-cursor-text` (string, optional) shown inside the expanded cursor; `data-am-cursor-size` (px, optional) overrides the global hover size for that specific element.
+  - **Module-level settings** (admin global):
+    - `size` (4..40 px, default 12) — base cursor diameter at rest.
+    - `color` (hex, default `#000000`) — base background.
+    - `hoverSize` (20..200 px, default 90) — expanded diameter.
+    - `hoverColor` (hex, default `#0a0a0a`) — hover background base.
+    - `hoverOpacity` (0..1, default 0.75) — alpha applied to hover color. Combined with `hoverBlur` produces glassmorphism.
+    - `hoverBlur` (0..30 px, default 8) — `backdrop-filter: blur()` amount. Set to 0 to disable the glass effect.
+    - `smoothness` (0.01..1, default 0.15) — per-frame lerp factor. Reuses the existing magnet sanitizer.
+- **Mouse Interactions category now has three modules**: magnet (1.15.0, recategorized in 1.20.0), magnetic (1.20.0), cursor (1.21.0). Each operates independently; they can coexist on the same page without conflict.
+
+### Wiring
+
+- Frontend: `frontend/src/modules/cursor.js` (new, ~200 lines) with one global rAF loop, one passive `mousemove` listener, delegated `mouseover` / `mouseout` listeners for hover state, and a debounced `resize` listener that activates/deactivates across the 992px breakpoint. Registry entry in `frontend/src/core/registry.js`.
+- PHP: `'cursor'` added to `Animicro::PRO_MODULES`, `available_modules`, and `module_settings` defaults. `Animicro_License_Manager::PRO_MODULES` also lists `'cursor'`. `class-compatibility.php::MODULE_INITIAL_CSS` has an empty entry; the special-case block in `get_editor_css()` emits the critical CSS (the `#am-cursor` element styles + `body.am-cursor-active { cursor: none !important }` + the text-input exception that preserves the I-beam in form fields for usability). `class-admin.php::update_settings()` gained six new sanitizer branches for `size` (clamp 4..40, cast int), `color` (sanitize_hex_color), `hoverSize` (clamp 20..200, cast int), `hoverColor` (sanitize_hex_color), `hoverOpacity` (clamp 0..1), and `hoverBlur` (clamp 0..30, cast int). `smoothness` reuses the magnet/magnetic branch.
+- Admin React: `ModuleConfig` extended with `size?`, `color?`, `hoverSize?`, `hoverColor?`, `hoverOpacity?`, `hoverBlur?`. `DEFAULT_CURSOR_CONFIG` and a new `MODULE_INFO` entry under `category: 'mouse'`. `ModuleSettings.tsx` adds seven controls (Base size, Base color, Hover size, Hover color, Hover opacity, Hover blur, Smoothness), reuses the existing `ColorField` component for the two color pickers, and excludes cursor from the generic duration / delay / easing / margin blocks. Two new `DATA_ATTRIBUTES` rows: `data-am-cursor-text` and `data-am-cursor-size`.
+
+### Safety / accessibility
+
+- **`prefers-reduced-motion: reduce`**: `init()` bails out completely — no listeners, no rAF, no overrides to the native cursor. The system cursor stays visible and usable.
+- **Touch-only devices** (`(pointer: coarse) AND NOT (pointer: fine)`): cursor never activates. Touch users get the native experience.
+- **Screens < 992px**: cursor auto-disables. Reactive: drag the browser window across the breakpoint and the cursor activates / deactivates cleanly (debounced 120ms to avoid thrashing).
+- **Builder editors** (Bricks / Elementor / etc.): `main.js::isInBuilder()` short-circuit. No cursor inside the editor preview.
+- **Page hidden**: the browser auto-pauses `requestAnimationFrame` while the tab is inactive.
+- **Text input usability**: `cursor: none !important` is overridden by `cursor: text !important` for `input[type=text|email|password|search|url|tel|number]` and `textarea`, so the I-beam stays visible inside form fields where users expect it.
+- **`pointer-events: none`** on `#am-cursor` so it never intercepts clicks. All form / link interactions pass through normally.
+- **`will-change: transform, width, height`** for GPU compositing.
+
 ## [1.20.0] - 2026-05-13
 
 ### Added

@@ -29,6 +29,7 @@ const MODULES = {
   'clip-reveal':  () => import('../modules/clip-reveal.js'),
   'magnet':       () => import('../modules/magnet.js'),
   'magnetic':     () => import('../modules/magnetic.js'),
+  'cursor':       () => import('../modules/cursor.js'),
   'spin':         () => import('../modules/spin.js'),
   'page-curtain': () => import('../modules/page-curtain.js'),
 };
