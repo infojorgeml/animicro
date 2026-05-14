@@ -86,7 +86,7 @@ export default function Dashboard({ settings, isPremium, onToggleModule, onUpdat
                             ))}
                             {mod.isPro && (
                               <span className={`
-                                rounded px-2 py-1 text-xs font-semibold uppercase
+                                rounded px-2 py-1 text-[10px] font-semibold uppercase
                                 ${isPremium
                                   ? 'bg-[#ffeeb5] text-[#ad8700]'
                                   : 'bg-gray-200 text-gray-500'}
