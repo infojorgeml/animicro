@@ -86,6 +86,19 @@ export const DEFAULT_SCRAMBLE_CONFIG: ModuleConfig = {
   scrambleSpeed:  0.05,
 };
 
+export const DEFAULT_MAGNETIC_CONFIG: ModuleConfig = {
+  // duration/easing/delay/margin are inert (local rAF lerp loop, no
+  // viewport gating). Kept for ModuleConfig shape + REST loop.
+  duration:    0.6,
+  easing:      'ease-out',
+  delay:       0,
+  margin:      '-50px 0px',
+  range:       100,
+  strength:    30,
+  smoothness:  0.15,
+  axis:        'both',
+};
+
 export const DEFAULT_CLIP_REVEAL_CONFIG: ModuleConfig = {
   duration: 0.8,
   easing:   'ease-out',
@@ -243,7 +256,7 @@ export const DEFAULT_PAGE_CURTAIN_CONFIG: ModuleConfig = {
 // transitions live in their own admin tab (Page Transitions), so Dashboard.tsx
 // doesn't render them. The category tag here exists purely to identify the
 // page-curtain entry when PageTransitions.tsx filters by it.
-export type ModuleCategory = 'entry' | 'text' | 'group' | 'scroll' | 'continuous' | 'media' | 'page';
+export type ModuleCategory = 'entry' | 'text' | 'group' | 'scroll' | 'continuous' | 'media' | 'page' | 'mouse';
 
 export interface ModuleInfo {
   id: string;
@@ -257,6 +270,7 @@ export interface ModuleInfo {
 export const MODULE_CATEGORIES: { id: ModuleCategory; label: string; description: string }[] = [
   { id: 'entry',      label: 'Entry Animations',     description: 'Triggered once when the element enters the viewport' },
   { id: 'continuous', label: 'Continuous (Infinite)', description: 'Infinite looping animations that play constantly, no scroll trigger' },
+  { id: 'mouse',      label: 'Mouse Interactions',    description: 'Cursor-driven effects: elements that react to mouse position' },
   { id: 'text',       label: 'Text',                 description: 'Typography-specific animations' },
   { id: 'group',      label: 'Groups & Layouts',     description: 'Animate containers and their children' },
   { id: 'scroll',     label: 'Scroll & Continuous',   description: 'Scroll-linked animations' },
@@ -277,8 +291,11 @@ export const MODULE_INFO: ModuleInfo[] = [
   // Continuous (Infinite)
   { id: 'float',       name: 'Float',       description: 'Infinite soft up/down floating motion',     cssClass: '.am-float',       isPro: false, category: 'continuous' },
   { id: 'pulse',       name: 'Pulse',       description: 'Infinite gentle scale pulse — breathing-like', cssClass: '.am-pulse',    isPro: false, category: 'continuous' },
-  { id: 'magnet',      name: 'Magnet',      description: 'Element drifts smoothly toward the mouse with inertia', cssClass: '.am-magnet', isPro: true,  category: 'continuous' },
   { id: 'spin',        name: 'Spin',        description: 'Continuous rotation that speeds up momentarily with scroll', cssClass: '.am-spin',   isPro: true,  category: 'continuous' },
+
+  // Mouse Interactions
+  { id: 'magnet',      name: 'Magnet',      description: 'Element drifts smoothly toward the mouse with inertia (viewport-wide effect)', cssClass: '.am-magnet',   isPro: true, category: 'mouse' },
+  { id: 'magnetic',    name: 'Magnetic',    description: 'Buttons and icons are pulled toward the cursor when it gets close (local effect)', cssClass: '.am-magnetic', isPro: true, category: 'mouse' },
 
   // Text
   { id: 'split',        name: 'Split Text',   description: 'Splits and animates text by letters/words', cssClass: '.am-split-chars .am-split-words', isPro: true, category: 'text' },
@@ -349,9 +366,10 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-scale-max',          type: 'float',        defaultValue: '1.05',    usedBy: 'pulse' },
   { attribute: 'data-am-skew',               type: 'float (deg)',  defaultValue: '5',       usedBy: 'skew-up' },
   { attribute: 'data-am-zoom-scale',         type: 'float',        defaultValue: '1.08',    usedBy: 'hover-zoom' },
-  { attribute: 'data-am-strength',           type: 'float (1–100)',  defaultValue: '15',    usedBy: 'magnet' },
-  { attribute: 'data-am-smoothness',         type: 'float (0.01–1)', defaultValue: '0.08',  usedBy: 'magnet — lerp factor; lower = more inertia' },
-  { attribute: 'data-am-axis',               type: 'enum',           defaultValue: 'both',  usedBy: 'magnet — `x` / `y` / `both`' },
+  { attribute: 'data-am-strength',           type: 'float (1–100)',  defaultValue: '15 (magnet) / 30 (magnetic)', usedBy: 'magnet, magnetic — pull strength as %' },
+  { attribute: 'data-am-smoothness',         type: 'float (0.01–1)', defaultValue: '0.08 (magnet) / 0.15 (magnetic)', usedBy: 'magnet, magnetic — lerp factor; lower = more inertia' },
+  { attribute: 'data-am-axis',               type: 'enum',           defaultValue: 'both',  usedBy: 'magnet, magnetic — `x` / `y` / `both`' },
+  { attribute: 'data-am-range',              type: 'float (20–600 px)', defaultValue: '100', usedBy: 'magnetic — attraction radius around the element' },
 ];
 
 export interface EasingOption {

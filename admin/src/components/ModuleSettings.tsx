@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_SCATTER_CONFIG, DEFAULT_SCRAMBLE_CONFIG, DEFAULT_SPIN_CONFIG, DEFAULT_CLIP_REVEAL_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_MAGNETIC_CONFIG, DEFAULT_SCATTER_CONFIG, DEFAULT_SCRAMBLE_CONFIG, DEFAULT_SPIN_CONFIG, DEFAULT_CLIP_REVEAL_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 import ColorField from './ColorField';
@@ -34,6 +34,7 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   'hover-zoom': DEFAULT_HOVER_ZOOM_CONFIG,
   'img-parallax': DEFAULT_IMG_PARALLAX_CONFIG,
   magnet: DEFAULT_MAGNET_CONFIG,
+  magnetic: DEFAULT_MAGNETIC_CONFIG,
   scatter: DEFAULT_SCATTER_CONFIG,
   scramble: DEFAULT_SCRAMBLE_CONFIG,
   spin: DEFAULT_SPIN_CONFIG,
@@ -522,6 +523,120 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
+        {/* Magnetic — Range */}
+        {moduleId === 'magnetic' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Range
+              <span className="font-mono text-brand-500">{config.range ?? 100}px</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Attraction radius around the element. The cursor has to enter this distance from the element's centre before the pull kicks in. Larger values make the effect feel "field-like"; smaller values feel "snappy & precise".
+            </p>
+            <input
+              type="range"
+              min="20"
+              max="600"
+              step="10"
+              value={config.range ?? 100}
+              onChange={e => onUpdate({ range: parseInt(e.target.value, 10) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>20px — Tight</span>
+              <span>600px — Wide field</span>
+            </div>
+          </div>
+        )}
+
+        {/* Magnetic — Strength */}
+        {moduleId === 'magnetic' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Strength
+              <span className="font-mono text-brand-500">{config.strength ?? 30}</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              How far the element travels toward the cursor, as a percentage of the cursor-to-centre distance.
+            </p>
+            <input
+              type="range"
+              min="1"
+              max="100"
+              step="1"
+              value={config.strength ?? 30}
+              onChange={e => onUpdate({ strength: parseInt(e.target.value, 10) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>1 — Whisper</span>
+              <span>100 — Stuck to cursor</span>
+            </div>
+          </div>
+        )}
+
+        {/* Magnetic — Smoothness */}
+        {moduleId === 'magnetic' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Smoothness
+              <span className="font-mono text-brand-500">{config.smoothness ?? 0.15}</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Per-frame interpolation factor (LERP). Lower values feel heavy with inertia; higher values feel light and snappy.
+            </p>
+            <input
+              type="range"
+              min="0.01"
+              max="1"
+              step="0.01"
+              value={config.smoothness ?? 0.15}
+              onChange={e => onUpdate({ smoothness: parseFloat(e.target.value) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0.01 — Heavy</span>
+              <span>1 — Instant</span>
+            </div>
+          </div>
+        )}
+
+        {/* Magnetic — Axis */}
+        {moduleId === 'magnetic' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Axis
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Restrict movement to a single axis. Useful for nav links (horizontal only) or sidebars (vertical only).
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {([
+                { value: 'both', label: 'Both',       icon: '✛' },
+                { value: 'x',    label: 'Horizontal', icon: '↔' },
+                { value: 'y',    label: 'Vertical',   icon: '↕' },
+              ] as const).map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => onUpdate({ axis: opt.value })}
+                  className={`
+                    rounded-lg border px-3 py-2.5 text-left transition-colors
+                    ${(config.axis ?? 'both') === opt.value
+                      ? 'border-brand-500 bg-brand-50 text-brand-700'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'}
+                  `}
+                >
+                  <span className="block text-sm font-medium">{opt.icon}</span>
+                  <span className="block text-xs text-gray-400 mt-0.5">{opt.label}</span>
+                </button>
+              ))}
+            </div>
+            <p className="mt-1.5 text-xs text-gray-400">
+              Current: <span className="font-mono text-brand-500">{config.axis ?? 'both'}</span>
+            </p>
+          </div>
+        )}
+
         {/* Magnet — Strength */}
         {moduleId === 'magnet' && (
           <div>
@@ -636,8 +751,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse, img-parallax, magnet, scramble, spin) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && moduleId !== 'spin' && (
+        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse, img-parallax, magnet, scramble, spin, magnetic) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && moduleId !== 'spin' && moduleId !== 'magnetic' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Duration
@@ -662,8 +777,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
         )}
 
-        {/* Delay (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet, spin) */}
-        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && moduleId !== 'spin' && (
+        {/* Delay (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet, spin, magnetic) */}
+        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && moduleId !== 'spin' && moduleId !== 'magnetic' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Delay
@@ -1064,8 +1179,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Easing (hidden for typewriter, parallax, text-fill-scroll, img-parallax, magnet, scramble, spin) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && moduleId !== 'spin' && (
+        {/* Easing (hidden for typewriter, parallax, text-fill-scroll, img-parallax, magnet, scramble, spin, magnetic) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && moduleId !== 'spin' && moduleId !== 'magnetic' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Easing curve
@@ -1091,8 +1206,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
         )}
 
-        {/* Activation margin (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet, spin) */}
-        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && moduleId !== 'spin' && (
+        {/* Activation margin (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet, spin, magnetic) */}
+        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && moduleId !== 'spin' && moduleId !== 'magnetic' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Activation margin

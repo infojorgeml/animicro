@@ -5,6 +5,35 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.20.0] - 2026-05-13
+
+### Added
+
+- **`magnetic` module (Pro)** — local pull-to-cursor interaction for buttons, icons and links. When the visitor's pointer enters the configured radius around an element's centre, the element is translated toward the cursor by a percentage of the cursor-to-centre distance. When the cursor exits the radius, the lerp target snaps back to `(0, 0)` and the element drifts elastically home. The classic Awwwards-style "premium feel" interaction.
+  - **Class**: `.am-magnetic`.
+  - **Per-element attributes**: `data-am-range` (NEW, 20..600 px, default 100 — attraction radius around the element's centre). `data-am-strength` (reuses magnet's sanitizer, 1..100, default 30 — % of distance to pull). `data-am-smoothness` (reuses magnet's, 0.01..1, default 0.15 — lerp factor per frame). `data-am-axis` (reuses magnet's, `x`/`y`/`both`, default `both` — axis lock).
+  - **Module-level settings** (admin global): all four fields as defaults.
+- **New admin category `mouse` — "Mouse Interactions"** in `MODULE_CATEGORIES`, positioned between `continuous` and `text`. Description: *"Cursor-driven effects: elements that react to mouse position"*. Groups cursor-related modules naturally (current: magnet + magnetic; future candidates: cursor-follower, magnetic-links, etc.).
+
+### Changed
+
+- **Magnet (existing module) moved category** from `continuous` to `mouse`. Zero behavioural changes — same code, same defaults, same data-am-* attributes, same sanitizers. The card just renders under "Mouse Interactions" in the Modules dashboard now instead of "Continuous (Infinite)". Users who already had Magnet activated in pre-1.20 installs find their `active_modules` and `module_settings.magnet` intact after the update — only the visual placement changed.
+
+### Wiring
+
+- Frontend: `frontend/src/modules/magnetic.js` (new, ~150 lines). One global pointermove listener (passive), one rAF loop, scroll + resize listeners to refresh cached `cx`/`cy` per element (avoids `getBoundingClientRect()` per tick). Registry entry in `frontend/src/core/registry.js`.
+- PHP: `'magnetic'` added to `Animicro::PRO_MODULES`, `available_modules` (next to `magnet`), and `module_settings` defaults. `Animicro_License_Manager::PRO_MODULES` also lists `'magnetic'`. `class-compatibility.php::MODULE_INITIAL_CSS` has an empty entry (no initial-hide — element starts in its natural position). `class-admin.php::update_settings()` gained ONE new sanitizer branch (`range`, `clamp_float` 20..600); `strength` / `smoothness` / `axis` reuse the magnet sanitizers verbatim.
+- Admin React: `ModuleConfig` extended with `range?: number`. `ModuleCategory` type extended with `'mouse'`. `MODULE_CATEGORIES` array gets the new entry. `DEFAULT_MAGNETIC_CONFIG` added; `magnet` MODULE_INFO entry recategorized to `'mouse'`. `ModuleSettings.tsx`: imports `DEFAULT_MAGNETIC_CONFIG`, adds it to the `DEFAULTS` map, renders four magnetic-specific controls (Range, Strength, Smoothness, Axis 3-button), and excludes magnetic from the generic duration / delay / easing / margin blocks. `DATA_ATTRIBUTES` rows updated: `data-am-strength` / `data-am-smoothness` / `data-am-axis` now list both `magnet` and `magnetic` as users; new row for `data-am-range`.
+
+### Safety / accessibility
+
+- **`prefers-reduced-motion: reduce`**: `init()` bails out completely — no listeners, no rAF.
+- **Touch-only devices** (`(pointer: coarse) AND NOT (pointer: fine)`): skip. Hybrid laptops with trackpad + touchscreen still get the effect.
+- **Builder editors**: `main.js::isInBuilder()` short-circuit.
+- **Page hidden**: browser auto-pauses rAF.
+- **Init dedup** via `data-am-magnetic-ready="1"`.
+- **`pointermove` listener** (passive: true) unifies mouse / pen input. Touch-only is already filtered before the listener is attached.
+
 ## [1.19.0] - 2026-05-13
 
 ### Added

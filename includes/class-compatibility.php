@@ -47,6 +47,10 @@ class Animicro_Compatibility {
 		// Spin doesn't need an initial-hide — the element starts visible
 		// in its natural position and rotates from there each frame.
 		'spin'          => '',
+		// Magnetic doesn't need an initial-hide — the element starts in
+		// its natural position and translates from there when the cursor
+		// approaches.
+		'magnetic'      => '',
 		// Clip-reveal: critical inline rule clips the element entirely
 		// (inset 100% = nothing visible) until Motion's animate() writes
 		// the first inline clip-path frame, sliding from the variant's
