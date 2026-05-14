@@ -503,6 +503,24 @@ class Animicro_Admin {
 				$entry['scrambleSpeed'] = $this->clamp_float( $raw_mod['scrambleSpeed'] ?? null, 0.02, 0.5, (float) $module_defaults['scrambleSpeed'] );
 			}
 
+			// Spin (1.18.0): spinSpeed / spinDirection / scrollBoost.
+			// Distinct field names (vs `speed` / `direction`) so the
+			// REST sanitizers don't collide with parallax (`speed`, clamp
+			// -5..5) or page-curtain (`direction`, whitelist fade/slide-*).
+			if ( isset( $module_defaults['spinSpeed'] ) ) {
+				$entry['spinSpeed'] = $this->clamp_float( $raw_mod['spinSpeed'] ?? null, 1, 360, (float) $module_defaults['spinSpeed'] );
+			}
+			if ( isset( $module_defaults['spinDirection'] ) ) {
+				$allowed_spin_dirs = [ 'left', 'right' ];
+				$raw_spin_dir      = isset( $raw_mod['spinDirection'] ) ? (string) $raw_mod['spinDirection'] : (string) $module_defaults['spinDirection'];
+				$entry['spinDirection'] = in_array( $raw_spin_dir, $allowed_spin_dirs, true )
+					? $raw_spin_dir
+					: (string) $module_defaults['spinDirection'];
+			}
+			if ( isset( $module_defaults['scrollBoost'] ) ) {
+				$entry['scrollBoost'] = $this->clamp_float( $raw_mod['scrollBoost'] ?? null, 0, 20, (float) $module_defaults['scrollBoost'] );
+			}
+
 			// Scatter (1.16.0): radius controls how far each span starts from
 			// its final position; rotateMax sets the max random rotation
 			// (0 disables rotation entirely). staggerDelay reuses the

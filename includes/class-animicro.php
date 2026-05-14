@@ -8,7 +8,7 @@ class Animicro {
 	const PRO_MODULES = [
 		'blur', 'stagger', 'grid-reveal', 'text-fill-scroll',
 		'parallax', 'split', 'text-reveal', 'img-parallax', 'magnet',
-		'scatter', 'scramble',
+		'scatter', 'scramble', 'spin',
 	];
 
 	private static ?Animicro $instance = null;
@@ -76,7 +76,7 @@ class Animicro {
 	public static function get_default_settings(): array {
 		return [
 			'active_modules'    => [],
-			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'float', 'pulse', 'hover-zoom', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'img-parallax', 'magnet', 'split', 'scatter', 'scramble', 'text-reveal', 'typewriter', 'page-curtain' ],
+			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'float', 'pulse', 'hover-zoom', 'spin', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'img-parallax', 'magnet', 'split', 'scatter', 'scramble', 'text-reveal', 'typewriter', 'page-curtain' ],
 			'module_settings'   => [
 				'fade' => [
 					'duration' => 0.6,
@@ -153,6 +153,21 @@ class Animicro {
 					'margin'         => '-50px 0px',
 					'staggerDelay'   => 0.04,
 					'scrambleSpeed'  => 0.05,
+				],
+				'spin' => [
+					// duration/easing/delay/margin are inert (continuous,
+					// driven by an rAF loop), kept to satisfy the REST loop.
+					// Field names are spinSpeed / spinDirection (not speed /
+					// direction) so the REST sanitizers don't collide with
+					// parallax's `speed` (clamp -5..5) or page-curtain's
+					// `direction` (whitelist fade/slide-up/slide-down).
+					'duration'      => 0.6,
+					'easing'        => 'linear',
+					'delay'         => 0.0,
+					'margin'        => '-50px 0px',
+					'spinSpeed'     => 30.0,
+					'spinDirection' => 'right',
+					'scrollBoost'   => 5.0,
 				],
 				'text-reveal' => [
 					'duration'     => 0.6,

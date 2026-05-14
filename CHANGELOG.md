@@ -5,6 +5,33 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.18.0] - 2026-05-13
+
+### Added
+
+- **`spin` module (Pro)** — continuous rotation that accelerates momentarily when the visitor scrolls, then decays back to the baseline. The Awwwards-style circular-badge effect. Per-element direction (`data-am-direction="left|right"`) and baseline speed (`data-am-speed`, deg/sec). Default direction / speed / scroll-boost configured globally from the admin panel.
+  - **Architecture**: single global `requestAnimationFrame` loop + single global `scroll` listener (passive) + single global `IntersectionObserver`. Only elements currently in (or near) the viewport are ticked each frame; when none are visible, the rAF loop is paused entirely (`rafId = null`) and resumed via `ensureLoop()` when an element re-enters the viewport. CPU cost off-screen ≈ 0.
+  - **Why a manual rAF loop instead of Motion's `animate({ repeat: Infinity })`**: Motion can't modulate animation speed per frame from outside the animation; we need `(baseSpeed + scrollVelocity * scrollBoost)` every frame. Same precedent as magnet.
+  - **Frame-delta correct**: rotation is computed in degrees-per-**second** scaled by `deltaSec = (now - lastTimestamp) / 1000`, not by a fixed per-frame step. This keeps the visual speed constant under variable frame rates (e.g. 30fps under heavy load still looks the same as 60fps).
+  - **Decay**: scroll velocity multiplies by `0.92` each frame (~8%/frame, ~150ms half-life) — the boost dissipates smoothly into the baseline.
+  - **Cap**: `scrollVelocity` is capped at `min(dy, 80)` per `scroll` event so a giant programmatic `scrollTo()` doesn't spin the badges wildly.
+  - **GPU compositing**: `will-change: transform` applied to each element so per-frame transform writes stay off the main thread.
+
+### Wiring
+
+- Frontend: `frontend/src/modules/spin.js` (new, ~140 lines). Registry entry in `frontend/src/core/registry.js`.
+- PHP: `'spin'` added to `Animicro::PRO_MODULES`, `available_modules` (placed inside the "continuous" section), and `module_settings` defaults. Fields are `spinSpeed: 30.0`, `spinDirection: 'right'`, `scrollBoost: 5.0` (plus the standard inert duration/easing/delay/margin). Names are **`spinSpeed`** / **`spinDirection`** (not `speed` / `direction`) on purpose: the existing `speed` REST sanitizer clamps to `-5..5` (parallax) and the existing `direction` sanitizer's allow-list is `fade/slide-up/slide-down` (page-curtain). Using distinct keys avoids silent collisions. `Animicro_License_Manager::PRO_MODULES` also lists `'spin'`. `class-compatibility.php::MODULE_INITIAL_CSS` has an empty entry — no initial-hide rule (element starts in its natural position). `class-admin.php::update_settings()` gained three sanitizer branches: `clamp_float` 1..360 for `spinSpeed`, allow-list (`left`/`right`) for `spinDirection`, `clamp_float` 0..20 for `scrollBoost`.
+- Admin React: `ModuleConfig` extended with `spinSpeed? / spinDirection? / scrollBoost?`. `DEFAULT_SPIN_CONFIG` and a new `MODULE_INFO` entry under `category: 'continuous'`. `ModuleSettings.tsx`: three new controls (Speed slider 1–360°/s, Direction 2-button selector CW/CCW with `↻`/`↺` glyphs, Scroll boost slider 0–20). Spin is excluded from the generic duration / delay / easing / margin / distance blocks (all inert for this module). New rows in `DATA_ATTRIBUTES` for `data-am-speed` (extended to include spin's deg/sec semantics) and `data-am-direction` (new row, dedicated to spin's left/right).
+
+### Safety / graceful degradation
+
+- **`prefers-reduced-motion: reduce`**: `init()` bails out completely — no listener, no observer, no rAF. Elements stay in their natural (unrotated) position.
+- **Builder editors** (Bricks / Elementor / etc.): `main.js::isInBuilder()` short-circuits before module loading.
+- **Page hidden** (tab switched away): the browser pauses `requestAnimationFrame` automatically, so the rotation freezes and resumes seamlessly when the tab comes back. No extra code required.
+- **IntersectionObserver fallback**: very old browsers without IO get a "always visible" fallback so they still see the effect.
+- **Init dedup**: `data-am-spin-ready="1"` flag per element prevents double-registration if the registry re-runs (HMR, late-injected DOM).
+- **Lenis smooth scroll** (existing Pro feature): unaffected — Lenis still emits real `scroll` events that the listener catches.
+
 ## [1.17.0] - 2026-05-13
 
 ### Added

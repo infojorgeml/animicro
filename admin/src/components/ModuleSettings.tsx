@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_SCATTER_CONFIG, DEFAULT_SCRAMBLE_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_SCATTER_CONFIG, DEFAULT_SCRAMBLE_CONFIG, DEFAULT_SPIN_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 import ColorField from './ColorField';
@@ -36,6 +36,7 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   magnet: DEFAULT_MAGNET_CONFIG,
   scatter: DEFAULT_SCATTER_CONFIG,
   scramble: DEFAULT_SCRAMBLE_CONFIG,
+  spin: DEFAULT_SPIN_CONFIG,
 };
 
 const hasDistance = (id: string) => id.startsWith('slide-') || id === 'skew-up' || id === 'split' || id === 'stagger' || id === 'grid-reveal';
@@ -398,6 +399,93 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
+        {/* Spin — Speed (degrees per second) */}
+        {moduleId === 'spin' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Speed
+              <span className="font-mono text-brand-500">{config.spinSpeed ?? 30}°/s</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Baseline rotation speed in degrees per second. Per-element override via <code className="bg-gray-100 px-1 py-0.5 rounded">data-am-speed</code>.
+            </p>
+            <input
+              type="range"
+              min="1"
+              max="360"
+              step="5"
+              value={config.spinSpeed ?? 30}
+              onChange={e => onUpdate({ spinSpeed: parseInt(e.target.value, 10) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>1°/s — Subtle</span>
+              <span>360°/s — Fast</span>
+            </div>
+          </div>
+        )}
+
+        {/* Spin — Direction (CW / CCW) */}
+        {moduleId === 'spin' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Direction
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Default rotation sense. Per-element override via <code className="bg-gray-100 px-1 py-0.5 rounded">data-am-direction="left"</code> or <code className="bg-gray-100 px-1 py-0.5 rounded">"right"</code>.
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {([
+                { value: 'right', label: 'Right (CW)',  icon: '↻' },
+                { value: 'left',  label: 'Left (CCW)',  icon: '↺' },
+              ] as const).map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => onUpdate({ spinDirection: opt.value })}
+                  className={`
+                    rounded-lg border px-3 py-2.5 text-left transition-colors
+                    ${(config.spinDirection ?? 'right') === opt.value
+                      ? 'border-brand-500 bg-brand-50 text-brand-700'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'}
+                  `}
+                >
+                  <span className="block text-sm font-medium">{opt.icon}</span>
+                  <span className="block text-xs text-gray-400 mt-0.5">{opt.label}</span>
+                </button>
+              ))}
+            </div>
+            <p className="mt-1.5 text-xs text-gray-400">
+              Current: <span className="font-mono text-brand-500">{config.spinDirection ?? 'right'}</span>
+            </p>
+          </div>
+        )}
+
+        {/* Spin — Scroll boost */}
+        {moduleId === 'spin' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Scroll boost
+              <span className="font-mono text-brand-500">{config.scrollBoost ?? 5}</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              How much the scroll velocity adds to the rotation speed momentarily. <strong>0</strong> = scroll has no effect (constant baseline). Higher values make the rotation react more dramatically to scroll.
+            </p>
+            <input
+              type="range"
+              min="0"
+              max="20"
+              step="1"
+              value={config.scrollBoost ?? 5}
+              onChange={e => onUpdate({ scrollBoost: parseInt(e.target.value, 10) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0 — No scroll reaction</span>
+              <span>20 — Wild</span>
+            </div>
+          </div>
+        )}
+
         {/* Magnet — Strength */}
         {moduleId === 'magnet' && (
           <div>
@@ -512,8 +600,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse, img-parallax, magnet, scramble) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && (
+        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse, img-parallax, magnet, scramble, spin) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && moduleId !== 'spin' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Duration
@@ -538,8 +626,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
         )}
 
-        {/* Delay (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet) */}
-        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && (
+        {/* Delay (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet, spin) */}
+        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && moduleId !== 'spin' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Delay
@@ -940,8 +1028,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Easing (hidden for typewriter, parallax, text-fill-scroll, img-parallax, magnet, scramble) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && (
+        {/* Easing (hidden for typewriter, parallax, text-fill-scroll, img-parallax, magnet, scramble, spin) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && moduleId !== 'spin' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Easing curve
@@ -967,8 +1055,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
         </div>
         )}
 
-        {/* Activation margin (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet) */}
-        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && (
+        {/* Activation margin (hidden for parallax, text-fill-scroll, img-parallax, hover-zoom, magnet, spin) */}
+        {moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'img-parallax' && moduleId !== 'hover-zoom' && moduleId !== 'magnet' && moduleId !== 'spin' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Activation margin

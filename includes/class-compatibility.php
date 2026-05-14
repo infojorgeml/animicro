@@ -44,6 +44,9 @@ class Animicro_Compatibility {
 		// Scramble doesn't need an initial-hide — the text is already
 		// rendered by the theme and we mutate textContent in place.
 		'scramble'      => '',
+		// Spin doesn't need an initial-hide — the element starts visible
+		// in its natural position and rotates from there each frame.
+		'spin'          => '',
 		'text-reveal' => 'opacity:0;will-change:opacity,transform;',
 		'typewriter'  => 'opacity:0;',
 		// page-curtain doesn't use the regular `.am-NAME` descendant selector

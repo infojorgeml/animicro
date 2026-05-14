@@ -86,6 +86,18 @@ export const DEFAULT_SCRAMBLE_CONFIG: ModuleConfig = {
   scrambleSpeed:  0.05,
 };
 
+export const DEFAULT_SPIN_CONFIG: ModuleConfig = {
+  // duration / easing / delay / margin are inert (continuous, manual
+  // rAF loop). Kept for shape consistency with the REST loop.
+  duration:       0.6,
+  easing:         'linear',
+  delay:          0,
+  margin:         '-50px 0px',
+  spinSpeed:      30,
+  spinDirection:  'right',
+  scrollBoost:    5,
+};
+
 export const DEFAULT_TEXT_REVEAL_CONFIG: ModuleConfig = {
   duration: 0.6,
   easing: 'ease-out',
@@ -258,6 +270,7 @@ export const MODULE_INFO: ModuleInfo[] = [
   { id: 'float',       name: 'Float',       description: 'Infinite soft up/down floating motion',     cssClass: '.am-float',       isPro: false, category: 'continuous' },
   { id: 'pulse',       name: 'Pulse',       description: 'Infinite gentle scale pulse — breathing-like', cssClass: '.am-pulse',    isPro: false, category: 'continuous' },
   { id: 'magnet',      name: 'Magnet',      description: 'Element drifts smoothly toward the mouse with inertia', cssClass: '.am-magnet', isPro: true,  category: 'continuous' },
+  { id: 'spin',        name: 'Spin',        description: 'Continuous rotation that speeds up momentarily with scroll', cssClass: '.am-spin',   isPro: true,  category: 'continuous' },
 
   // Text
   { id: 'split',        name: 'Split Text',   description: 'Splits and animates text by letters/words', cssClass: '.am-split-chars .am-split-words', isPro: true, category: 'text' },
@@ -304,7 +317,8 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-scale',     type: 'float',         defaultValue: '0.95',      usedBy: 'scale' },
   { attribute: 'data-am-blur',      type: 'float (px)',    defaultValue: '4',         usedBy: 'blur' },
   { attribute: 'data-am-stagger',   type: 'float (s)',     defaultValue: '0.05',      usedBy: 'stagger, split, text-reveal, grid-reveal' },
-  { attribute: 'data-am-speed',     type: 'float',         defaultValue: '0.5 (parallax) / 0.2 (img-parallax)', usedBy: 'parallax, img-parallax' },
+  { attribute: 'data-am-speed',     type: 'float',         defaultValue: '0.5 (parallax) / 0.2 (img-parallax) / 30 (spin, deg/sec)', usedBy: 'parallax, img-parallax, spin' },
+  { attribute: 'data-am-direction', type: 'enum',          defaultValue: 'right',     usedBy: 'spin — `left` / `right` (CW / CCW rotation)' },
   { attribute: 'data-am-typing-speed', type: 'float (s)',  defaultValue: '0.06',      usedBy: 'typewriter' },
   { attribute: 'data-am-back-speed',   type: 'float (s)',  defaultValue: '0.03',      usedBy: 'typewriter' },
   { attribute: 'data-am-back-delay',   type: 'float (s)',  defaultValue: '1.5',       usedBy: 'typewriter' },
