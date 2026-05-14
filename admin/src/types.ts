@@ -46,6 +46,7 @@ export interface ModuleConfig {
   hoverColor?: string;
   hoverOpacity?: number;
   hoverBlur?: number;
+  angle?: number;
 }
 
 export interface SmoothScrollConfig {

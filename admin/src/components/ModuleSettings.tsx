@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_MAGNETIC_CONFIG, DEFAULT_SCATTER_CONFIG, DEFAULT_SCRAMBLE_CONFIG, DEFAULT_SPIN_CONFIG, DEFAULT_CLIP_REVEAL_CONFIG, DEFAULT_CURSOR_CONFIG, DEFAULT_KEN_BURNS_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_MAGNETIC_CONFIG, DEFAULT_SCATTER_CONFIG, DEFAULT_SCRAMBLE_CONFIG, DEFAULT_SPIN_CONFIG, DEFAULT_CLIP_REVEAL_CONFIG, DEFAULT_CURSOR_CONFIG, DEFAULT_KEN_BURNS_CONFIG, DEFAULT_FLIP_X_CONFIG, DEFAULT_FLIP_Y_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 import ColorField from './ColorField';
@@ -41,6 +41,8 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   spin: DEFAULT_SPIN_CONFIG,
   'clip-reveal': DEFAULT_CLIP_REVEAL_CONFIG,
   'ken-burns': DEFAULT_KEN_BURNS_CONFIG,
+  'flip-x': DEFAULT_FLIP_X_CONFIG,
+  'flip-y': DEFAULT_FLIP_Y_CONFIG,
 };
 
 const hasDistance = (id: string) => id.startsWith('slide-') || id === 'skew-up' || id === 'split' || id === 'stagger' || id === 'grid-reveal';
@@ -890,6 +892,32 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             <p className="mt-1.5 text-xs text-gray-400">
               Current: <span className="font-mono text-brand-500">{config.axis ?? 'both'}</span>
             </p>
+          </div>
+        )}
+
+        {/* Flip angle (flip-x / flip-y) */}
+        {(moduleId === 'flip-x' || moduleId === 'flip-y') && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Flip angle
+              <span className="font-mono text-brand-500">{config.angle ?? 180}°</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Starting rotation in degrees ({moduleId === 'flip-x' ? 'around the X axis — vertical flip' : 'around the Y axis — horizontal flip'}). Converges to 0° at the end of the animation. <strong>180°</strong> is the classic card-flip; <strong>90°</strong> makes the element appear sliding-in from the side; <strong>360°</strong>/<strong>720°</strong> do full spins. Negative values flip in the opposite direction. <strong>Tip:</strong> try easing <code className="bg-gray-100 px-1 py-0.5 rounded">Bounce Out</code> for a satisfying "card lands with a snap" effect.
+            </p>
+            <input
+              type="range"
+              min="-360"
+              max="720"
+              step="15"
+              value={config.angle ?? 180}
+              onChange={e => onUpdate({ angle: parseInt(e.target.value, 10) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>-360° — Reverse loop</span>
+              <span>720° — Double spin</span>
+            </div>
           </div>
         )}
 

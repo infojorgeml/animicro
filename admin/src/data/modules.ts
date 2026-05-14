@@ -236,6 +236,22 @@ export const DEFAULT_SKEW_UP_CONFIG: ModuleConfig = {
   skew: 5,
 };
 
+export const DEFAULT_FLIP_X_CONFIG: ModuleConfig = {
+  duration: 0.8,
+  easing:   'ease-out',
+  delay:    0,
+  margin:   '-50px 0px',
+  angle:    180,
+};
+
+export const DEFAULT_FLIP_Y_CONFIG: ModuleConfig = {
+  duration: 0.8,
+  easing:   'ease-out',
+  delay:    0,
+  margin:   '-50px 0px',
+  angle:    180,
+};
+
 export const DEFAULT_HOVER_ZOOM_CONFIG: ModuleConfig = {
   duration: 0.4,
   easing: 'ease-out',
@@ -309,6 +325,8 @@ export const MODULE_INFO: ModuleInfo[] = [
   { id: 'slide-right', name: 'Slide Right', description: 'Slides in toward the right (from the left edge)',  cssClass: '.am-slide-right', isPro: false, category: 'entry' },
   { id: 'slide-left',  name: 'Slide Left',  description: 'Slides in toward the left (from the right edge)',  cssClass: '.am-slide-left',  isPro: false, category: 'entry' },
   { id: 'skew-up',     name: 'Skew Up',     description: 'Slides up with a slight skew that straightens as it stops', cssClass: '.am-skew-up', isPro: false, category: 'entry' },
+  { id: 'flip-x',      name: 'Flip X',      description: '3D card flip on the X axis (vertical rotation — like opening a book top-to-bottom)',     cssClass: '.am-flip-x', isPro: true,  category: 'entry' },
+  { id: 'flip-y',      name: 'Flip Y',      description: '3D card flip on the Y axis (horizontal rotation — like turning a page left-to-right)',   cssClass: '.am-flip-y', isPro: true,  category: 'entry' },
   { id: 'blur',        name: 'Blur',        description: 'Blur that clears as it appears',            cssClass: '.am-blur',        isPro: true,  category: 'entry' },
 
   // Continuous (Infinite)
@@ -390,6 +408,7 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-amplitude',          type: 'float (px)',   defaultValue: '12',      usedBy: 'float' },
   { attribute: 'data-am-scale-max',          type: 'float',        defaultValue: '1.05',    usedBy: 'pulse' },
   { attribute: 'data-am-skew',               type: 'float (deg)',  defaultValue: '5',       usedBy: 'skew-up' },
+  { attribute: 'data-am-angle',              type: 'float (deg, ±720)', defaultValue: '180', usedBy: 'flip-x, flip-y' },
   { attribute: 'data-am-zoom-scale',         type: 'float',        defaultValue: '1.08',    usedBy: 'hover-zoom' },
   { attribute: 'data-am-strength',           type: 'float (1–100)',  defaultValue: '15 (magnet) / 30 (magnetic)', usedBy: 'magnet, magnetic — pull strength as %' },
   { attribute: 'data-am-smoothness',         type: 'float (0.01–1)', defaultValue: '0.08 (magnet) / 0.15 (magnetic)', usedBy: 'magnet, magnetic — lerp factor; lower = more inertia' },

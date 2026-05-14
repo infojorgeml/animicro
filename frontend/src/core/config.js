@@ -147,6 +147,7 @@ export function getElementConfig(el, moduleId = '') {
     colorFill:    d.amColorFill  || mod.colorFill  || '#000000',
     scrollStart:  safeInt(d.amScrollStart,   mod.scrollStart  ?? 62),
     scrollEnd:    safeInt(d.amScrollEnd,     mod.scrollEnd    ?? 60),
+    angle:        safeFloat(d.amAngle,       mod.angle        ?? 180),
     margin:       d.amMargin    || mod.margin  || '-50px 0px',
   };
 }

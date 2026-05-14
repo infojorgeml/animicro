@@ -5,6 +5,32 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.23.0] - 2026-05-13
+
+### Added
+
+- **`flip-x` and `flip-y` modules (Pro)** — 3D card-flip entry animation. Two sibling classes that dispatch to a single `flip.js` implementation (same pattern as slide-up/down/left/right → slide.js). `.am-flip-x` rotates on the X axis (vertical flip — like opening a book top-to-bottom); `.am-flip-y` rotates on the Y axis (horizontal flip — like turning a page left-to-right).
+  - **Trigger**: viewport (Motion's `inView()` gated by `cfg.margin`). One-shot animation when the element enters the viewport.
+  - **Per-element attribute**: `data-am-angle` (float deg, default 180, clamp -720..720). Allows subtle flips (90° = element slides in from the side), reverse direction (-180°), or full spins (360°, 720°).
+  - **Other per-element attributes** (via `getElementConfig`): `data-am-duration` (default 0.8s — slightly longer than fade's 0.6s because 3D rotation reads better with more time), `data-am-delay`, `data-am-easing` (default `ease-out`), `data-am-margin`.
+  - **Module-level settings** (admin global): same fields as defaults. Both `flip-x` and `flip-y` are independent in `module_settings` so a user can run them with different defaults on the same site.
+  - **Why `transformPerspective: 1000`**: Motion v12's `transformPerspective` property gets injected into the composed inline transform as `perspective(1000px)`. Without it, a 3D rotation looks flat (the matrix gets projected to 2D with no depth). This way we don't have to touch the parent element or do DOM wraps.
+- **`angle` field added to `getElementConfig`** in `frontend/src/core/config.js`. Reads `data-am-angle` + module setting + falls back to 180. Follows the same pattern as `distance`, `scale`, `blur`, etc.
+- **`data-am-angle` row in `DATA_ATTRIBUTES`** for the admin cheat sheet.
+
+### Wiring
+
+- Frontend: `frontend/src/modules/flip.js` (new, ~75 lines). Registry registers two entries (`'flip-x'` and `'flip-y'`) that both import the same file; `init(name)` picks the axis based on the module id passed by the loader.
+- PHP: `'flip-x'` and `'flip-y'` added to `Animicro::PRO_MODULES`, `available_modules`, and two separate `module_settings` defaults (same shape, both with `duration: 0.8`, `angle: 180.0`). `Animicro_License_Manager::PRO_MODULES` also lists both. `class-compatibility.php::MODULE_INITIAL_CSS` has `'opacity:0;will-change:opacity,transform;'` entries for both — the standard `body:not(...) .am-flip-* { opacity:0 }` rule is enough (no special-case needed). `class-admin.php::update_settings()` gained one new sanitizer branch (`angle`, clamp -720..720). Reused by both flip-x and flip-y because they share the same field key.
+- Admin React: `ModuleConfig` extended with `angle?: number`. `DEFAULT_FLIP_X_CONFIG` and `DEFAULT_FLIP_Y_CONFIG` added (identical shape). Two `MODULE_INFO` entries under `category: 'entry'` next to skew-up. `ModuleSettings.tsx` adds a single "Flip angle" control (range -360..720, step 15, default 180) that fires for both moduleIds. Description text adapts based on which axis (vertical vs horizontal flip).
+
+### Safety / accessibility
+
+- **`prefers-reduced-motion: reduce`**: `main.js` short-circuits before module loading. The element stays at opacity 1 with no rotation.
+- **Builder editors** (Bricks / Elementor / etc.): the critical CSS `body:not(...) .am-flip-* { opacity:0 }` doesn't apply because builder body classes are in the `:not()` chain.
+- **Init dedup** via `data-am-flip-init="1"` flag (shared between flip-x and flip-y because an element typically has only ONE flip class).
+- **Browser support**: `rotateX/Y` with `perspective()` is universally supported in modern browsers (caniuse > 98%). No polyfill needed.
+
 ## [1.22.0] - 2026-05-13
 
 ### Added

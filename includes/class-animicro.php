@@ -9,7 +9,7 @@ class Animicro {
 		'blur', 'stagger', 'grid-reveal', 'text-fill-scroll',
 		'parallax', 'split', 'text-reveal', 'img-parallax', 'magnet',
 		'scatter', 'scramble', 'spin', 'clip-reveal', 'magnetic',
-		'cursor',
+		'cursor', 'flip-x', 'flip-y',
 	];
 
 	private static ?Animicro $instance = null;
@@ -77,7 +77,7 @@ class Animicro {
 	public static function get_default_settings(): array {
 		return [
 			'active_modules'    => [],
-			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'float', 'pulse', 'hover-zoom', 'spin', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'img-parallax', 'clip-reveal', 'ken-burns', 'magnet', 'magnetic', 'cursor', 'split', 'scatter', 'scramble', 'text-reveal', 'typewriter', 'page-curtain' ],
+			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'flip-x', 'flip-y', 'float', 'pulse', 'hover-zoom', 'spin', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'img-parallax', 'clip-reveal', 'ken-burns', 'magnet', 'magnetic', 'cursor', 'split', 'scatter', 'scramble', 'text-reveal', 'typewriter', 'page-curtain' ],
 			'module_settings'   => [
 				'fade' => [
 					'duration' => 0.6,
@@ -253,6 +253,24 @@ class Animicro {
 					'margin'   => '-50px 0px',
 					'distance' => 40,
 					'skew'     => 5,
+				],
+				'flip-x' => [
+					// 3D card flip on X axis. Default slightly slower than fade
+					// (0.6) because rotation reads better with a bit more time.
+					'duration' => 0.8,
+					'easing'   => 'ease-out',
+					'delay'    => 0.0,
+					'margin'   => '-50px 0px',
+					'angle'    => 180.0,
+				],
+				'flip-y' => [
+					// 3D card flip on Y axis. Same defaults — only the axis
+					// (selected in flip.js by module id) differs.
+					'duration' => 0.8,
+					'easing'   => 'ease-out',
+					'delay'    => 0.0,
+					'margin'   => '-50px 0px',
+					'angle'    => 180.0,
 				],
 				'hover-zoom' => [
 					'duration'  => 0.4,
