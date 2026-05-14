@@ -9,6 +9,7 @@ class Animicro {
 		'blur', 'stagger', 'grid-reveal', 'text-fill-scroll',
 		'parallax', 'split', 'text-reveal', 'img-parallax', 'magnet',
 		'scatter', 'scramble', 'spin', 'clip-reveal', 'magnetic',
+		'cursor',
 	];
 
 	private static ?Animicro $instance = null;
@@ -76,7 +77,7 @@ class Animicro {
 	public static function get_default_settings(): array {
 		return [
 			'active_modules'    => [],
-			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'float', 'pulse', 'hover-zoom', 'spin', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'img-parallax', 'clip-reveal', 'magnet', 'magnetic', 'split', 'scatter', 'scramble', 'text-reveal', 'typewriter', 'page-curtain' ],
+			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'float', 'pulse', 'hover-zoom', 'spin', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'img-parallax', 'clip-reveal', 'magnet', 'magnetic', 'cursor', 'split', 'scatter', 'scramble', 'text-reveal', 'typewriter', 'page-curtain' ],
 			'module_settings'   => [
 				'fade' => [
 					'duration' => 0.6,
@@ -300,6 +301,26 @@ class Animicro {
 					'strength'   => 30.0,
 					'smoothness' => 0.15,
 					'axis'       => 'both',
+				],
+				'cursor' => [
+					// duration/easing/delay/margin are inert (continuous,
+					// driven by an rAF loop; no viewport gating). Kept
+					// for the shared REST loop shape.
+					'duration'     => 0.6,
+					'easing'       => 'ease-out',
+					'delay'        => 0.0,
+					'margin'       => '-50px 0px',
+					'size'         => 12,
+					'color'        => '#000000',
+					'hoverSize'    => 90,
+					'hoverColor'   => '#0a0a0a',
+					'hoverOpacity' => 0.75,
+					'hoverBlur'    => 8,
+					// smoothness reuses the existing sanitizer from magnet
+					// (0.01..1 clamp). Default 0.15 — the lerp factor that
+					// produced the cinematic feel in the user's reference
+					// implementation.
+					'smoothness'   => 0.15,
 				],
 				'page-curtain' => [
 					'duration'  => 0.8,

@@ -51,6 +51,11 @@ class Animicro_Compatibility {
 		// its natural position and translates from there when the cursor
 		// approaches.
 		'magnetic'      => '',
+		// Custom cursor: special-cased in get_editor_css() below — it
+		// emits the styles for the floating #am-cursor element + a
+		// `body.am-cursor-active { cursor: none }` rule that hides the
+		// native cursor while the module is active.
+		'cursor'        => '',
 		// Clip-reveal: critical inline rule clips the element entirely
 		// (inset 100% = nothing visible) until Motion's animate() writes
 		// the first inline clip-path frame, sliding from the variant's
@@ -162,6 +167,19 @@ class Animicro_Compatibility {
 					$rules[] = '@media (prefers-reduced-motion: reduce){.am-clip-reveal{clip-path:none!important;}}';
 					$rules[] = '@media (scripting: none){.am-clip-reveal{clip-path:none!important;}}';
 				}
+				continue;
+			}
+
+			// Custom Cursor (1.21.0): emit the static styles for the
+			// floating #am-cursor element plus the `cursor: none` rule on
+			// the body when the module is active. Text inputs keep their
+			// I-beam (cursor: text) for form usability — without that
+			// exception, typing in an input feels broken because the
+			// cursor "disappears" inside the field.
+			if ( 'cursor' === $module ) {
+				$rules[] = 'body.am-cursor-active{cursor:none!important;}';
+				$rules[] = 'body.am-cursor-active input[type="text"],body.am-cursor-active input[type="email"],body.am-cursor-active input[type="password"],body.am-cursor-active input[type="search"],body.am-cursor-active input[type="url"],body.am-cursor-active input[type="tel"],body.am-cursor-active input[type="number"],body.am-cursor-active textarea{cursor:text!important;}';
+				$rules[] = '#am-cursor{position:fixed;top:0;left:0;width:12px;height:12px;background:#000;border-radius:50%;pointer-events:none;z-index:999999999;transform:translate(-50%,-50%);transition:width 0.3s cubic-bezier(0.25,1,0.5,1),height 0.3s cubic-bezier(0.25,1,0.5,1),background-color 0.3s,backdrop-filter 0.3s;display:flex;align-items:center;justify-content:center;color:#fff;font-family:sans-serif;font-weight:500;font-size:0;overflow:hidden;will-change:transform,width,height,top,left;}';
 				continue;
 			}
 

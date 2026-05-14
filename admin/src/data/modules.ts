@@ -86,6 +86,21 @@ export const DEFAULT_SCRAMBLE_CONFIG: ModuleConfig = {
   scrambleSpeed:  0.05,
 };
 
+export const DEFAULT_CURSOR_CONFIG: ModuleConfig = {
+  // duration/easing/delay/margin are inert (rAF loop, no viewport gate).
+  duration:     0.6,
+  easing:       'ease-out',
+  delay:        0,
+  margin:       '-50px 0px',
+  size:         12,
+  color:        '#000000',
+  hoverSize:    90,
+  hoverColor:   '#0a0a0a',
+  hoverOpacity: 0.75,
+  hoverBlur:    8,
+  smoothness:   0.15,
+};
+
 export const DEFAULT_MAGNETIC_CONFIG: ModuleConfig = {
   // duration/easing/delay/margin are inert (local rAF lerp loop, no
   // viewport gating). Kept for ModuleConfig shape + REST loop.
@@ -296,6 +311,7 @@ export const MODULE_INFO: ModuleInfo[] = [
   // Mouse Interactions
   { id: 'magnet',      name: 'Magnet',      description: 'Element drifts smoothly toward the mouse with inertia (viewport-wide effect)', cssClass: '.am-magnet',   isPro: true, category: 'mouse' },
   { id: 'magnetic',    name: 'Magnetic',    description: 'Buttons and icons are pulled toward the cursor when it gets close (local effect)', cssClass: '.am-magnetic', isPro: true, category: 'mouse' },
+  { id: 'cursor',      name: 'Custom Cursor', description: 'Replaces the system cursor with a custom circle that grows on hover targets', cssClass: '.am-cursor-expand', isPro: true, category: 'mouse' },
 
   // Text
   { id: 'split',        name: 'Split Text',   description: 'Splits and animates text by letters/words', cssClass: '.am-split-chars .am-split-words', isPro: true, category: 'text' },
@@ -370,6 +386,8 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-smoothness',         type: 'float (0.01–1)', defaultValue: '0.08 (magnet) / 0.15 (magnetic)', usedBy: 'magnet, magnetic — lerp factor; lower = more inertia' },
   { attribute: 'data-am-axis',               type: 'enum',           defaultValue: 'both',  usedBy: 'magnet, magnetic — `x` / `y` / `both`' },
   { attribute: 'data-am-range',              type: 'float (20–600 px)', defaultValue: '100', usedBy: 'magnetic — attraction radius around the element' },
+  { attribute: 'data-am-cursor-text',        type: 'string',            defaultValue: '(empty)', usedBy: 'cursor — text shown inside the expanded cursor on hover' },
+  { attribute: 'data-am-cursor-size',        type: 'float (px)',        defaultValue: '(global hoverSize)', usedBy: 'cursor — override hover size for this specific element' },
 ];
 
 export interface EasingOption {

@@ -40,6 +40,12 @@ export interface ModuleConfig {
   scrollBoost?: number;
   shape?: string;
   range?: number;
+  size?: number;
+  color?: string;
+  hoverSize?: number;
+  hoverColor?: string;
+  hoverOpacity?: number;
+  hoverBlur?: number;
 }
 
 export interface SmoothScrollConfig {
