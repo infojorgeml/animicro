@@ -5,6 +5,39 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.19.0] - 2026-05-13
+
+### Added
+
+- **`clip-reveal` module (Pro)** — premium image reveal via `clip-path` animation. The element starts 100% clipped (`clip-path: inset(100%)` via critical inline CSS) and reveals to fully visible when it enters the viewport. Seven shape presets:
+  - `curtain-down` (`inset(0 0 100% 0) → inset(0)`) — top to bottom curtain.
+  - `curtain-up` (`inset(100% 0 0 0) → inset(0)`) — bottom to top curtain.
+  - `curtain-left` (`inset(0 100% 0 0) → inset(0)`) — left to right curtain.
+  - `curtain-right` (`inset(0 0 0 100%) → inset(0)`) — right to left curtain.
+  - `center-h` (`inset(0 50% 0 50%) → inset(0)`) — vertical line splits sideways.
+  - `center-v` (`inset(50% 0 50% 0) → inset(0)`) — horizontal line splits up + down.
+  - `circle` (`circle(0% at 50% 50%) → circle(150% at 50% 50%)`) — circle expands from center. The 150% final radius overdraws any rectangle's half-diagonal (max ~71% for a square; wider for extreme aspect ratios), guaranteeing the element ends fully visible.
+- **Class**: `.am-clip-reveal`. Works on any element (`<img>`, `<section>`, `<div>`), not only images.
+- **API**: per-element `data-am-shape="..."` (one of the seven values; falls back to the global default if invalid). Standard `data-am-duration` (default 0.8s — slightly longer than fade because clip-path looks more cinematic slow), `-easing` (especially `cubic-bezier(0.65, 0, 0.35, 1)` for that premium smooth feel), `-delay`, `-margin` all work via `getElementConfig`.
+- **Why critical CSS instead of JS-applied initial state**: keeping `clip-path: inset(100%)` active until Motion's `animate()` writes the first frame means the element stays 100% clipped between init and animation start — no intermediate "sliver visible" flash. Motion's first frame sets the inline `clip-path` to the variant's `from` state (e.g. `inset(0 0 100% 0)`), overriding the critical CSS, and then interpolates to `to`.
+- **Two `@media` fallbacks** at the CSS layer guarantee the image stays visible under hostile conditions:
+  - `@media (prefers-reduced-motion: reduce) { .am-clip-reveal { clip-path: none !important; } }` — visitor opted out of motion; `main.js` short-circuits before loading modules, so JS never reaches the element. Without this rule the image would stay clipped (invisible) forever.
+  - `@media (scripting: none) { .am-clip-reveal { clip-path: none !important; } }` — same logic for JS-disabled environments. Same pattern as page-curtain.
+
+### Wiring
+
+- Frontend: `frontend/src/modules/clip-reveal.js` (new, ~85 lines) with a 7-entry SHAPES table + `init()` doing inView gating + per-element `animate()` call. Registry entry in `frontend/src/core/registry.js`.
+- PHP: `'clip-reveal'` added to `Animicro::PRO_MODULES`, `available_modules` (placed in the Media block alongside hover-zoom / img-parallax), and `module_settings` defaults (`shape: 'curtain-down'`, plus the standard duration/easing/delay/margin). `Animicro_License_Manager::PRO_MODULES` also lists `'clip-reveal'`. `class-compatibility.php::MODULE_INITIAL_CSS` carries `'clip-reveal' => 'clip-path:inset(100%);will-change:clip-path;'`, plus a special-case in `get_editor_css()` that emits the three rules (critical + reduced-motion fallback + scripting:none fallback). `class-admin.php::update_settings()` gained one sanitizer branch for `shape` with a 7-value allow-list.
+- Admin React: `ModuleConfig` extended with `shape?: string`. `DEFAULT_CLIP_REVEAL_CONFIG` and a new `MODULE_INFO` entry under `category: 'media'`. `ModuleSettings.tsx` adds a Shape select dropdown with three `<optgroup>` sections (Curtain / Center split / Circle) so the 7 options are visually grouped.
+
+### Safety / accessibility
+
+- **`prefers-reduced-motion: reduce`**: `main.js` short-circuits; the `@media` fallback in critical CSS forces `clip-path: none` so the image is fully visible.
+- **JS disabled**: `@media (scripting: none)` fallback applies; image stays visible.
+- **Builder editors** (Bricks / Elementor / etc.): the frontend selector chain in `class-compatibility.php::get_frontend_selector()` excludes editor body classes, so the critical CSS doesn't apply inside the editor preview — image renders normally.
+- **Init dedup**: `data-am-clip-reveal-init="1"` flag per element prevents double-registration.
+- **`is-ready` semantic flip**: added synchronously after sanity checks pass, before `inView` fires, so any future CSS rule scoped to `.am-clip-reveal.is-ready` has the same lifecycle as split / text-reveal / scatter.
+
 ## [1.18.0] - 2026-05-13
 
 ### Added

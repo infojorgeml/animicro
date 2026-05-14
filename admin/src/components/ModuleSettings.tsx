@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_SCATTER_CONFIG, DEFAULT_SCRAMBLE_CONFIG, DEFAULT_SPIN_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_SCATTER_CONFIG, DEFAULT_SCRAMBLE_CONFIG, DEFAULT_SPIN_CONFIG, DEFAULT_CLIP_REVEAL_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 import ColorField from './ColorField';
@@ -37,6 +37,7 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   scatter: DEFAULT_SCATTER_CONFIG,
   scramble: DEFAULT_SCRAMBLE_CONFIG,
   spin: DEFAULT_SPIN_CONFIG,
+  'clip-reveal': DEFAULT_CLIP_REVEAL_CONFIG,
 };
 
 const hasDistance = (id: string) => id.startsWith('slide-') || id === 'skew-up' || id === 'split' || id === 'stagger' || id === 'grid-reveal';
@@ -396,6 +397,41 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
               <span>1.01 — Breath</span>
               <span>1.5 — Heartbeat</span>
             </div>
+          </div>
+        )}
+
+        {/* Clip Reveal — Shape selector */}
+        {moduleId === 'clip-reveal' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Reveal shape
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              How the image is uncovered when it enters the viewport. Default for elements that don't specify <code className="bg-gray-100 px-1 py-0.5 rounded">data-am-shape</code>.
+            </p>
+            <select
+              value={config.shape ?? 'curtain-down'}
+              onChange={e => onUpdate({ shape: e.target.value })}
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm
+                         focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            >
+              <optgroup label="Curtain">
+                <option value="curtain-down">Curtain down (top → bottom)</option>
+                <option value="curtain-up">Curtain up (bottom → top)</option>
+                <option value="curtain-left">Curtain right (left → right)</option>
+                <option value="curtain-right">Curtain left (right → left)</option>
+              </optgroup>
+              <optgroup label="Center split">
+                <option value="center-h">Center horizontal (line splits sideways)</option>
+                <option value="center-v">Center vertical (line splits up + down)</option>
+              </optgroup>
+              <optgroup label="Circle">
+                <option value="circle">Circle expand (from center)</option>
+              </optgroup>
+            </select>
+            <p className="mt-1.5 text-xs text-gray-400">
+              Current: <span className="font-mono text-brand-500">{config.shape ?? 'curtain-down'}</span>
+            </p>
           </div>
         )}
 

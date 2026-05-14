@@ -503,6 +503,17 @@ class Animicro_Admin {
 				$entry['scrambleSpeed'] = $this->clamp_float( $raw_mod['scrambleSpeed'] ?? null, 0.02, 0.5, (float) $module_defaults['scrambleSpeed'] );
 			}
 
+			// Clip-reveal (1.19.0): whitelist for `shape`. Seven valid values
+			// covering the supported clip-path presets. Falls back to the
+			// stored default if the incoming value isn't recognised.
+			if ( isset( $module_defaults['shape'] ) ) {
+				$allowed_shapes = [ 'curtain-down', 'curtain-up', 'curtain-left', 'curtain-right', 'center-h', 'center-v', 'circle' ];
+				$raw_shape      = isset( $raw_mod['shape'] ) ? (string) $raw_mod['shape'] : (string) $module_defaults['shape'];
+				$entry['shape'] = in_array( $raw_shape, $allowed_shapes, true )
+					? $raw_shape
+					: (string) $module_defaults['shape'];
+			}
+
 			// Spin (1.18.0): spinSpeed / spinDirection / scrollBoost.
 			// Distinct field names (vs `speed` / `direction`) so the
 			// REST sanitizers don't collide with parallax (`speed`, clamp

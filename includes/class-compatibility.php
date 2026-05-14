@@ -47,6 +47,13 @@ class Animicro_Compatibility {
 		// Spin doesn't need an initial-hide — the element starts visible
 		// in its natural position and rotates from there each frame.
 		'spin'          => '',
+		// Clip-reveal: critical inline rule clips the element entirely
+		// (inset 100% = nothing visible) until Motion's animate() writes
+		// the first inline clip-path frame, sliding from the variant's
+		// `from` state to `inset(0)` / `circle(150%)`. Special-cased in
+		// get_editor_css() below to also emit the reduced-motion + no-JS
+		// fallbacks so the image stays visible if either applies.
+		'clip-reveal'   => 'clip-path:inset(100%);will-change:clip-path;',
 		'text-reveal' => 'opacity:0;will-change:opacity,transform;',
 		'typewriter'  => 'opacity:0;',
 		// page-curtain doesn't use the regular `.am-NAME` descendant selector
@@ -132,6 +139,24 @@ class Animicro_Compatibility {
 				if ( $tr_css ) {
 					$rules[] = "{$prefix} .am-text-reveal{{$tr_css}}";
 					$rules[] = "{$prefix} .am-text-reveal.is-ready{opacity:1;}";
+				}
+				continue;
+			}
+
+			// Clip-reveal (1.19.0): the element is fully clipped at first
+			// paint (`clip-path: inset(100%)`) so the animation can start
+			// from any of the seven shape variants without flashing the
+			// intermediate state. JS overrides the inline clip-path when
+			// Motion's animate() begins. Safety nets via media queries:
+			// if the visitor opted into reduced motion, or if scripting
+			// is disabled (so JS never runs), force `clip-path: none` so
+			// the image stays visible instead of being permanently hidden.
+			if ( 'clip-reveal' === $module ) {
+				$cr_css = self::MODULE_INITIAL_CSS['clip-reveal'] ?? '';
+				if ( $cr_css ) {
+					$rules[] = "{$prefix} .am-clip-reveal{{$cr_css}}";
+					$rules[] = '@media (prefers-reduced-motion: reduce){.am-clip-reveal{clip-path:none!important;}}';
+					$rules[] = '@media (scripting: none){.am-clip-reveal{clip-path:none!important;}}';
 				}
 				continue;
 			}
