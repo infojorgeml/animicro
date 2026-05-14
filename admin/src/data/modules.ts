@@ -86,6 +86,14 @@ export const DEFAULT_SCRAMBLE_CONFIG: ModuleConfig = {
   scrambleSpeed:  0.05,
 };
 
+export const DEFAULT_CLIP_REVEAL_CONFIG: ModuleConfig = {
+  duration: 0.8,
+  easing:   'ease-out',
+  delay:    0,
+  margin:   '-50px 0px',
+  shape:    'curtain-down',
+};
+
 export const DEFAULT_SPIN_CONFIG: ModuleConfig = {
   // duration / easing / delay / margin are inert (continuous, manual
   // rAF loop). Kept for shape consistency with the REST loop.
@@ -291,6 +299,7 @@ export const MODULE_INFO: ModuleInfo[] = [
   // Media & Images
   { id: 'hover-zoom',   name: 'Zoom Hover',     description: 'Image scales up on hover within an overflow:hidden parent', cssClass: '.am-hover-zoom',   isPro: false, category: 'media' },
   { id: 'img-parallax', name: 'Image Parallax', description: 'Window effect — inner image translates on scroll inside an overflow:hidden frame', cssClass: '.am-img-parallax', isPro: true,  category: 'media' },
+  { id: 'clip-reveal',  name: 'Clip Reveal',    description: 'Premium image reveal via clip-path: curtains, center split, expanding circle', cssClass: '.am-clip-reveal', isPro: true, category: 'media' },
 
   // Page Transitions (rendered in their own tab, not on the Modules dashboard).
   // Single module that intercepts navigation clicks to animate an overlay IN
@@ -319,6 +328,7 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-stagger',   type: 'float (s)',     defaultValue: '0.05',      usedBy: 'stagger, split, text-reveal, grid-reveal' },
   { attribute: 'data-am-speed',     type: 'float',         defaultValue: '0.5 (parallax) / 0.2 (img-parallax) / 30 (spin, deg/sec)', usedBy: 'parallax, img-parallax, spin' },
   { attribute: 'data-am-direction', type: 'enum',          defaultValue: 'right',     usedBy: 'spin — `left` / `right` (CW / CCW rotation)' },
+  { attribute: 'data-am-shape',     type: 'enum',          defaultValue: 'curtain-down', usedBy: 'clip-reveal — `curtain-down`, `curtain-up`, `curtain-left`, `curtain-right`, `center-h`, `center-v`, `circle`' },
   { attribute: 'data-am-typing-speed', type: 'float (s)',  defaultValue: '0.06',      usedBy: 'typewriter' },
   { attribute: 'data-am-back-speed',   type: 'float (s)',  defaultValue: '0.03',      usedBy: 'typewriter' },
   { attribute: 'data-am-back-delay',   type: 'float (s)',  defaultValue: '1.5',       usedBy: 'typewriter' },

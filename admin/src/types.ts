@@ -38,6 +38,7 @@ export interface ModuleConfig {
   spinSpeed?: number;
   spinDirection?: string;
   scrollBoost?: number;
+  shape?: string;
 }
 
 export interface SmoothScrollConfig {

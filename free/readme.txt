@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.18.0
+Stable tag: 1.19.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,11 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.19.0 =
+* **New `clip-reveal` module (Pro)** — `.am-clip-reveal` images (or any element) get a premium reveal via clip-path. Seven shapes: `curtain-down`, `curtain-up`, `curtain-left`, `curtain-right`, `center-h`, `center-v`, `circle`. Per-element via `data-am-shape="..."`, default configurable from the admin panel.
+* Triggered when the element enters the viewport (IntersectionObserver gated). Standard `data-am-duration` / `-easing` / `-delay` / `-margin` attributes apply.
+* Safe by default: critical inline CSS clips the element entirely until JS arrives. If JS is disabled or the visitor prefers reduced motion, `@media` fallbacks force `clip-path: none` so the image stays fully visible.
 
 = 1.18.0 =
 * **New `spin` module (Pro)** — `.am-spin` elements rotate continuously and accelerate momentarily when the visitor scrolls. Perfect for circular badges ("Award winning", "100% Quality", brand seals) that you see on Awwwards-style sites.
@@ -242,6 +247,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.19.0 =
+New Pro module `clip-reveal`: premium image reveal via clip-path with 7 shape presets (curtains in 4 directions, center split horizontal/vertical, expanding circle). Class `.am-clip-reveal` + `data-am-shape`. No breaking changes.
 
 = 1.18.0 =
 New Pro module `spin`: continuous rotation with scroll-velocity boost. Per-element direction (left / right) and speed. Class `.am-spin`. No breaking changes.
