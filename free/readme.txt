@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.22.0
+Stable tag: 1.23.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,12 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.23.0 =
+* **New `flip-x` and `flip-y` modules (Pro)** — 3D card-flip entry animation, the classic AOS-style effect. Elements appear rotating on their X axis (`.am-flip-x`, like opening a book top-to-bottom) or Y axis (`.am-flip-y`, like turning a page left-to-right) from a configurable angle back to 0°. Perfect for pricing grids, testimonial cards, feature blocks.
+* Per-element `data-am-angle` (default 180°, range -720..720) lets you do subtle flips (90°), reverse direction (-180°), or full spins (360°, 720°).
+* Built on Motion v12's `transformPerspective` so the rotation reads 3D without forcing perspective on the parent element. Standard `data-am-duration` / `-easing` / `-delay` / `-margin` work as usual.
+* Tip: try the `Bounce Out` easing for a "card lands with a snap" feel — looks great on pricing tables.
 
 = 1.22.0 =
 * **New `ken-burns` module (Free)** — Slow infinite zoom for hero images. Apply `.am-ken-burns` to any image / element and it cycles between scale 1 and 1.15 over 15 seconds (configurable), giving static backgrounds the cinematic documentary feel.
@@ -265,6 +271,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.23.0 =
+New Pro modules `flip-x` and `flip-y`: 3D card-flip entry animation on the X or Y axis. Classic AOS-style effect for pricing grids and feature cards. Configurable rotation angle (`data-am-angle`, default 180°). No breaking changes.
 
 = 1.22.0 =
 New Free module `ken-burns`: slow infinite zoom for hero images. Class `.am-ken-burns`, per-element `data-am-scale` / `data-am-duration` for fine-tuning. No breaking changes.

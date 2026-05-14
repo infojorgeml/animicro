@@ -4,7 +4,7 @@
 **Tags:** animation, motion, css, performance, page-builder
 **Requires at least:** 6.0
 **Tested up to:** 6.9
-**Stable tag:** 1.22.0
+**Stable tag:** 1.23.0
 **Requires PHP:** 7.4
 **License:** GPLv2 or later
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
@@ -42,6 +42,8 @@ Under **Animicro → Advanced** you can enable **Respect Reduced Motion** (skips
 | Slide Left | `.am-slide-left` | Slides in toward the left (from the right edge) |
 | Slide Right | `.am-slide-right` | Slides in toward the right (from the left edge) |
 | Skew Up | `.am-skew-up` | Slides up with a slight skew that straightens as it stops |
+| Flip X (Pro) | `.am-flip-x` | 3D card flip on the X axis — vertical rotation entry |
+| Flip Y (Pro) | `.am-flip-y` | 3D card flip on the Y axis — horizontal rotation entry |
 | Float | `.am-float` | Infinite soft up/down floating motion (continuous) |
 | Pulse | `.am-pulse` | Infinite gentle scale pulse — breathing-like (continuous) |
 | Ken Burns | `.am-ken-burns` | Slow infinite zoom for hero images — cinematic documentary feel |

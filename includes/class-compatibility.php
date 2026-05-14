@@ -21,6 +21,8 @@ class Animicro_Compatibility {
 		'slide-right' => 'opacity:0;transform:translateX(-30px);will-change:opacity,transform;',
 		'slide-left'  => 'opacity:0;transform:translateX(30px);will-change:opacity,transform;',
 		'skew-up'     => 'opacity:0;transform:translateY(40px) skewY(5deg);will-change:opacity,transform;',
+		'flip-x'      => 'opacity:0;will-change:opacity,transform;',
+		'flip-y'      => 'opacity:0;will-change:opacity,transform;',
 		'scale'       => 'opacity:0;transform:scale(0.95);will-change:opacity,transform;',
 		'float'       => '',
 		'pulse'       => '',

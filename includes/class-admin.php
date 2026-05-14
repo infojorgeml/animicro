@@ -503,6 +503,14 @@ class Animicro_Admin {
 				$entry['scrambleSpeed'] = $this->clamp_float( $raw_mod['scrambleSpeed'] ?? null, 0.02, 0.5, (float) $module_defaults['scrambleSpeed'] );
 			}
 
+			// Flip-x / Flip-y (1.23.0): one new sanitizer for the rotation
+			// angle. Wide clamp (-720..720) so users can choose negative
+			// directions or full loops (360°, 720°) if they want a
+			// "double-spin entry" effect.
+			if ( isset( $module_defaults['angle'] ) ) {
+				$entry['angle'] = $this->clamp_float( $raw_mod['angle'] ?? null, -720, 720, (float) $module_defaults['angle'] );
+			}
+
 			// Magnetic (1.20.0): only `range` is new. `strength`, `smoothness`
 			// and `axis` reuse the sanitizer branches from magnet — same
 			// semantics, same clamp ranges, same whitelist for axis.
