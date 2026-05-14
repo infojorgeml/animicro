@@ -24,7 +24,7 @@ export default function App() {
           <p className="text-sm text-gray-500">
             v{version}
             {isPremium && (
-              <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
+              <span className="ml-2 rounded bg-[#ffeeb5] px-2 py-1 text-xs font-semibold uppercase text-[#ad8700]">
                 Pro
               </span>
             )}

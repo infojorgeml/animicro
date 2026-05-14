@@ -47,7 +47,7 @@ export default function TabNav({ activeTab, onTabChange, isPremium }: TabNavProp
           >
             {tab.label}
             {tab.isPro && (
-              <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 leading-none">
+              <span className="rounded bg-[#ffeeb5] px-1.5 py-1 text-[10px] font-semibold uppercase text-[#ad8700] leading-none">
                 Pro
               </span>
             )}
