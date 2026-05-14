@@ -29,7 +29,7 @@ class Animicro_License_Manager {
 	const OPTION_NAME = 'animicro_premium_active';
 
 	const PRO_MODULES  = [ 'blur', 'stagger', 'grid-reveal', 'text-fill-scroll', 'parallax', 'split', 'text-reveal', 'img-parallax', 'magnet', 'scatter', 'scramble', 'spin', 'clip-reveal', 'magnetic', 'cursor', 'flip-x', 'flip-y' ];
-	const FREE_MODULES = [ 'fade', 'slide-up', 'slide-down', 'slide-left', 'slide-right', 'skew-up', 'scale', 'float', 'pulse', 'highlight', 'typewriter', 'hover-zoom', 'page-curtain', 'ken-burns' ];
+	const FREE_MODULES = [ 'fade', 'slide-up', 'slide-down', 'slide-left', 'slide-right', 'skew-up', 'scale', 'float', 'pulse', 'highlight', 'typewriter', 'hover-zoom', 'page-curtain', 'ken-burns', 'scroll-slide-left', 'scroll-slide-right' ];
 
 	private string $product_slug = 'animicro';
 

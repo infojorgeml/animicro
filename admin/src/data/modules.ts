@@ -211,6 +211,23 @@ export const DEFAULT_PARALLAX_CONFIG: ModuleConfig = {
   speed: 0.5,
 };
 
+export const DEFAULT_SCROLL_SLIDE_LEFT_CONFIG: ModuleConfig = {
+  // duration/easing/delay/margin are inert (scroll-linked, no inView).
+  duration: 0.6,
+  easing:   'linear',
+  delay:    0,
+  margin:   '-50px 0px',
+  speed:    1,
+};
+
+export const DEFAULT_SCROLL_SLIDE_RIGHT_CONFIG: ModuleConfig = {
+  duration: 0.6,
+  easing:   'linear',
+  delay:    0,
+  margin:   '-50px 0px',
+  speed:    1,
+};
+
 export const DEFAULT_FLOAT_CONFIG: ModuleConfig = {
   duration: 3,
   easing: 'ease-in-out',
@@ -353,7 +370,9 @@ export const MODULE_INFO: ModuleInfo[] = [
 
   // Scroll & Continuous
   { id: 'text-fill-scroll', name: 'Text Fill on Scroll', description: 'Fills text word by word as user scrolls', cssClass: '.am-text-fill-scroll', isPro: true, category: 'scroll' },
-  { id: 'parallax',         name: 'Parallax',            description: 'Scroll-linked parallax movement',         cssClass: '.am-parallax',         isPro: true, category: 'scroll' },
+  { id: 'parallax',         name: 'Parallax',            description: 'Scroll-linked parallax movement',         cssClass: '.am-parallax',         isPro: true,  category: 'scroll' },
+  { id: 'scroll-slide-left',  name: 'Scroll Slide Left',  description: 'As you scroll down, the element drifts horizontally across the viewport (right → left)', cssClass: '.am-scroll-slide-left',  isPro: false, category: 'scroll' },
+  { id: 'scroll-slide-right', name: 'Scroll Slide Right', description: 'As you scroll down, the element drifts horizontally across the viewport (left → right)', cssClass: '.am-scroll-slide-right', isPro: false, category: 'scroll' },
 
   // Media & Images
   { id: 'hover-zoom',   name: 'Zoom Hover',     description: 'Image scales up on hover within an overflow:hidden parent', cssClass: '.am-hover-zoom',   isPro: false, category: 'media' },
@@ -386,7 +405,7 @@ export const DATA_ATTRIBUTES: DataAttribute[] = [
   { attribute: 'data-am-scale',     type: 'float',         defaultValue: '0.95 (scale) / 1.15 (ken-burns)', usedBy: 'scale, ken-burns' },
   { attribute: 'data-am-blur',      type: 'float (px)',    defaultValue: '4',         usedBy: 'blur' },
   { attribute: 'data-am-stagger',   type: 'float (s)',     defaultValue: '0.05',      usedBy: 'stagger, split, text-reveal, grid-reveal' },
-  { attribute: 'data-am-speed',     type: 'float',         defaultValue: '0.5 (parallax) / 0.2 (img-parallax) / 30 (spin, deg/sec)', usedBy: 'parallax, img-parallax, spin' },
+  { attribute: 'data-am-speed',     type: 'float',         defaultValue: '0.5 (parallax) / 0.2 (img-parallax) / 30 (spin, deg/sec) / 1 (scroll-slide)', usedBy: 'parallax, img-parallax, spin, scroll-slide-left, scroll-slide-right' },
   { attribute: 'data-am-direction', type: 'enum',          defaultValue: 'right',     usedBy: 'spin — `left` / `right` (CW / CCW rotation)' },
   { attribute: 'data-am-shape',     type: 'enum',          defaultValue: 'curtain-down', usedBy: 'clip-reveal — `curtain-down`, `curtain-up`, `curtain-left`, `curtain-right`, `center-h`, `center-v`, `circle`' },
   { attribute: 'data-am-typing-speed', type: 'float (s)',  defaultValue: '0.06',      usedBy: 'typewriter' },
