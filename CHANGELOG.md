@@ -5,6 +5,32 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.22.0] - 2026-05-13
+
+### Added
+
+- **`ken-burns` module (Free)** — slow, infinite, oscillating zoom for hero images. Architecturally identical to `pulse.js` (a single `animate()` call per element with keyframe `[1, scale, 1]` and `repeat: Infinity`); the difference is the defaults: 15s cycle (vs pulse's 1.5s) and scale 1.15 (vs pulse's 1.05). Result: the "documentary cinematic feel" instead of the "fast breathing" feel.
+  - **Class**: `.am-ken-burns`. Works on any element, optimised for hero images.
+  - **Per-element attributes**: `data-am-duration` (1..60s, default 15), `data-am-scale` (1.01..3, default 1.15 — reuses the existing `scale` sanitizer from the scale module), `data-am-easing` (default `ease-in-out`), `data-am-delay` (0..10s, default 0).
+  - **Module-level settings** (admin global): same fields as defaults.
+  - **Tier: Free** — added to `Animicro_License_Manager::FREE_MODULES`. Available in both Free and Pro builds.
+  - **Category**: `media` ("Media & Images") — sits next to `hover-zoom`, `img-parallax`, `clip-reveal`.
+  - **Tip**: the parent should have `overflow: hidden` so the zoomed image stays clipped to its frame. NOT auto-wrapped (unlike `hover-zoom`) because most hero containers in builders already have `overflow: hidden`; auto-wrapping would interfere with the user's layout control.
+
+### Wiring
+
+- Frontend: `frontend/src/modules/ken-burns.js` (new, ~75 lines) — mirror of `pulse.js` with new defaults. Registry entry in `frontend/src/core/registry.js`.
+- PHP: `'ken-burns'` added to `Animicro::available_modules` and `module_settings` defaults; **NOT** in `PRO_MODULES`. `Animicro_License_Manager::FREE_MODULES` includes `'ken-burns'`. `class-compatibility.php::MODULE_INITIAL_CSS` has an empty entry (no initial-hide needed — the image starts visible at scale 1). **`class-admin.php` unchanged**: all sanitizers we need (`duration`, `easing`, `delay`, `margin`, `scale`) already exist as generic or reused from the `scale` module.
+- Admin React: **`admin/src/types.ts` unchanged** — `scale` is already in `ModuleConfig`. `DEFAULT_KEN_BURNS_CONFIG` added in `admin/src/data/modules.ts`; new `MODULE_INFO` entry under `category: 'media'` with `isPro: false`. The `data-am-scale` row in `DATA_ATTRIBUTES` was updated to list `ken-burns` alongside `scale`. `ModuleSettings.tsx`: new "Zoom amount" control (range 1.05–2, step 0.01, default 1.15) specific to `ken-burns`. The existing "Cycle duration" block (previously for `float` + `pulse`) was extended to include `ken-burns` with a wider range (3–60s, step 1) and a Ken-Burns-specific copy ("Cinematic" vs "Restless" labels). `ken-burns` excluded from the generic Duration block to avoid showing both controls.
+
+### Safety / accessibility
+
+- **`prefers-reduced-motion: reduce`**: `init()` bails out — the element stays at scale 1 with no animation.
+- **Builder editors**: `main.js::isInBuilder()` short-circuit.
+- **Page hidden**: Motion auto-pauses while the tab is inactive.
+- **Init dedup** via `data-am-ken-burns-init="1"` flag.
+- **GPU compositing** via `will-change: transform`.
+
 ## [1.21.0] - 2026-05-13
 
 ### Added

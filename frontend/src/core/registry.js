@@ -27,6 +27,7 @@ const MODULES = {
   'hover-zoom':   () => import('../modules/hover-zoom.js'),
   'img-parallax': () => import('../modules/img-parallax.js'),
   'clip-reveal':  () => import('../modules/clip-reveal.js'),
+  'ken-burns':    () => import('../modules/ken-burns.js'),
   'magnet':       () => import('../modules/magnet.js'),
   'magnetic':     () => import('../modules/magnetic.js'),
   'cursor':       () => import('../modules/cursor.js'),

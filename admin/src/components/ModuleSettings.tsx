@@ -1,4 +1,4 @@
-import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_MAGNETIC_CONFIG, DEFAULT_SCATTER_CONFIG, DEFAULT_SCRAMBLE_CONFIG, DEFAULT_SPIN_CONFIG, DEFAULT_CLIP_REVEAL_CONFIG, DEFAULT_CURSOR_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
+import { DEFAULT_FADE_CONFIG, DEFAULT_SCALE_CONFIG, DEFAULT_SLIDE_UP_CONFIG, DEFAULT_SLIDE_DOWN_CONFIG, DEFAULT_SLIDE_RIGHT_CONFIG, DEFAULT_SLIDE_LEFT_CONFIG, DEFAULT_BLUR_CONFIG, DEFAULT_SPLIT_CONFIG, DEFAULT_TEXT_REVEAL_CONFIG, DEFAULT_TYPEWRITER_CONFIG, DEFAULT_STAGGER_CONFIG, DEFAULT_GRID_REVEAL_CONFIG, DEFAULT_HIGHLIGHT_CONFIG, DEFAULT_TEXT_FILL_SCROLL_CONFIG, DEFAULT_PARALLAX_CONFIG, DEFAULT_FLOAT_CONFIG, DEFAULT_PULSE_CONFIG, DEFAULT_SKEW_UP_CONFIG, DEFAULT_HOVER_ZOOM_CONFIG, DEFAULT_IMG_PARALLAX_CONFIG, DEFAULT_MAGNET_CONFIG, DEFAULT_MAGNETIC_CONFIG, DEFAULT_SCATTER_CONFIG, DEFAULT_SCRAMBLE_CONFIG, DEFAULT_SPIN_CONFIG, DEFAULT_CLIP_REVEAL_CONFIG, DEFAULT_CURSOR_CONFIG, DEFAULT_KEN_BURNS_CONFIG, EASING_OPTIONS, MARGIN_OPTIONS, MODULE_INFO } from '../data/modules';
 import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 import ColorField from './ColorField';
@@ -40,6 +40,7 @@ const DEFAULTS: Record<string, typeof DEFAULT_FADE_CONFIG> = {
   scramble: DEFAULT_SCRAMBLE_CONFIG,
   spin: DEFAULT_SPIN_CONFIG,
   'clip-reveal': DEFAULT_CLIP_REVEAL_CONFIG,
+  'ken-burns': DEFAULT_KEN_BURNS_CONFIG,
 };
 
 const hasDistance = (id: string) => id.startsWith('slide-') || id === 'skew-up' || id === 'split' || id === 'stagger' || id === 'grid-reveal';
@@ -324,28 +325,30 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </>
         )}
 
-        {/* Cycle duration (float, pulse — continuous loops) */}
-        {(moduleId === 'float' || moduleId === 'pulse') && (
+        {/* Cycle duration (float, pulse, ken-burns — continuous loops) */}
+        {(moduleId === 'float' || moduleId === 'pulse' || moduleId === 'ken-burns') && (
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
               Cycle duration
               <span className="font-mono text-brand-500">{config.duration}s</span>
             </label>
             <p className="text-xs text-gray-400 mb-2">
-              Length of one full loop ({moduleId === 'float' ? 'up then back down' : 'grow then shrink'}). Longer values feel calmer; shorter values feel more urgent.
+              {moduleId === 'ken-burns'
+                ? 'Length of one full zoom cycle (in → out). Longer values give the cinematic documentary feel; shorter values look more obvious / nervous.'
+                : `Length of one full loop (${moduleId === 'float' ? 'up then back down' : 'grow then shrink'}). Longer values feel calmer; shorter values feel more urgent.`}
             </p>
             <input
               type="range"
-              min="0.3"
-              max="10"
-              step="0.1"
+              min={moduleId === 'ken-burns' ? '3' : '0.3'}
+              max={moduleId === 'ken-burns' ? '60' : '10'}
+              step={moduleId === 'ken-burns' ? '1' : '0.1'}
               value={config.duration}
               onChange={e => onUpdate({ duration: parseFloat(e.target.value) })}
               className="w-full accent-brand-500"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
-              <span>0.3s — Urgent</span>
-              <span>10s — Calm</span>
+              <span>{moduleId === 'ken-burns' ? '3s — Restless' : '0.3s — Urgent'}</span>
+              <span>{moduleId === 'ken-burns' ? '60s — Cinematic' : '10s — Calm'}</span>
             </div>
           </div>
         )}
@@ -916,8 +919,8 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
           </div>
         )}
 
-        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse, img-parallax, magnet, scramble, spin, magnetic, cursor) */}
-        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && moduleId !== 'spin' && moduleId !== 'magnetic' && moduleId !== 'cursor' && (
+        {/* Duration (hidden for typewriter, parallax, text-fill-scroll, float, pulse, img-parallax, magnet, scramble, spin, magnetic, cursor, ken-burns) */}
+        {moduleId !== 'typewriter' && moduleId !== 'parallax' && moduleId !== 'text-fill-scroll' && moduleId !== 'float' && moduleId !== 'pulse' && moduleId !== 'img-parallax' && moduleId !== 'magnet' && moduleId !== 'scramble' && moduleId !== 'spin' && moduleId !== 'magnetic' && moduleId !== 'cursor' && moduleId !== 'ken-burns' && (
         <div>
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
             Duration
@@ -966,6 +969,32 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
             <span>2.0s</span>
           </div>
         </div>
+        )}
+
+        {/* Ken Burns — Zoom (scale max) */}
+        {moduleId === 'ken-burns' && (
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+              Zoom amount
+              <span className="font-mono text-brand-500">{config.scale ?? 1.15}×</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Maximum zoom reached at the peak of each cycle. Higher values make the documentary feel more dramatic. Per-element override via <code className="bg-gray-100 px-1 py-0.5 rounded">data-am-scale</code>. Remember the parent should have <code className="bg-gray-100 px-1 py-0.5 rounded">overflow: hidden</code> so the zoomed image stays clipped.
+            </p>
+            <input
+              type="range"
+              min="1.05"
+              max="2"
+              step="0.01"
+              value={config.scale ?? 1.15}
+              onChange={e => onUpdate({ scale: parseFloat(e.target.value) })}
+              className="w-full accent-brand-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>1.05× — Whisper</span>
+              <span>2× — Dramatic</span>
+            </div>
+          </div>
         )}
 
         {/* Scale factor (scale module only) */}

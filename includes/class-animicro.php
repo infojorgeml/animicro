@@ -77,7 +77,7 @@ class Animicro {
 	public static function get_default_settings(): array {
 		return [
 			'active_modules'    => [],
-			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'float', 'pulse', 'hover-zoom', 'spin', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'img-parallax', 'clip-reveal', 'magnet', 'magnetic', 'cursor', 'split', 'scatter', 'scramble', 'text-reveal', 'typewriter', 'page-curtain' ],
+			'available_modules' => [ 'fade', 'scale', 'slide-up', 'slide-down', 'slide-right', 'slide-left', 'skew-up', 'float', 'pulse', 'hover-zoom', 'spin', 'blur', 'stagger', 'grid-reveal', 'highlight', 'text-fill-scroll', 'parallax', 'img-parallax', 'clip-reveal', 'ken-burns', 'magnet', 'magnetic', 'cursor', 'split', 'scatter', 'scramble', 'text-reveal', 'typewriter', 'page-curtain' ],
 			'module_settings'   => [
 				'fade' => [
 					'duration' => 0.6,
@@ -267,6 +267,16 @@ class Animicro {
 					'delay'    => 0.0,
 					'margin'   => '-50px 0px',
 					'speed'    => 0.2,
+				],
+				'ken-burns' => [
+					// Slow infinite zoom for hero images. Architecturally
+					// identical to pulse but with much longer duration and
+					// bigger scale — the "documentary panning" feel.
+					'duration' => 15.0,
+					'easing'   => 'ease-in-out',
+					'delay'    => 0.0,
+					'margin'   => '-50px 0px',  // inert (no viewport gating)
+					'scale'    => 1.15,
 				],
 				'clip-reveal' => [
 					'duration' => 0.8,
