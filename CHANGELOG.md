@@ -5,6 +5,19 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.24.1] - 2026-05-14
+
+### Changed
+
+- **`Tested up to: 7.0`** in `README.md` and `free/readme.txt`. WordPress 7.0 releases on 2026-05-20; smoke-tested locally against this plugin and confirmed full compatibility. Pure metadata bump — zero code modified, zero modules added. The bump justifies a release because wp.org only refreshes the "Tested up to" badge on the public plugin directory when a new tag is published (the value can't be edited retroactively on already-published tags).
+- **`Requires at least: 6.0`** unchanged. Animicro continues to support WordPress 6.0+; we only confirm that the latest supported version is now 7.0.
+
+### Notes
+
+- This release also bundles two admin-only UX commits that landed on `main` between 1.24.0 and 1.24.1 (no separate release was cut for them at the time):
+  - Pro badge restyle: custom gold palette (`#ffeeb5` bg, `#ad8700` text), uppercase, `rounded` (not pill), 10px font-size unified across the App header, Module dashboard cards and TabNav indicators.
+  - Page Transitions tab now uses the Modules-dashboard drilldown pattern: a compact toggleable card per module + a gear icon that opens a dedicated `PageCurtainSettings` page (with breadcrumb back button + class chip + Copy button) instead of inlining all settings under the toggle.
+
 ## [1.24.0] - 2026-05-14
 
 ### Added

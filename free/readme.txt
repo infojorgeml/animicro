@@ -2,8 +2,8 @@
 Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
-Tested up to: 6.9
-Stable tag: 1.24.0
+Tested up to: 7.0
+Stable tag: 1.24.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,11 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.24.1 =
+* **Tested and confirmed compatible with WordPress 7.0.** Metadata-only patch — no code changes. Bumps the `Tested up to` header so the plugin's wp.org directory listing no longer shows the "may be incompatible" warning to visitors on the upcoming WP 7.0.
+* `Requires at least: 6.0` is unchanged — Animicro continues to work on WordPress 6.0 and newer.
+* Several admin UI polish commits since 1.24.0 also bundled in this release: refreshed Pro badge styling (custom gold palette, uppercase, unified 10px font-size) and the Page Transitions tab now uses the same compact-card + drilldown pattern as the Modules dashboard.
 
 = 1.24.0 =
 * **Two new Free modules: `scroll-slide-left` and `scroll-slide-right`** — scroll-linked horizontal drift. As the visitor scrolls vertically, the element translates horizontally across the viewport. Classic "newspaper strip" / "ticker tape" effect for Hero headlines and section dividers.
@@ -278,6 +283,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.24.1 =
+Metadata-only patch: confirmed compatible with WordPress 7.0. No functional changes. Safe to update at any time.
 
 = 1.24.0 =
 Two new Free modules — `scroll-slide-left` and `scroll-slide-right`: scroll-linked horizontal drift for Hero headlines. As you scroll down, the element crosses the viewport horizontally. Configurable travel speed. No breaking changes.
