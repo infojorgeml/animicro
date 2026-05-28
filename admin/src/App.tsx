@@ -3,7 +3,6 @@ import './types';
 import { useSettings } from './hooks/useSettings';
 import TabNav, { type TabId } from './components/TabNav';
 import Dashboard from './components/Dashboard';
-import CheatSheet from './components/CheatSheet';
 import SmoothScroll from './components/SmoothScroll';
 import AdvancedSettings from './components/AdvancedSettings';
 import PageTransitions from './components/PageTransitions';
@@ -78,7 +77,6 @@ export default function App() {
                 onUpdateModuleSettings={updateModuleSettings}
               />
             )}
-            {activeTab === 'cheatsheet' && isPremium && <CheatSheet />}
             {activeTab === 'smooth-scroll' && isPremium && (
               <SmoothScroll config={settings.smooth_scroll} onChange={updateSmoothScroll} />
             )}
