@@ -5,6 +5,21 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.25.1] - 2026-05-14
+
+### Fixed
+
+- **Easing sanitizer rejected 3 of the 7 dropdown options (data-loss).** `Animicro_Admin::sanitize_easing()` allow-listed only `linear / ease / ease-in / ease-out / ease-in-out`, but the admin easing dropdown (`EASING_OPTIONS`) also offers `back-out` ("Bounce Out"), `circ-out` ("Snap Out") and `cubic-bezier(0.25, 0.4, 0.25, 1)` ("Premium (Apple-like)"). Selecting any of those three and saving caused the REST handler to silently reject the value and persist the module's default easing instead — the dropdown showed one thing while the backend stored another. This is the save-path twin of the frontend bug fixed in 1.12.9 (`parseEasing` was corrected then, but the PHP sanitizer was never updated when these easings shipped in 1.12.8). The fix expands the keyword allow-list and adds a `cubic-bezier(a, b, c, d)` regex so every dropdown value — and any well-formed custom curve — round-trips correctly. Affects ~20 modules that expose the easing control. Discovered during a holistic audit; no other functional bugs found.
+
+### Changed
+
+- **Hardening — `spin.js` IntersectionObserver guard.** `init()` now reuses the existing observer instead of unconditionally creating a new one (`if (io === null)`), matching the pattern already in `scroll-slide.js`. Harmless in classic WordPress full-page-load context, but prevents orphaning an observer under a hypothetical re-init.
+- **Hardening — `.distignore` completeness.** Added `includes/class-updater.php` and `includes/lib/` to the distribution ignore-list. `scripts/build.sh` already strips these Pro-only paths from the Free ZIP (that's the primary barrier); this is defense-in-depth for any tooling that reads `.distignore` directly.
+
+### Notes
+
+- Audit verdict: the plugin is in solid shape. REST security (nonce + `manage_options`), output escaping (page-curtain), Free/Pro build separation, PHP↔TS default consistency and WP best practices all came back clean. Deferred (documented, not in this release): extracting duplicated `clamp` / `safeFloat` / `prefersReducedMotion` helpers to a shared `core/utils.js`, `will-change` cleanup on one-shot modules, and admin i18n.
+
 ## [1.25.0] - 2026-05-14
 
 ### Added
