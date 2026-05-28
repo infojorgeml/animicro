@@ -1501,10 +1501,12 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
 
       </div>
 
-      {/* Per-module data-am-* cheat sheet. Limited to `fade` for now while
-          we validate the layout; once approved we'll drop the guard and
-          this section appears for every module. */}
-      {moduleId === 'fade' && <ModuleDataAttributes moduleId={moduleId} />}
+      {/* Per-module data-am-* cheat sheet. Renders the filtered subset
+          of DATA_ATTRIBUTES that apply to this module (generic "All"
+          attributes + the ones listed under this module id in usedBy).
+          Returns null when there's nothing to show, so modules without
+          per-element overrides don't get an empty section. */}
+      <ModuleDataAttributes moduleId={moduleId} />
     </div>
   );
 }
