@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 7.0
-Stable tag: 1.24.1
+Stable tag: 1.25.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,11 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.25.0 =
+* **Per-module attribute cheat sheets.** Every module drilldown now ends with a focused table listing exactly the `data-am-*` attributes that apply to THAT module (generic ones like `data-am-duration` + module-specific ones). One copy button per row.
+* **Global "Cheat Sheet" tab removed.** Now that each module carries its own focused mini cheatsheet inline, the top-level tab was duplicate effort and one more knob to ignore. Admin sidebar goes from 5 tabs to 4: Modules / Page Transitions / Smooth Scroll / Advanced.
+* No data loss — all attribute definitions still live in the same place, just rendered closer to where they're useful.
 
 = 1.24.1 =
 * **Tested and confirmed compatible with WordPress 7.0.** Metadata-only patch — no code changes. Bumps the `Tested up to` header so the plugin's wp.org directory listing no longer shows the "may be incompatible" warning to visitors on the upcoming WP 7.0.
@@ -283,6 +288,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.25.0 =
+Admin UX refresh: each module drilldown now shows its own focused data-am-* cheat sheet inline, and the duplicate global "Cheat Sheet" tab is gone. No behaviour changes on the frontend — same animations, same attributes, just easier to find.
 
 = 1.24.1 =
 Metadata-only patch: confirmed compatible with WordPress 7.0. No functional changes. Safe to update at any time.

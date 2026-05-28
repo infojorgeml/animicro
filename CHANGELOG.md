@@ -5,6 +5,28 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.25.0] - 2026-05-14
+
+### Added
+
+- **`ModuleDataAttributes` component** (`admin/src/components/ModuleDataAttributes.tsx`, ~95 lines). Renders a compact 4-column table (Attribute / Type / Default / Copy button) showing the `data-am-*` attributes that apply to the current module — generic ones from the `"All"` bucket plus the ones whose `usedBy` field includes the module id. Rendered at the bottom of every `ModuleSettings` drilldown so users can see the relevant attributes inline without leaving the page.
+- **Tolerant `usedBy` tokeniser** in the filter logic. The pre-existing `DATA_ATTRIBUTES.usedBy` strings mix module ids with description text (e.g. `"magnet, magnetic — pull strength as %"` or `"fade, scale, slide-*, blur (opt-in); typewriter ..."`). The filter splits the head before any em-dash or open-paren, tokenises by comma/semicolon, supports `slide-*` wildcards, and exact-matches against `moduleId`. Returns `null` if no attributes match, so modules without per-element overrides don't render an empty section.
+
+### Removed
+
+- **Global "Cheat Sheet" tab** (`admin/src/components/CheatSheet.tsx` deleted, ~85 lines). The tab dumped every `data-am-*` attribute into one long, scrolly table — duplicate effort now that each module carries its own focused inline cheatsheet. `TabId` union shrinks from 5 to 4 (`'modules' | 'page-transitions' | 'smooth-scroll' | 'advanced'`). `App.tsx` removes the `<CheatSheet />` render and its import; `TabNav.tsx` removes the tab entry. `DATA_ATTRIBUTES` and `MODULE_INFO` exports in `admin/src/data/modules.ts` stay intact — `ModuleDataAttributes` still reads them. No data loss; the same information is rendered closer to where it's useful.
+
+### Changed (admin polish bundled in this release)
+
+- **Pro badge restyle.** Custom gold palette (`#ffeeb5` background, `#ad8700` text), uppercase, `rounded` (not pill), `px-2 py-1`, font-size unified to `text-[10px]` across `App.tsx` (header), `Dashboard.tsx` (module cards) and `TabNav.tsx` (compact tab indicator). The locked-Pro variant in Dashboard cards stays grey to signal "Pro feature, not unlocked" distinctly.
+- **Page Transitions tab now uses the Modules drilldown pattern.** Previously the page-curtain settings were inlined under the toggle in a tall card. Now matches Dashboard.tsx: list view with a compact toggleable card per module + gear icon; clicking the gear opens a dedicated `PageCurtainSettings.tsx` (~200 lines) with the same breadcrumb + class chip + Copy button as `ModuleSettings`. Consistent UX across tabs.
+- **Active module cards** in Dashboard / Page Transitions use `bg-[#f6f6f6]` + `border-white` for the "on" state (replaces the previous brand-tinted state). Same look on both tabs.
+
+### Notes
+
+- **No frontend behaviour changes.** This release is admin-UX only. Animations, attributes, sanitizers, JS bundles — all unchanged.
+- The user-facing impact in the WP admin: fewer global knobs to scroll through (one tab gone), and per-module documentation now sits next to the controls instead of in a separate destination.
+
 ## [1.24.1] - 2026-05-14
 
 ### Changed
