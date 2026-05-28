@@ -3,6 +3,7 @@ import type { ModuleConfig } from '../types';
 import AnimationPreview from './AnimationPreview';
 import ColorField from './ColorField';
 import CopyClassButton from './CopyClassButton';
+import ModuleDataAttributes from './ModuleDataAttributes';
 import Toggle from './Toggle';
 
 interface ModuleSettingsProps {
@@ -1499,6 +1500,11 @@ export default function ModuleSettings({ moduleId, config, onUpdate, onBack }: M
       </div>
 
       </div>
+
+      {/* Per-module data-am-* cheat sheet. Limited to `fade` for now while
+          we validate the layout; once approved we'll drop the guard and
+          this section appears for every module. */}
+      {moduleId === 'fade' && <ModuleDataAttributes moduleId={moduleId} />}
     </div>
   );
 }
