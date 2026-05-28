@@ -141,15 +141,20 @@ export function init() {
   // the viewport. rootMargin: 50px so the rotation feels "alive" the
   // instant the badge crosses into view, not 1 frame later.
   if (typeof IntersectionObserver === 'function') {
-    io = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        const item = items.find((it) => it.el === entry.target);
-        if (!item) return;
-        if (entry.isIntersecting) visible.add(item);
-        else visible.delete(item);
-      });
-      ensureLoop();
-    }, { rootMargin: '50px' });
+    // Guard against creating a second observer on re-init (matches the
+    // pattern in scroll-slide.js). Harmless in classic WP full-page
+    // loads, but prevents orphaning an observer if init() ever runs twice.
+    if (io === null) {
+      io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const item = items.find((it) => it.el === entry.target);
+          if (!item) return;
+          if (entry.isIntersecting) visible.add(item);
+          else visible.delete(item);
+        });
+        ensureLoop();
+      }, { rootMargin: '50px' });
+    }
 
     items.forEach((it) => io.observe(it.el));
   } else {

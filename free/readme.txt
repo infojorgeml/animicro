@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 7.0
-Stable tag: 1.25.0
+Stable tag: 1.25.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,10 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.25.1 =
+* **Fixed: easing dropdown options "Bounce Out", "Snap Out" and "Premium (Apple-like)" were silently reverting to the default on save.** The server-side validator only accepted the four basic easings; the three richer curves added back in 1.12.8 were rejected when you saved. Now all seven dropdown options (plus any custom `cubic-bezier`) save and apply correctly.
+* Hardening: defensive guard so the Spin module never creates a duplicate IntersectionObserver; rounded out the distribution ignore-list. No behaviour change.
 
 = 1.25.0 =
 * **Per-module attribute cheat sheets.** Every module drilldown now ends with a focused table listing exactly the `data-am-*` attributes that apply to THAT module (generic ones like `data-am-duration` + module-specific ones). One copy button per row.
@@ -288,6 +292,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.25.1 =
+Bug fix: the "Bounce Out", "Snap Out" and "Premium" easing options now save correctly (previously they silently reverted to the default). Recommended update for anyone using non-default easings.
 
 = 1.25.0 =
 Admin UX refresh: each module drilldown now shows its own focused data-am-* cheat sheet inline, and the duplicate global "Cheat Sheet" tab is gone. No behaviour changes on the frontend — same animations, same attributes, just easier to find.

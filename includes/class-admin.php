@@ -734,8 +734,30 @@ class Animicro_Admin {
 	}
 
 	private function sanitize_easing( $value, string $fallback ): string {
-		$allowed = [ 'linear', 'ease', 'ease-in', 'ease-out', 'ease-in-out' ];
-		return is_string( $value ) && in_array( $value, $allowed, true ) ? $value : $fallback;
+		if ( ! is_string( $value ) ) {
+			return $fallback;
+		}
+		$value = trim( $value );
+
+		// Keyword easings the admin dropdown offers (plus 'ease', a valid
+		// CSS/Motion keyword the frontend parseEasing() accepts even though
+		// the UI doesn't list it). Until 1.25.1 this list was missing
+		// back-out / circ-out / cubic-bezier, so selecting "Bounce Out",
+		// "Snap Out" or "Premium" in the dropdown silently reverted to the
+		// module default on save.
+		$allowed = [ 'linear', 'ease', 'ease-in', 'ease-out', 'ease-in-out', 'back-out', 'circ-out' ];
+		if ( in_array( $value, $allowed, true ) ) {
+			return $value;
+		}
+
+		// Accept any well-formed cubic-bezier(a, b, c, d) — covers the
+		// "Premium (Apple-like)" preset and matches what the frontend
+		// parseEasing() will accept, so custom curves round-trip too.
+		if ( preg_match( '/^cubic-bezier\(\s*-?\d*\.?\d+\s*(?:,\s*-?\d*\.?\d+\s*){3}\)$/', $value ) ) {
+			return $value;
+		}
+
+		return $fallback;
 	}
 
 	private function read_manifest( string $relative_path ): ?array {
