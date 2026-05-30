@@ -43,10 +43,12 @@ class Animicro_Admin {
 	 */
 	public function maybe_handle_connect_callback(): void {
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- the `state` query arg IS the nonce; we verify it inside handle_callback().
-		if ( ( $_GET['page'] ?? '' ) !== 'animicro-license' ) {
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+		if ( 'animicro-license' !== $page ) {
 			return;
 		}
-		if ( ( $_GET['action'] ?? '' ) !== 'connect-callback' ) {
+		$action = isset( $_GET['action'] ) ? sanitize_key( wp_unslash( $_GET['action'] ) ) : '';
+		if ( 'connect-callback' !== $action ) {
 			return;
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -254,7 +256,7 @@ class Animicro_Admin {
 
 		add_filter( 'script_loader_tag', [ $this, 'add_module_type' ], 10, 3 );
 
-		$current_page = isset( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : 'animicro'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page routing
+		$current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : 'animicro'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page routing
 		$page         = ( 'animicro-license' === $current_page ) ? 'license' : 'modules';
 
 		// Page Curtain (1.14.1+): the React admin needs `wp.media()` to power
