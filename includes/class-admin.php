@@ -764,7 +764,7 @@ class Animicro_Admin {
 		$file = ANIMICRO_DIR . $relative_path;
 		if ( ! file_exists( $file ) ) {
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( sprintf( 'Animicro: manifest not found at %s', $file ) );
+				error_log( sprintf( 'Animicro: manifest not found at %s', $file ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- diagnostic only, gated behind WP_DEBUG.
 			}
 			return null;
 		}
@@ -772,7 +772,7 @@ class Animicro_Admin {
 		$contents = file_get_contents( $file );
 		if ( false === $contents ) {
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( sprintf( 'Animicro: failed to read manifest %s', $file ) );
+				error_log( sprintf( 'Animicro: failed to read manifest %s', $file ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- diagnostic only, gated behind WP_DEBUG.
 			}
 			return null;
 		}
@@ -780,7 +780,7 @@ class Animicro_Admin {
 		$decoded = json_decode( $contents, true );
 		if ( ! is_array( $decoded ) ) {
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( sprintf( 'Animicro: malformed manifest JSON at %s', $file ) );
+				error_log( sprintf( 'Animicro: malformed manifest JSON at %s', $file ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- diagnostic only, gated behind WP_DEBUG.
 			}
 			return null;
 		}

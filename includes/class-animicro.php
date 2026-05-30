@@ -39,14 +39,14 @@ class Animicro {
 		if ( false === get_option( 'animicro_settings' ) ) {
 			add_option( 'animicro_settings', $defaults, '', false );
 		} else {
-			// Migrate existing installs to autoload=false (no-op if already set).
-			global $wpdb;
-			$wpdb->update(
-				$wpdb->options,
-				[ 'autoload' => 'no' ],
-				[ 'option_name' => 'animicro_settings' ]
-			);
-			wp_cache_delete( 'alloptions', 'options' );
+			// Migrate existing installs to autoload=false so the option is
+			// not loaded on every request. delete + re-add is the
+			// standard-API way to flip autoload on an already-existing
+			// option (wp_set_option_autoload() would be cleaner but it's
+			// WP 6.6+, and we support 6.0+). Runs once on activation only.
+			$existing = get_option( 'animicro_settings', $defaults );
+			delete_option( 'animicro_settings' );
+			add_option( 'animicro_settings', $existing, '', false );
 		}
 	}
 
