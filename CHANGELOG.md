@@ -5,6 +5,12 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.25.2] - 2026-05-30
+
+### Fixed
+
+- **`data-am-delay` (and the global delay setting) was silently ignored on `text-reveal`, `split` and `stagger`.** These three modules feed the delay into Motion's `stagger()` helper via its options object. Motion renamed that option from `start` to `startDelay` in a newer release; the modules still passed `{ start: cfg.delay }`, so `startDelay` stayed at its default `0` and the animations fired immediately no matter what delay the user configured. This was especially visible on hero elements (already in the viewport on load, so `inView` triggers instantly → the delay was the only thing holding the animation, and it was being dropped). Fixed by passing `{ startDelay: cfg.delay }` in all three modules. The other animation modules apply delay directly (not through `stagger()`) and were never affected.
+
 ## [1.25.1] - 2026-05-14
 
 ### Fixed

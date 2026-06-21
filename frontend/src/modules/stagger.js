@@ -21,7 +21,7 @@ export function init() {
         { opacity: [0, 1], y: [cfg.distance, 0] },
         {
           duration: cfg.duration,
-          delay: stagger(cfg.staggerDelay, { start: cfg.delay }),
+          delay: stagger(cfg.staggerDelay, { startDelay: cfg.delay }),
           ease: cfg.easing,
         }
       );

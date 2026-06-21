@@ -3,7 +3,7 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 7.0
-Stable tag: 1.25.1
+Stable tag: 1.25.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,9 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.25.2 =
+* **Fixed: `data-am-delay` was ignored on Text Reveal, Split Text and Stagger.** These three modules pass the delay through Motion's `stagger()` helper, which renamed its option from `start` to `startDelay` in a newer version — so the delay silently fell back to 0 and animations started immediately regardless of the configured value. Now the per-element and global delay work correctly on all three. The other modules were unaffected.
 
 = 1.25.1 =
 * **Fixed: easing dropdown options "Bounce Out", "Snap Out" and "Premium (Apple-like)" were silently reverting to the default on save.** The server-side validator only accepted the four basic easings; the three richer curves added back in 1.12.8 were rejected when you saved. Now all seven dropdown options (plus any custom `cubic-bezier`) save and apply correctly.
@@ -292,6 +295,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.25.2 =
+Bug fix: the delay setting now works on Text Reveal, Split Text and Stagger (it was being ignored, so those animations started instantly). Recommended update if you use any of those modules with a delay.
 
 = 1.25.1 =
 Bug fix: the "Bounce Out", "Snap Out" and "Premium" easing options now save correctly (previously they silently reverted to the default). Recommended update for anyone using non-default easings.
