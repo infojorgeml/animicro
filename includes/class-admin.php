@@ -5,8 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Animicro_Admin {
 
-	private string $page_hook         = '';
-	private string $license_page_hook = '';
+	private string $page_hook = '';
 
 	/** Whether admin JS/CSS were enqueued (manifest + entry found). */
 	private bool $admin_assets_enqueued = false;
@@ -19,80 +18,10 @@ class Animicro_Admin {
 			add_action( 'admin_menu', [ $this, 'register_menu' ] );
 			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 			add_action( 'admin_notices', [ $this, 'notice_free_deactivated' ] );
-			add_action( 'admin_notices', [ $this, 'maybe_notice_revoke_reminder' ] );
 			// Run before any plugin renders its admin notice. Priority 1 so
 			// we strip the action queue before WP starts firing it.
 			add_action( 'in_admin_header', [ $this, 'suppress_admin_notices' ], 1 );
-
-			// LicenSuite v3 Connect: handle the dashboard redirect callback.
-			if ( Animicro::is_pro_plugin() ) {
-				add_action( 'admin_init', [ $this, 'maybe_handle_connect_callback' ] );
-			}
 		}
-	}
-
-	/**
-	 * Catch the LicenSuite dashboard redirect after the user completes the
-	 * Connect flow. URL shape:
-	 *   /wp-admin/admin.php?page=animicro-license&action=connect-callback
-	 *   &token=<one-time>&state=<wp-nonce>
-	 *
-	 * Verifies the WP nonce in `state`, runs the token-for-secret exchange,
-	 * then redirects to the clean license page so the React UI re-fetches
-	 * `/license/status` and renders the new connected state.
-	 */
-	public function maybe_handle_connect_callback(): void {
-		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- the `state` query arg IS the nonce; we verify it inside handle_callback().
-		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
-		if ( 'animicro-license' !== $page ) {
-			return;
-		}
-		$action = isset( $_GET['action'] ) ? sanitize_key( wp_unslash( $_GET['action'] ) ) : '';
-		if ( 'connect-callback' !== $action ) {
-			return;
-		}
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-		if ( ! class_exists( 'Animicro_License_Manager' ) ) {
-			return;
-		}
-
-		$token = sanitize_text_field( wp_unslash( $_GET['token'] ?? '' ) );
-		$state = sanitize_text_field( wp_unslash( $_GET['state'] ?? '' ) );
-		// phpcs:enable WordPress.Security.NonceVerification.Recommended
-
-		$manager = new Animicro_License_Manager();
-		$manager->handle_callback( $token, $state );
-
-		wp_safe_redirect( admin_url( 'admin.php?page=animicro-license' ) );
-		exit;
-	}
-
-	/**
-	 * After the user clicks "Disconnect" in the React UI, remind them that
-	 * the seat is still held by this site on LicenSuite until they revoke
-	 * the connection from the dashboard. One-shot via a 60 s transient.
-	 */
-	public function maybe_notice_revoke_reminder(): void {
-		if ( ! Animicro::is_pro_plugin() ) {
-			return;
-		}
-		if ( ! get_transient( 'animicro_show_revoke_notice' ) ) {
-			return;
-		}
-		delete_transient( 'animicro_show_revoke_notice' );
-
-		echo '<div class="notice notice-info is-dismissible"><p>'
-			. wp_kses(
-				sprintf(
-					/* translators: %s: dashboard URL. */
-					__( '<strong>Animicro Pro:</strong> the local connection has been removed. To free up the seat for another site, also revoke this connection from your <a href="%s" target="_blank" rel="noopener">LicenSuite dashboard</a>.', 'animicro' ),
-					esc_url( 'https://licensuite.vercel.app/' )
-				),
-				[ 'strong' => [], 'a' => [ 'href' => [], 'target' => [], 'rel' => [] ] ]
-			)
-			. '</p></div>';
 	}
 
 	/**
@@ -118,7 +47,7 @@ class Animicro_Admin {
 			return;
 		}
 
-		$animicro_screens = array_filter( [ $this->page_hook, $this->license_page_hook ] );
+		$animicro_screens = array_filter( [ $this->page_hook ] );
 		if ( ! in_array( $screen->id, $animicro_screens, true ) ) {
 			return;
 		}
@@ -192,16 +121,8 @@ class Animicro_Admin {
 			80
 		);
 
-		if ( Animicro::is_pro_plugin() ) {
-			$this->license_page_hook = add_submenu_page(
-				'animicro',
-				__( 'Pro License', 'animicro' ),
-				__( 'License', 'animicro' ),
-				'manage_options',
-				'animicro-license',
-				[ $this, 'render_page' ]
-			);
-		}
+		// The License screen (animicro-license) is the shared LicenSuite SDK
+		// page, registered by Animicro_License_Page — not a React screen.
 	}
 
 	public function render_page(): void {
@@ -218,8 +139,7 @@ class Animicro_Admin {
 	}
 
 	public function enqueue_assets( string $hook ): void {
-		$allowed_hooks = array_filter( [ $this->page_hook, $this->license_page_hook ] );
-		if ( ! in_array( $hook, $allowed_hooks, true ) ) {
+		if ( '' === $this->page_hook || $hook !== $this->page_hook ) {
 			return;
 		}
 
@@ -256,14 +176,10 @@ class Animicro_Admin {
 
 		add_filter( 'script_loader_tag', [ $this, 'add_module_type' ], 10, 3 );
 
-		$current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : 'animicro'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page routing
-		$page         = ( 'animicro-license' === $current_page ) ? 'license' : 'modules';
-
 		// Page Curtain (1.14.1+): the React admin needs `wp.media()` to power
 		// the Logo URL media-library picker. wp_enqueue_media() loads the
-		// thickbox/backbone bundle that exposes window.wp.media. Only needed
-		// on the main settings page, not the License screen.
-		if ( 'animicro' === $current_page && function_exists( 'wp_enqueue_media' ) ) {
+		// thickbox/backbone bundle that exposes window.wp.media.
+		if ( function_exists( 'wp_enqueue_media' ) ) {
 			wp_enqueue_media();
 		}
 
@@ -280,7 +196,6 @@ class Animicro_Admin {
 			'settings'   => Animicro::get_settings(),
 			'version'    => ANIMICRO_VERSION,
 			'isPremium'  => $is_premium,
-			'page'       => $page,
 			'proPlugin'  => $is_pro_plugin,
 			'upgradeUrl' => $is_pro_plugin
 				? admin_url( 'admin.php?page=animicro-license' )
@@ -334,31 +249,8 @@ class Animicro_Admin {
 			],
 		] );
 
-		if ( Animicro::is_pro_plugin() ) {
-			register_rest_route( 'animicro/v1', '/license/status', [
-				[
-					'methods'             => 'GET',
-					'callback'            => [ $this, 'get_license_status' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-				],
-			] );
-
-			register_rest_route( 'animicro/v1', '/license/connect-url', [
-				[
-					'methods'             => 'GET',
-					'callback'            => [ $this, 'get_connect_url' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-				],
-			] );
-
-			register_rest_route( 'animicro/v1', '/license/disconnect', [
-				[
-					'methods'             => 'POST',
-					'callback'            => [ $this, 'disconnect_license' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-				],
-			] );
-		}
+		// License activation/removal is handled by the shared LicenSuite SDK
+		// page (Animicro_License_Page) via admin-post.php — no REST routes.
 	}
 
 	public function check_permission( ?\WP_REST_Request $request = null ): bool {
@@ -672,48 +564,6 @@ class Animicro_Admin {
 		update_option( 'animicro_settings', $clean );
 
 		return new \WP_REST_Response( $clean, 200 );
-	}
-
-	public function get_license_status(): \WP_REST_Response {
-		$manager = new Animicro_License_Manager();
-
-		$is_dev         = $manager->is_dev_mode();
-		$has_connection = $manager->has_connection();
-		$license_data   = $manager->get_license_data();
-		$connect_error  = $manager->consume_connect_error();
-
-		$state = $is_dev ? 'dev' : ( $has_connection ? 'connected' : 'disconnected' );
-
-		return new \WP_REST_Response( [
-			'state'          => $state,
-			'is_premium'     => Animicro_License_Manager::is_premium(),
-			'is_dev'         => $is_dev,
-			'has_connection' => $has_connection,
-			'connection_id'  => $manager->get_connection_id(),
-			'plan'           => $license_data['plan'] ?? null,
-			'expires_at'     => $license_data['expires_at'] ?? null,
-			'sites'          => $license_data['sites'] ?? null,
-			'connect_error'  => empty( $connect_error ) ? null : [
-				'reason'  => $connect_error['reason'] ?? 'unknown',
-				'message' => $manager->get_error_message( $connect_error['reason'] ?? 'server_error' ),
-			],
-		], 200 );
-	}
-
-	public function get_connect_url(): \WP_REST_Response {
-		$manager = new Animicro_License_Manager();
-		return new \WP_REST_Response( [ 'url' => $manager->get_connect_url() ], 200 );
-	}
-
-	public function disconnect_license(): \WP_REST_Response {
-		$manager = new Animicro_License_Manager();
-		$manager->clear_connection();
-
-		// Hint the user that the seat is still occupied on the server until
-		// they revoke from the dashboard.
-		set_transient( 'animicro_show_revoke_notice', '1', MINUTE_IN_SECONDS );
-
-		return new \WP_REST_Response( [ 'success' => true ], 200 );
 	}
 
 	private function sanitize_margin( $value, string $fallback ): string {

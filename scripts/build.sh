@@ -83,8 +83,9 @@ copy_shared "$BUILD/animicro"
 sed -i.bak "s/define( 'ANIMICRO_PRO', true )/define( 'ANIMICRO_PRO', false )/" "$BUILD/animicro/animicro.php"
 rm -f "$BUILD/animicro/animicro.php.bak"
 
-# Exclude license manager from free build
-rm -f "$BUILD/animicro/includes/class-license-manager.php"
+# Exclude licensing (LicenSuite SDK copy) from free build — copy_shared never
+# copies it, this is belt-and-braces.
+rm -rf "$BUILD/animicro/includes/licensing"
 
 # Copy WP.org readme.txt
 if [[ -f "$ROOT/free/readme.txt" ]]; then
@@ -107,8 +108,10 @@ sed -i.bak \
     "$BUILD/animicro-pro/animicro.php"
 rm -f "$BUILD/animicro-pro/animicro.php.bak"
 
-# Include license manager (LicenSuite v3 Connect flow — no build-time key injection)
-cp "$ROOT/includes/class-license-manager.php" "$BUILD/animicro-pro/includes/"
+# Include licensing (LicenSuite SDK copy: manager + License admin page — no
+# build-time key injection; the embedded anon key is public by design)
+mkdir -p "$BUILD/animicro-pro/includes/licensing"
+cp "$ROOT/includes/licensing/"*.php "$BUILD/animicro-pro/includes/licensing/"
 
 # Include the GitHub Releases self-updater + vendored plugin-update-checker
 # library. Both are stripped from the free build (copy_shared above does not
