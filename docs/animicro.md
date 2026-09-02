@@ -105,7 +105,7 @@ Builder body classes monitored: `elementor-editor-active`, `bricks-is-builder`, 
 ## Pro License
 
 - **Free modules**: fade, scale, slide-up, slide-down, slide-left, slide-right, skew-up, float, pulse, highlight, typewriter, hover-zoom.
-- **Pro modules**: blur, stagger, grid-reveal, text-fill-scroll, parallax, img-parallax, split, text-reveal. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
+- **Pro modules**: grid-reveal, text-fill-scroll, split, text-reveal, img-parallax, magnet, magnetic, cursor, scatter, scramble, spin, clip-reveal. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
 - **Cheat Sheet** and **Smooth Scroll** tabs are Pro-only.
 - License activation via **LicenSuite v3.0 Connect flow** (OAuth-style account binding); product slug `animicro`. The user never pastes a license key — they click **Connect**, authenticate on the LicenSuite dashboard, pick a license, and the dashboard redirects back with a one-time `token`. The plugin exchanges that token for a long-lived `connection_id + connection_secret` pair stored in `wp_options` (secret AES-256-CBC encrypted at rest). Endpoints:
   - `GET https://licensuite.vercel.app/plugin-connect?product=…&return=…&site_url=…&state=…` — dashboard page the plugin opens in a new tab.
@@ -128,7 +128,7 @@ Builder body classes monitored: `elementor-editor-active`, `bricks-is-builder`, 
 | `admin/src/components/AdvancedSettings.tsx` | Free: reduced motion + debug mode |
 | `frontend/src/smooth-scroll.js` | Lenis init (dynamic chunk) |
 | `includes/class-compatibility.php` | get_editor_css(), BUILDER_EDITOR_CLASSES, MODULE_INITIAL_CSS |
-| `includes/class-license-manager.php` | Validation, is_premium(), is_pro_module() |
+| `includes/licensing/class-license-manager.php` | Validation, is_premium() (LicenSuite SDK copy; is_pro_module() lives in `Animicro`) |
 | `frontend/src/core/config.js` | getElementConfig(el, moduleId) |
 | `frontend/src/core/registry.js` | loadModules(), MODULES map |
 | `admin/src/data/modules.ts` | MODULE_INFO, DATA_ATTRIBUTES, EASING_OPTIONS, MARGIN_OPTIONS |

@@ -342,9 +342,9 @@ export const MODULE_INFO: ModuleInfo[] = [
   { id: 'slide-right', name: 'Slide Right', description: 'Slides in toward the right (from the left edge)',  cssClass: '.am-slide-right', isPro: false, category: 'entry' },
   { id: 'slide-left',  name: 'Slide Left',  description: 'Slides in toward the left (from the right edge)',  cssClass: '.am-slide-left',  isPro: false, category: 'entry' },
   { id: 'skew-up',     name: 'Skew Up',     description: 'Slides up with a slight skew that straightens as it stops', cssClass: '.am-skew-up', isPro: false, category: 'entry' },
-  { id: 'flip-x',      name: 'Flip X',      description: '3D card flip on the X axis (vertical rotation — like opening a book top-to-bottom)',     cssClass: '.am-flip-x', isPro: true,  category: 'entry' },
-  { id: 'flip-y',      name: 'Flip Y',      description: '3D card flip on the Y axis (horizontal rotation — like turning a page left-to-right)',   cssClass: '.am-flip-y', isPro: true,  category: 'entry' },
-  { id: 'blur',        name: 'Blur',        description: 'Blur that clears as it appears',            cssClass: '.am-blur',        isPro: true,  category: 'entry' },
+  { id: 'flip-x',      name: 'Flip X',      description: '3D card flip on the X axis (vertical rotation — like opening a book top-to-bottom)',     cssClass: '.am-flip-x', isPro: false,  category: 'entry' },
+  { id: 'flip-y',      name: 'Flip Y',      description: '3D card flip on the Y axis (horizontal rotation — like turning a page left-to-right)',   cssClass: '.am-flip-y', isPro: false,  category: 'entry' },
+  { id: 'blur',        name: 'Blur',        description: 'Blur that clears as it appears',            cssClass: '.am-blur',        isPro: false,  category: 'entry' },
 
   // Continuous (Infinite)
   { id: 'float',       name: 'Float',       description: 'Infinite soft up/down floating motion',     cssClass: '.am-float',       isPro: false, category: 'continuous' },
@@ -365,12 +365,12 @@ export const MODULE_INFO: ModuleInfo[] = [
   { id: 'typewriter',   name: 'Typewriter',   description: 'Types text character by character with a blinking cursor', cssClass: '.am-typewriter', isPro: false, category: 'text' },
 
   // Groups & Layouts
-  { id: 'stagger',      name: 'Stagger',      description: 'Animates container children in sequence',   cssClass: '.am-stagger',      isPro: true, category: 'group' },
+  { id: 'stagger',      name: 'Stagger',      description: 'Animates container children in sequence',   cssClass: '.am-stagger',      isPro: false, category: 'group' },
   { id: 'grid-reveal',  name: 'Grid Reveal',  description: 'Spatial animation that reveals grid items from a focal point', cssClass: '.am-grid-reveal', isPro: true, category: 'group' },
 
   // Scroll & Continuous
   { id: 'text-fill-scroll', name: 'Text Fill on Scroll', description: 'Fills text word by word as user scrolls', cssClass: '.am-text-fill-scroll', isPro: true, category: 'scroll' },
-  { id: 'parallax',         name: 'Parallax',            description: 'Scroll-linked parallax movement',         cssClass: '.am-parallax',         isPro: true,  category: 'scroll' },
+  { id: 'parallax',         name: 'Parallax',            description: 'Scroll-linked parallax movement',         cssClass: '.am-parallax',         isPro: false,  category: 'scroll' },
   { id: 'scroll-slide-left',  name: 'Scroll Slide Left',  description: 'As you scroll down, the element drifts horizontally across the viewport (right → left)', cssClass: '.am-scroll-slide-left',  isPro: false, category: 'scroll' },
   { id: 'scroll-slide-right', name: 'Scroll Slide Right', description: 'As you scroll down, the element drifts horizontally across the viewport (left → right)', cssClass: '.am-scroll-slide-right', isPro: false, category: 'scroll' },
 

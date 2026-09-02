@@ -6,10 +6,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Animicro {
 
 	const PRO_MODULES = [
-		'blur', 'stagger', 'grid-reveal', 'text-fill-scroll',
-		'parallax', 'split', 'text-reveal', 'img-parallax', 'magnet',
-		'scatter', 'scramble', 'spin', 'clip-reveal', 'magnetic',
-		'cursor', 'flip-x', 'flip-y',
+		'grid-reveal', 'text-fill-scroll', 'split', 'text-reveal',
+		'img-parallax', 'magnet', 'scatter', 'scramble', 'spin',
+		'clip-reveal', 'magnetic', 'cursor',
 	];
 
 	private static ?Animicro $instance = null;

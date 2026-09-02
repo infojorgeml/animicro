@@ -2,8 +2,8 @@
 Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
-Tested up to: 7.0
-Stable tag: 1.25.2
+Tested up to: 7.1
+Stable tag: 1.27.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -30,12 +30,25 @@ Animicro lets you add high-end animations (Awwwards-style) with minimal performa
 * **Highlight** (`.am-highlight`) — Animated marker highlight behind text on entry
 * **Typewriter** (`.am-typewriter`) — Types text character by character with a blinking cursor
 * **Zoom Hover** (`.am-hover-zoom`) — Image scales up smoothly on hover (parent needs `overflow: hidden`)
+* **Blur** (`.am-blur`) — Blur that clears as the element appears
+* **Flip X / Flip Y** (`.am-flip-x`, `.am-flip-y`) — 3D card flip on entry, AOS-style
+* **Ken Burns** (`.am-ken-burns`) — Slow infinite zoom for hero images (continuous)
+* **Stagger** (`.am-stagger`) — Animates a container's children in sequence
+* **Parallax** (`.am-parallax`) — Scroll-linked parallax movement
+* **Scroll Slide Left / Right** (`.am-scroll-slide-left`, `.am-scroll-slide-right`) — Horizontal drift across the viewport as you scroll
+* **Page Curtain** — Symmetric overlay transition between internal pages
 
 Each module has its own settings panel with live preview so you can tune duration, easing, delay, and activation margin without leaving the admin.
 
 = Pro modules (available with Animicro Pro) =
 
-Blur, Stagger, Grid Reveal, Text Fill on Scroll, Parallax, Image Parallax (window effect), Split Text, and Text Reveal. Plus Smooth Scroll and a Cheat Sheet reference panel. Learn more at [animicro.com](https://animicro.com).
+Twelve premium modules, grouped in three families:
+
+* **Mouse Interactions** — Magnet, Magnetic and Custom Cursor: elements that react to the visitor's pointer.
+* **Premium text** — Split Text, Scatter Text, Scramble Text and Text Reveal.
+* **Premium reveals** — Clip Reveal, Grid Reveal, Image Parallax, Text Fill on Scroll and Spin.
+
+Plus **Smooth Scroll**. Learn more at [animicro.com](https://animicro.com).
 
 = Builder compatibility =
 
@@ -63,7 +76,7 @@ Use `data-am-*` attributes. For example: `data-am-duration="1"`, `data-am-delay=
 
 = What is Animicro Pro? =
 
-Animicro Pro is a separate plugin that replaces the free version and unlocks 11 additional animation modules plus Smooth Scroll and a Cheat Sheet. Visit [animicro.com](https://animicro.com) to learn more.
+Animicro Pro is a separate plugin that replaces the free version and unlocks 12 additional animation modules plus Smooth Scroll. Visit [animicro.com](https://animicro.com) to learn more.
 
 == External Services ==
 
@@ -85,6 +98,13 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 1.27.0 =
+* **Five modules moved from Pro to Free: Blur, Stagger, Parallax, Flip X and Flip Y.** Stagger in particular is infrastructure rather than an effect — without it you cannot animate a list, a card grid or a menu in sequence — so it belongs in the free tier. If you are on Pro nothing changes for you; if you are on Free these five simply unlock, with all their settings and `data-am-*` attributes, no markup changes needed.
+* The free tier now ships 21 modules and Pro keeps 12, grouped as Mouse Interactions (Magnet, Magnetic, Custom Cursor), premium text (Split, Scatter, Scramble, Text Reveal) and premium reveals (Clip Reveal, Grid Reveal, Image Parallax, Text Fill on Scroll, Spin), plus Smooth Scroll.
+* Tested up to WordPress 7.1.
+* Documentation: the free module list in this readme was out of date — Ken Burns, Scroll Slide Left/Right and Page Curtain were already free but never listed, and the Pro list still mentioned the Cheat Sheet panel that was removed in 1.25.0. Both are now accurate.
+* Animicro Pro: licensing now points at the migrated LicenSuite backend and activation is a **license key** again (after purchase you receive a key and paste it in /wp-admin), replacing the OAuth "Connect" flow. Plugin deactivation no longer wipes the license, so toggling the plugin off and on is instant. Pro users upgrading from 1.25.x need a new key — the previous ones do not exist in the migrated database. This work was prepared as 1.26.0, which was never published; it ships here.
 
 = 1.25.2 =
 * **Fixed: `data-am-delay` was ignored on Text Reveal, Split Text and Stagger.** These three modules pass the delay through Motion's `stagger()` helper, which renamed its option from `start` to `startDelay` in a newer version — so the delay silently fell back to 0 and animations started immediately regardless of the configured value. Now the per-element and global delay work correctly on all three. The other modules were unaffected.
@@ -295,6 +315,9 @@ https://github.com/infojorgeml/animicro
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.27.0 =
+Blur, Stagger, Parallax, Flip X and Flip Y are now free. Update and they unlock automatically — no markup changes. Pro users: activation moved to license keys and needs a new key issued from your account.
 
 = 1.25.2 =
 Bug fix: the delay setting now works on Text Reveal, Split Text and Stagger (it was being ignored, so those animations started instantly). Recommended update if you use any of those modules with a delay.

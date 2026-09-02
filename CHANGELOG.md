@@ -5,6 +5,32 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.27.0] - 2026-09-02
+
+Folds in the licensing work that was prepared as 1.26.0 but never published.
+
+### Changed
+
+- **Five modules moved from Pro to Free: `blur`, `stagger`, `parallax`, `flip-x`, `flip-y`.** The free tier goes from 16 to 21 modules, Pro from 17 to 12. The reasoning per module: **Stagger** is infrastructure, not an effect — without it you cannot animate a list, a card grid or a menu in sequence, which is the first thing most people try, so gating it made the free tier read as crippled. **Blur** is Fade plus a `filter`, too thin to defend a paywall. **Flip X / Flip Y** are a CSS `rotateY` anyone writes by hand, and they still carry the known `data-am-loop` limitation — better given away than sold. **Parallax** is one of the most-searched terms in the WordPress plugin directory, so it earns more as an acquisition hook in the free listing than as a locked row (Image Parallax stays Pro). Purely a change to `Animicro::PRO_MODULES` and the admin registry — no module code touched, no markup or settings changes, and existing Pro installs see no difference.
+- Pro now tells one coherent story: Mouse Interactions (`magnet`, `magnetic`, `cursor`), premium text (`split`, `scatter`, `scramble`, `text-reveal`) and premium reveals (`clip-reveal`, `grid-reveal`, `img-parallax`, `text-fill-scroll`, `spin`), plus Smooth Scroll.
+- `Tested up to` bumped to WordPress 7.1.
+
+### Fixed
+
+- `free/readme.txt` listed only 12 of the 16 free modules — Ken Burns, Scroll Slide Left/Right and Page Curtain shipped free but were never advertised — and the Pro blurb still promised the Cheat Sheet panel removed in 1.25.0. The stale Pro module list in `docs/animicro.md` (still naming blur/stagger/parallax as Pro, and missing the six modules added since) is corrected too.
+
+- **License activation is now a license key, not the OAuth "Connect" flow.** After purchase the user receives a key by email and pastes it on the License page — no more logging into the LicenSuite dashboard from inside the plugin. The key is validated against the `license-check` Edge Function (key + domain + product), which registers the domain in `license_sites` and enforces the plan's multi-site seat limit server-side (the real anti-sharing control). The key is stored AES-256-CBC encrypted at rest. Rationale: emailing a key is far lower friction at the point of sale than sending buyers to an unfamiliar dashboard.
+- **Deactivating the plugin no longer clears the license.** `Animicro::deactivate()` was wiping the stored credentials on every deactivation (the old Connect-flow convention), so toggling the plugin off and on forced a full re-activation. The key and the activated seat now persist across deactivation — reactivating is instant. Full cleanup (and freeing the seat) happens only on delete.
+
+### Added
+
+- **`uninstall.php` now frees the seat on the server.** On delete, the plugin calls `license-deactivate` (key + domain + product) to release this site from the plan automatically, then wipes all local options. The old Connect flow had no self-revoke endpoint, so this previously needed a manual dashboard step.
+- License page: a key-entry form (auto-formats `XXXX-XXXX-…` as you type, validates the 8-group format), an "active" card showing plan / sites / expiry + the masked key, and a **Remove key** action that frees the seat. An amber state explains an installed-but-blocked key (expired / site-limit reached).
+
+### Removed
+
+- The OAuth-style **Connect** flow in its entirety: the `/plugin-connect` dashboard hand-off, the token `exchange`, the `connect-callback` `admin_init` handler, the `plugin-validate` connection check, the `connection_id` / `connection_secret` storage, and the `/license/connect-url` + `/license/disconnect` REST routes (replaced by `/license/activate-key` + `/license/deactivate-key`). Stale connection options from older installs are cleaned up on next activation and on uninstall.
+
 ## [1.25.2] - 2026-05-30
 
 ### Fixed
