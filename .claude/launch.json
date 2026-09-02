@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "vite:admin (watch)",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["run", "dev:admin"],
+      "port": 0
+    },
+    {
+      "name": "vite:frontend (watch)",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["run", "dev:frontend"],
+      "port": 0
+    }
+  ]
+}
