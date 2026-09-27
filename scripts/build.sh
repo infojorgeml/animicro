@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Build both Animicro free (WP.org) and Animicro Pro ZIPs from a single source.
+# Build the Animicro ZIP (the same package that goes to WordPress.org).
 # Usage: bash scripts/build.sh
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -29,7 +29,7 @@ fi
 # 2. Clean previous builds
 # ---------------------------------------------------------------------------
 rm -rf "$BUILD"
-mkdir -p "$BUILD/animicro" "$BUILD/animicro-pro" "$RELEASE"
+mkdir -p "$BUILD/animicro" "$RELEASE"
 
 # ---------------------------------------------------------------------------
 # Helper: copy shared assets into a target directory
@@ -60,34 +60,24 @@ copy_shared() {
         cp "$ROOT/README.md" "$TARGET/"
     fi
 
-    # Plugin icons / banners. PUC (vendored in the Pro build) auto-discovers
-    # `assets/icon-128x128.png`, `assets/icon-256x256.png`, `assets/icon.svg`,
-    # `assets/banner-*.png` and feeds them to WP's update_plugins transient so
-    # the WP admin "Update Plugins" screen renders our logo instead of the
-    # generic placeholder. Same files also surface in the "View details"
-    # lightbox. Free build benefits too (WP.org serves icons from SVN, but
-    # bundling them locally is harmless).
+    # Plugin icons / banners (WP.org serves them from SVN, but bundling them
+    # locally is harmless and keeps the "View details" lightbox complete).
     if [[ -d "$ROOT/assets" ]]; then
         cp -r "$ROOT/assets" "$TARGET/assets"
     fi
+
+    # macOS Finder metadata: WP.org's Plugin Check rejects hidden files.
+    find "$TARGET" -name ".DS_Store" -delete
 }
 
 # ---------------------------------------------------------------------------
-# 3. Free build (WP.org)
+# 3. Plugin package
 # ---------------------------------------------------------------------------
-echo "==> Building FREE (animicro) ..."
+echo "==> Building animicro ..."
 
 copy_shared "$BUILD/animicro"
 
-# Ensure ANIMICRO_PRO is false (should already be, but enforce)
-sed -i.bak "s/define( 'ANIMICRO_PRO', true )/define( 'ANIMICRO_PRO', false )/" "$BUILD/animicro/animicro.php"
-rm -f "$BUILD/animicro/animicro.php.bak"
-
-# Exclude licensing (LicenSuite SDK copy) from free build — copy_shared never
-# copies it, this is belt-and-braces.
-rm -rf "$BUILD/animicro/includes/licensing"
-
-# Copy WP.org readme.txt
+# WP.org readme.txt
 if [[ -f "$ROOT/free/readme.txt" ]]; then
     cp "$ROOT/free/readme.txt" "$BUILD/animicro/readme.txt"
 fi
@@ -95,46 +85,18 @@ fi
 echo "   Done: build/animicro/"
 
 # ---------------------------------------------------------------------------
-# 4. Pro build
-# ---------------------------------------------------------------------------
-echo "==> Building PRO (animicro-pro) ..."
-
-copy_shared "$BUILD/animicro-pro"
-
-# Set ANIMICRO_PRO to true and rename plugin for WP dashboard
-sed -i.bak \
-    -e "s/define( 'ANIMICRO_PRO', false )/define( 'ANIMICRO_PRO', true )/" \
-    -e "s/ \* Plugin Name:       Animicro$/ \* Plugin Name:       Animicro Pro/" \
-    "$BUILD/animicro-pro/animicro.php"
-rm -f "$BUILD/animicro-pro/animicro.php.bak"
-
-# Include licensing (LicenSuite SDK copy: manager + License admin page — no
-# build-time key injection; the embedded anon key is public by design)
-mkdir -p "$BUILD/animicro-pro/includes/licensing"
-cp "$ROOT/includes/licensing/"*.php "$BUILD/animicro-pro/includes/licensing/"
-
-# Include the GitHub Releases self-updater + vendored plugin-update-checker
-# library. Both are stripped from the free build (copy_shared above does not
-# copy them, so they only ever land in the Pro tree).
-cp "$ROOT/includes/class-updater.php" "$BUILD/animicro-pro/includes/"
-mkdir -p "$BUILD/animicro-pro/includes/lib"
-cp -R "$ROOT/includes/lib/plugin-update-checker" "$BUILD/animicro-pro/includes/lib/"
-
-echo "   Done: build/animicro-pro/"
-
-# ---------------------------------------------------------------------------
-# 5. Generate ZIPs
+# 4. Generate ZIP
 # ---------------------------------------------------------------------------
 echo ""
-echo "==> Generating ZIPs ..."
+echo "==> Generating ZIP ..."
 
 cd "$BUILD"
 
+# Start from scratch: `zip -r` into an existing archive only adds/updates
+# entries, so files removed from the plugin would linger in the ZIP.
+rm -f "$RELEASE/animicro-${VERSION}.zip"
 zip -rq "$RELEASE/animicro-${VERSION}.zip" animicro/
 echo "   Created: release/animicro-${VERSION}.zip ($(wc -c < "$RELEASE/animicro-${VERSION}.zip") bytes)"
-
-zip -rq "$RELEASE/animicro-pro-${VERSION}.zip" animicro-pro/
-echo "   Created: release/animicro-pro-${VERSION}.zip ($(wc -c < "$RELEASE/animicro-pro-${VERSION}.zip") bytes)"
 
 echo ""
 echo "==> Build complete!"

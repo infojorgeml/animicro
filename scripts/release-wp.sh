@@ -2,7 +2,7 @@
 # Publish the current Animicro free build to the WordPress.org SVN repository.
 #
 # Full flow (fully automated, with one confirmation prompt before committing):
-#   1. Rebuild both ZIPs so SVN trunk mirrors the latest code.
+#   1. Rebuild the ZIP so SVN trunk mirrors the latest code.
 #   2. Refresh SVN working copy (revert tags/ noise, update).
 #   3. Rsync build/animicro/ -> trunk/ (with --delete).
 #   4. svn add new files, svn rm deleted files, all scoped to trunk/.
@@ -56,7 +56,7 @@ if svn info "$SVN_REPO/tags/$VERSION" >/dev/null 2>&1; then
 fi
 
 # ---------------------------------------------------------------------------
-# 1. Rebuild ZIPs (ensures build/animicro/ is current)
+# 1. Rebuild the ZIP (ensures build/animicro/ is current)
 # ---------------------------------------------------------------------------
 bash "$ROOT/scripts/build.sh"
 

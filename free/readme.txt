@@ -3,52 +3,67 @@ Contributors: jorgemml
 Tags: animation, motion, css, performance, page-builder
 Requires at least: 6.0
 Tested up to: 7.1
-Stable tag: 1.27.0
+Stable tag: 2.0.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Utility-first micro-animations for WordPress. Simple CSS classes, extreme performance.
+Utility-first micro-animations for WordPress. Simple CSS classes, extreme performance. Every module included, free.
 
 == Description ==
 
-Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade`, `.am-scale`, or `.am-slide-up` in your Page Builder, and you're done.
+Animicro lets you add high-end animations (Awwwards-style) with minimal performance impact. Enable modules in the panel, apply classes like `.am-fade`, `.am-split-words` or `.am-text-reveal` in your page builder, and you're done.
 
 **Philosophy**: Utility-first. No complex interfaces, no timelines. Just classes and `data-am-*` attributes.
 
-= Free modules =
+**100% free.** Every module, Smooth Scroll and Page Transitions are included. No license keys, no locked features, no external calls.
 
-* **Fade** (`.am-fade`) — Smooth appearance with opacity
-* **Scale** (`.am-scale`) — Scales from small to full size
-* **Slide Up** (`.am-slide-up`) — Slides up when appearing
-* **Slide Down** (`.am-slide-down`) — Slides down when appearing
-* **Slide Left** (`.am-slide-left`) — Slides in toward the left (from the right edge)
-* **Slide Right** (`.am-slide-right`) — Slides in toward the right (from the left edge)
-* **Skew Up** (`.am-skew-up`) — Slides up with a slight skew that straightens as it stops (Stripe / Vercel-style)
-* **Float** (`.am-float`) — Infinite soft up/down floating motion (continuous)
-* **Pulse** (`.am-pulse`) — Infinite gentle scale pulse — breathing-like (continuous)
-* **Highlight** (`.am-highlight`) — Animated marker highlight behind text on entry
-* **Typewriter** (`.am-typewriter`) — Types text character by character with a blinking cursor
-* **Zoom Hover** (`.am-hover-zoom`) — Image scales up smoothly on hover (parent needs `overflow: hidden`)
-* **Blur** (`.am-blur`) — Blur that clears as the element appears
-* **Flip X / Flip Y** (`.am-flip-x`, `.am-flip-y`) — 3D card flip on entry, AOS-style
-* **Ken Burns** (`.am-ken-burns`) — Slow infinite zoom for hero images (continuous)
-* **Stagger** (`.am-stagger`) — Animates a container's children in sequence
-* **Parallax** (`.am-parallax`) — Scroll-linked parallax movement
-* **Scroll Slide Left / Right** (`.am-scroll-slide-left`, `.am-scroll-slide-right`) — Horizontal drift across the viewport as you scroll
-* **Page Curtain** — Symmetric overlay transition between internal pages
+= Entry animations =
 
-Each module has its own settings panel with live preview so you can tune duration, easing, delay, and activation margin without leaving the admin.
+* **Fade** (`.am-fade`), **Scale** (`.am-scale`), **Blur** (`.am-blur`)
+* **Slide Up / Down / Left / Right** (`.am-slide-up`, `.am-slide-down`, `.am-slide-left`, `.am-slide-right`)
+* **Skew Up** (`.am-skew-up`) — slides up with a slight skew that straightens as it stops
+* **Flip X / Flip Y** (`.am-flip-x`, `.am-flip-y`) — 3D card flip on entry
 
-= Pro modules (available with Animicro Pro) =
+= Text =
 
-Twelve premium modules, grouped in three families:
+* **Split Text** (`.am-split-chars`, `.am-split-words`) — animates text by letters or words
+* **Text Reveal** (`.am-text-reveal`) — reveals text line by line with a sliding mask
+* **Scatter Text** (`.am-scatter-chars`, `.am-scatter-words`) — letters or words fly in and converge
+* **Scramble Text** (`.am-scramble`) — decodes character by character with a glitch wave
+* **Highlight** (`.am-highlight`) — animated marker behind text
+* **Typewriter** (`.am-typewriter`) — types text with a blinking cursor, with rotating strings
 
-* **Mouse Interactions** — Magnet, Magnetic and Custom Cursor: elements that react to the visitor's pointer.
-* **Premium text** — Split Text, Scatter Text, Scramble Text and Text Reveal.
-* **Premium reveals** — Clip Reveal, Grid Reveal, Image Parallax, Text Fill on Scroll and Spin.
+= Groups & layouts =
 
-Plus **Smooth Scroll**. Learn more at [animicro.com](https://animicro.com).
+* **Stagger** (`.am-stagger`) — animates a container's children in sequence
+* **Grid Reveal** (`.am-grid-reveal`) — reveals grid items outward from a focal point
+
+= Scroll =
+
+* **Parallax** (`.am-parallax`) — scroll-linked parallax movement
+* **Text Fill on Scroll** (`.am-text-fill-scroll`) — fills text word by word as you scroll
+* **Scroll Slide Left / Right** (`.am-scroll-slide-left`, `.am-scroll-slide-right`) — horizontal drift across the viewport
+
+= Media =
+
+* **Clip Reveal** (`.am-clip-reveal`) — image reveal via clip-path: curtains, center split, expanding circle
+* **Image Parallax** (`.am-img-parallax`) — the image moves inside its frame as you scroll
+* **Ken Burns** (`.am-ken-burns`) — slow infinite zoom for hero images
+* **Zoom Hover** (`.am-hover-zoom`) — image scales up on hover
+
+= Continuous & mouse =
+
+* **Float** (`.am-float`), **Pulse** (`.am-pulse`), **Spin** (`.am-spin`)
+* **Magnet** (`.am-magnet`) and **Magnetic** (`.am-magnetic`) — elements pulled toward the cursor
+* **Custom Cursor** (`.am-cursor-expand`) — a custom cursor that grows on hover targets
+
+= Global =
+
+* **Smooth Scroll** — Lenis-powered smooth scrolling, with anchor support
+* **Page Curtain** — symmetric overlay transition between internal pages
+
+Each module has its own settings panel with live preview so you can tune duration, easing, delay, and activation margin without leaving the admin. Only the JavaScript of the modules you enable is loaded.
 
 = Builder compatibility =
 
@@ -58,6 +73,10 @@ Works with Elementor, Bricks, Breakdance, Oxygen, Divi, and Gutenberg. Dynamic i
 
 Under **Animicro → Advanced** you can enable **Respect Reduced Motion** (skips JS-driven animations when the visitor prefers reduced motion) and **Debug Mode** (outlines `.am-*` elements and logs script timing in the browser console).
 
+= Ready-made layouts =
+
+Want a head start? The [Animicro Library](https://animicro.com/library/) offers copy-paste Bricks sections built with these modules. The plugin itself is complete on its own and never requires the library.
+
 == Installation ==
 
 1. Upload the `animicro` folder to `/wp-content/plugins/`
@@ -66,6 +85,14 @@ Under **Animicro → Advanced** you can enable **Respect Reduced Motion** (skips
 
 == Frequently Asked Questions ==
 
+= Is Animicro really free? =
+
+Yes. Every module, Smooth Scroll and Page Transitions are included, with no license key and no locked features.
+
+= I was using Animicro Pro. What should I do? =
+
+Install Animicro from WordPress.org and activate it: it deactivates Animicro Pro automatically and keeps all your modules and settings (both use the same settings). Then delete Animicro Pro.
+
 = Can I combine multiple animation classes on one element? =
 
 No. Use only one animation class per element. Combining `.am-fade` with `.am-slide-up` on the same element can cause flicker.
@@ -73,10 +100,6 @@ No. Use only one animation class per element. Combining `.am-fade` with `.am-sli
 = How do I override settings per element? =
 
 Use `data-am-*` attributes. For example: `data-am-duration="1"`, `data-am-delay="0.3"`, `data-am-easing="ease-in-out"`.
-
-= What is Animicro Pro? =
-
-Animicro Pro is a separate plugin that replaces the free version and unlocks 12 additional animation modules plus Smooth Scroll. Visit [animicro.com](https://animicro.com) to learn more.
 
 == External Services ==
 
@@ -98,6 +121,12 @@ https://github.com/infojorgeml/animicro
 3. Builder compatibility settings
 
 == Changelog ==
+
+= 2.0.0 =
+* **Animicro is now 100% free.** Every module is included for everyone: Split Text, Text Reveal, Scatter, Scramble, Grid Reveal, Text Fill on Scroll, Clip Reveal, Image Parallax, Spin, Magnet, Magnetic and Custom Cursor join the free plugin, together with Smooth Scroll.
+* No license keys and no remote calls: all licensing code has been removed from the plugin.
+* Coming from Animicro Pro? Activating Animicro deactivates Animicro Pro automatically and keeps your modules and settings. You can then delete Animicro Pro.
+* Plugins screen: the "Upgrade" link is replaced by a "Bricks layouts" link to the optional Animicro Library.
 
 = 1.27.0 =
 * **Five modules moved from Pro to Free: Blur, Stagger, Parallax, Flip X and Flip Y.** Stagger in particular is infrastructure rather than an effect — without it you cannot animate a list, a card grid or a menu in sequence — so it belongs in the free tier. If you are on Pro nothing changes for you; if you are on Free these five simply unlock, with all their settings and `data-am-*` attributes, no markup changes needed.
@@ -316,6 +345,9 @@ https://github.com/infojorgeml/animicro
 
 == Upgrade Notice ==
 
+= 2.0.0 =
+Animicro is now 100% free: every module and Smooth Scroll are included, with no license. Pro users: activate Animicro and it replaces Animicro Pro, keeping your settings.
+
 = 1.27.0 =
 Blur, Stagger, Parallax, Flip X and Flip Y are now free. Update and they unlock automatically — no markup changes. Pro users: activation moved to license keys and needs a new key issued from your account.
 
@@ -341,7 +373,7 @@ New Pro modules `flip-x` and `flip-y`: 3D card-flip entry animation on the X or 
 New Free module `ken-burns`: slow infinite zoom for hero images. Class `.am-ken-burns`, per-element `data-am-scale` / `data-am-duration` for fine-tuning. No breaking changes.
 
 = 1.21.0 =
-New Pro module `cursor`: custom cursor replacement with smooth lerp follow + expand-on-hover for elements marked with `.am-cursor-expand`. Per-element text and size overrides via `data-am-cursor-text` / `data-am-cursor-size`. Mobile-safe (auto-disables below 992px and on touch-only devices). No breaking changes.
+New Pro module `cursor`: custom cursor with smooth follow that expands on elements marked `.am-cursor-expand`. Per-element text and size via `data-am-cursor-text` / `data-am-cursor-size`. Auto-disables on mobile and touch devices. No breaking changes.
 
 = 1.20.0 =
 New Pro module `magnetic`: local pull-to-cursor effect for buttons and icons. Also adds a new "Mouse Interactions" admin category that groups the existing Magnet module with the new Magnetic. No breaking changes to your saved settings.

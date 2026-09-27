@@ -76,9 +76,6 @@ export interface AnimicroData {
   nonce: string;
   settings: AnimicroSettings;
   version: string;
-  isPremium: boolean;
-  proPlugin: boolean;
-  upgradeUrl: string;
 }
 
 /**

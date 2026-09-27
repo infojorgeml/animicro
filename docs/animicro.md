@@ -18,7 +18,7 @@ Utility-first micro-animations for WordPress powered by [Motion One](https://mot
 | Backend | PHP 7.4+ OOP |
 | Admin UI | React 19, TypeScript, Tailwind CSS, Vite |
 | Frontend | Vanilla JS (ES Modules), CSS, Vite |
-| Animation | Motion One (~3.8kb). Smooth scroll (Lenis) exists only in the Pro product line, not in the WordPress.org free package. |
+| Animation | Motion One (~3.8kb). Smooth scroll via Lenis (loaded only when enabled). |
 | Build | Vite multi-entry (admin + frontend), `manifest.json` for dynamic enqueue |
 
 ## Folder Structure
@@ -29,7 +29,7 @@ animicro/
 │   └── src/           # React app (main.tsx, App.tsx, components/, hooks/, data/)
 ├── frontend/
 │   └── src/           # Vanilla JS (main.js, core/, modules/)
-├── includes/          # PHP classes (class-animicro, class-admin, class-frontend, class-compatibility, class-license-manager)
+├── includes/          # PHP classes (class-animicro, class-admin, class-frontend, class-compatibility)
 ├── docs/              # This file, bricks.md, etc.
 ├── animicro.php       # Bootstrap, constants, activation hooks
 ├── vite.config.ts     # Vite config (admin + frontend modes)
@@ -38,9 +38,9 @@ animicro/
 
 ## Data Flow
 
-1. **Settings** stored in `animicro_settings` (options API). Includes `active_modules`, `module_settings`, `smooth_scroll` (Pro), and `advanced` (`reducedMotion`, `debugMode`).
-2. **Admin** passes `animicroData` via `wp_add_inline_script` (REST URL, nonce, settings, isPremium, etc.).
-3. **Frontend** receives `animicroFrontData` with `modules` (active list), `moduleSettings` (per-module defaults), and `advanced`. If Pro and smooth scroll is enabled, `smoothScroll` is included with Lenis options (`lerp`, `duration`, `smoothWheel`, `wheelMultiplier`, `anchors`).
+1. **Settings** stored in `animicro_settings` (options API). Includes `active_modules`, `module_settings`, `smooth_scroll`, and `advanced` (`reducedMotion`, `debugMode`).
+2. **Admin** passes `animicroData` via `wp_add_inline_script` (REST URL, nonce, settings, version).
+3. **Frontend** receives `animicroFrontData` with `modules` (active list), `moduleSettings` (per-module defaults), and `advanced`. If smooth scroll is enabled, `smoothScroll` is included with Lenis options (`lerp`, `duration`, `smoothWheel`, `wheelMultiplier`, `anchors`).
 4. **Per-element** `data-am-*` attributes override module defaults. See `frontend/src/core/config.js` → `getElementConfig(el, moduleId)`.
 
 ## Frontend Modules
@@ -48,11 +48,11 @@ animicro/
 - **Entry**: `frontend/src/main.js` → `loadModules(activeModules)` from `core/registry.js`.
 - **Modules**: `fade`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `skew-up`, `flip-x`, `flip-y`, `scale`, `blur`, `float`, `pulse`, `hover-zoom`, `spin`, `stagger`, `grid-reveal`, `highlight`, `text-fill-scroll`, `parallax`, `scroll-slide-left`, `scroll-slide-right`, `img-parallax`, `clip-reveal`, `ken-burns`, `magnet`, `magnetic`, `cursor`, `split`, `scatter`, `scramble`, `text-reveal`, `typewriter`, `page-curtain`. Each exports `init()`.
 - **Config**: `getElementConfig(el, moduleId)` merges `el.dataset.am*` with `moduleSettings[moduleId]` and fallbacks.
-- **Code splitting**: Dynamic `import()` per module; only active modules load. **Smooth scroll** (`frontend/src/smooth-scroll.js`) is loaded only when `animicroFrontData.smoothScroll` is present (Pro + enabled in settings).
+- **Code splitting**: Dynamic `import()` per module; only active modules load. **Smooth scroll** (`frontend/src/smooth-scroll.js`) is loaded only when `animicroFrontData.smoothScroll` is present (enabled in settings).
 
-## Smooth Scroll (Pro, global)
+## Smooth Scroll (global)
 
-- Not a per-element module: no CSS class on content. Enable in **Animicro → Smooth Scroll** (Pro tab).
+- Not a per-element module: no CSS class on content. Enable in **Animicro → Smooth Scroll**.
 - **Frontend**: `main.js` dynamically imports `./smooth-scroll.js`, which initializes Lenis with the options from PHP and imports `lenis/dist/lenis.css` in that chunk.
 - **Builder detection**: Same URL checks as `main.js` — Lenis does not start inside Bricks, Elementor, Breakdance, Oxygen, or Divi builder previews.
 
@@ -102,19 +102,9 @@ Two layers protect elements from being stuck at `opacity: 0` inside builder edit
 
 Builder body classes monitored: `elementor-editor-active`, `bricks-is-builder`, `breakdance`, `oxygen-builder-body`, `et_pb_pagebuilder_layout`, `block-editor-page`.
 
-## Pro License
+## Free and open (2.0)
 
-- **Free modules**: fade, scale, slide-up, slide-down, slide-left, slide-right, skew-up, float, pulse, highlight, typewriter, hover-zoom.
-- **Pro modules**: grid-reveal, text-fill-scroll, split, text-reveal, img-parallax, magnet, magnetic, cursor, scatter, scramble, spin, clip-reveal. Locked in UI and frontend when `!Animicro_License_Manager::is_premium()`.
-- **Cheat Sheet** and **Smooth Scroll** tabs are Pro-only.
-- License activation via **LicenSuite v3.0 Connect flow** (OAuth-style account binding); product slug `animicro`. The user never pastes a license key — they click **Connect**, authenticate on the LicenSuite dashboard, pick a license, and the dashboard redirects back with a one-time `token`. The plugin exchanges that token for a long-lived `connection_id + connection_secret` pair stored in `wp_options` (secret AES-256-CBC encrypted at rest). Endpoints:
-  - `GET https://licensuite.vercel.app/plugin-connect?product=…&return=…&site_url=…&state=…` — dashboard page the plugin opens in a new tab.
-  - `POST https://licensuite.vercel.app/api/plugin-connect/exchange` — body `{ token, site_uuid }`, returns `{ connection_id, connection_secret, license: { plan, expires_at, sites } }`.
-  - `POST https://[ref].supabase.co/functions/v1/plugin-validate` — **two-layer auth**: `Authorization: Bearer <SUPABASE_ANON_KEY>` satisfies the Edge Function JWT verification layer, then the function reads `{ connection_id, connection_secret }` from the request body and matches them against `plugin_connections` server-side. Returns `{ valid, reason, plan: { slug, name, max_sites }, expires_at, sites }`. Cached in a transient for 24 h.
-- **Local development bypass**: `Animicro_License_Manager::is_development_domain()` short-circuits `validate_connection()` on `localhost`, `*.local`, `*.test`, `*.localhost`, `*.invalid`, `*.example`, IPv6 loopback `::1`, and IPv4 private ranges (`127.x`, `10.x`, `192.168.x`, `172.16-31.x`). No network call, no Connect flow needed, full Pro feature unlock locally. Override via the `animicro_is_development_domain` filter (set to `__return_false`) to test the real Connect flow against a staging dashboard.
-- **Premium gating**: `Animicro_License_Manager::is_premium()` derives the answer from current state on every call (no early-bail on a stored bool — that footgun caused 1.12.0–1.12.3 to lock-out users permanently after a transient cache hiccup). The premium-tier slug list is filterable via `animicro_premium_plan_slugs` (default `['pro', 'basic', 'agency', 'enterprise']`).
-- **Connection secret at rest**: AES-256-CBC encrypted in `animicro_connection_secret` using a key derived from `AUTH_KEY` + `SECURE_AUTH_KEY`. The `connection_id` (a UUID, not sensitive) is stored plain. The Supabase anon key is hardcoded in the source — it's public by design (the LicenSuite frontend embeds the same key in its HTML), so a build-time injection pipeline would have been overengineering.
-- **Plugin deactivation**: `Animicro::deactivate()` calls `clear_connection()` (delete connection_id, connection_secret, license_data, validation transients, deactivate_premium). Matches LicenSuite recommendation + Bricks/WP Rocket/Elementor prior art. The seat stays listed under "Connected sites" in the user's dashboard until they revoke it manually with one click — no public `plugin-self-revoke` endpoint exists yet.
+Since 2.0 every module, Smooth Scroll and Page Transitions are included for everyone: there is no Pro build, no license check and no remote call. Sites coming from the legacy "Animicro Pro" plugin (`animicro-pro/`) keep their settings — both share the `animicro_settings` option — and activating 2.0 deactivates the legacy plugin (see the guard at the top of `animicro.php`).
 
 ## Key Files
 
@@ -124,11 +114,10 @@ Builder body classes monitored: `elementor-editor-active`, `bricks-is-builder`, 
 | `includes/class-animicro.php` | Orchestrator, defaults, get_settings() |
 | `includes/class-admin.php` | Menu (SVG menu icon as base64 data URL), REST API, enqueue admin assets, plugin_action_links |
 | `includes/class-frontend.php` | Enqueue frontend assets, `animicroFrontData` (`advanced`, optional `smoothScroll`), builder-compat CSS via `wp_add_inline_style()` |
-| `admin/src/components/SmoothScroll.tsx` | Pro settings UI for global smooth scroll |
+| `admin/src/components/SmoothScroll.tsx` | Settings UI for global smooth scroll |
 | `admin/src/components/AdvancedSettings.tsx` | Free: reduced motion + debug mode |
 | `frontend/src/smooth-scroll.js` | Lenis init (dynamic chunk) |
 | `includes/class-compatibility.php` | get_editor_css(), BUILDER_EDITOR_CLASSES, MODULE_INITIAL_CSS |
-| `includes/licensing/class-license-manager.php` | Validation, is_premium() (LicenSuite SDK copy; is_pro_module() lives in `Animicro`) |
 | `frontend/src/core/config.js` | getElementConfig(el, moduleId) |
 | `frontend/src/core/registry.js` | loadModules(), MODULES map |
 | `admin/src/data/modules.ts` | MODULE_INFO, DATA_ATTRIBUTES, EASING_OPTIONS, MARGIN_OPTIONS |
@@ -248,32 +237,26 @@ Entry animation in the Stripe / Vercel aesthetic: `animate(el, { opacity: [0, 1]
 
 ## Release pipeline
 
-Animicro is built from a single source tree that produces two artefacts: the Free ZIP (published to wordpress.org via SVN) and the Pro ZIP (published as a GitHub Release asset, picked up by Pro installs through the in-dashboard updater).
+Animicro ships one artefact: the ZIP published to wordpress.org.
 
-- **Local build**: `scripts/build.sh` runs `pnpm run build` and stamps both `build/animicro/` (free) and `build/animicro-pro/` (pro), then zips them into `release/animicro-X.Y.Z.zip` and `release/animicro-pro-X.Y.Z.zip`. The pre-push git hook (`.githooks/pre-push`) re-runs this on every push so the local `release/` always mirrors the latest commit.
-- **Package manager**: this project uses **pnpm exclusively** (pinned via `packageManager: pnpm@11.x` in `package.json`). The CI workflow (`.github/workflows/release-pro.yml`) uses `pnpm/action-setup@v4` and runs `pnpm install --frozen-lockfile`. There is no `package-lock.json` in the repo — only `pnpm-lock.yaml`.
-- **WP.org SVN release (Free)**: `scripts/release-wp.sh` rsyncs `build/animicro/` into the SVN trunk, commits, then `svn cp trunk tags/VERSION`. Standard WordPress.org flow.
-- **GitHub Release (Pro)**: `.github/workflows/release-pro.yml` listens for `v*` tag pushes, rebuilds both ZIPs in CI, extracts the matching `## [VERSION]` section from `CHANGELOG.md` as release notes, and attaches the two ZIPs to a GitHub Release. The Pro plugin's `Animicro_Updater` (built on plugin-update-checker v5.6, vendored under `includes/lib/plugin-update-checker/`) polls the public repo daily and surfaces the new release as the standard WP "Update available" notice in `/wp-admin/plugins.php`.
-
-Distribution and licensing are decoupled by design: the public ZIP is downloadable by anyone, but `Animicro_License_Manager` still gates Pro modules at runtime, so an unlicensed install renders the Pro tab locked exactly as it does today.
+- **Local build**: `scripts/build.sh` runs `pnpm run build` if needed, stamps `build/animicro/` and zips it into `release/animicro-X.Y.Z.zip`. The pre-push git hook (`.githooks/pre-push`) re-runs it on every push so `release/` always mirrors the latest commit.
+- **Package manager**: this project uses **pnpm exclusively** (pinned via `packageManager: pnpm@11.x` in `package.json`). There is no `package-lock.json` in the repo — only `pnpm-lock.yaml`.
+- **WP.org SVN release**: `scripts/release-wp.sh` (`pnpm run release:wp`) rsyncs `build/animicro/` into the SVN trunk, commits, then `svn cp trunk tags/VERSION`.
 
 Release flow:
 
 ```bash
-# 1. Bump ANIMICRO_VERSION in animicro.php and "version" in package.json.
-# 2. Prepend a "## [X.Y.Z] - YYYY-MM-DD" block to CHANGELOG.md.
-# 3. Commit.
+# 1. Bump ANIMICRO_VERSION + the Version header in animicro.php, "version" in
+#    package.json, and "Stable tag" in free/readme.txt.
+# 2. Prepend a "## [X.Y.Z] - YYYY-MM-DD" block to CHANGELOG.md and a changelog
+#    entry to free/readme.txt.
+# 3. Commit, tag and push.
 git push origin main
+git tag vX.Y.Z && git push origin vX.Y.Z
 
-# 4. Tag and push — this triggers the GitHub Release.
-git tag vX.Y.Z
-git push origin vX.Y.Z
-
-# 5. (Free) Publish to wordpress.org SVN when ready.
-bash scripts/release-wp.sh
+# 4. Publish to wordpress.org (asks for the SVN password).
+pnpm run release:wp
 ```
-
-The Pro side is fully automated from step 4 onward. Step 5 stays manual because WP.org reviews each release.
 
 ## Adding a New Animation Module
 
@@ -281,5 +264,4 @@ The Pro side is fully automated from step 4 onward. Step 5 stays manual because 
 2. Register in `frontend/src/core/registry.js` MODULES.
 3. Add to `MODULE_INITIAL_CSS` in `class-compatibility.php` (initial hidden state).
 4. Add to `MODULE_INFO` and `available_modules` in PHP/React.
-5. If Pro: set `isPro: true` in MODULE_INFO; add to `PRO_MODULES` in class-license-manager.php.
-6. If new settings keys are stored in options: whitelist them in `class-admin.php` `update_settings()` so REST save does not strip fields.
+5. If new settings keys are stored in options: whitelist them in `class-admin.php` `update_settings()` so REST save does not strip fields.

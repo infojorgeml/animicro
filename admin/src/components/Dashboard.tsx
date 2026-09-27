@@ -14,12 +14,11 @@ const DEFAULT_MODULE_CONFIG: ModuleConfig = {
 
 interface DashboardProps {
   settings: AnimicroSettings;
-  isPremium: boolean;
   onToggleModule: (id: string) => void;
   onUpdateModuleSettings: (moduleId: string, partial: Partial<ModuleConfig>) => void;
 }
 
-export default function Dashboard({ settings, isPremium, onToggleModule, onUpdateModuleSettings }: DashboardProps) {
+export default function Dashboard({ settings, onToggleModule, onUpdateModuleSettings }: DashboardProps) {
   const [settingsFor, setSettingsFor] = useState<string | null>(null);
 
   if (settingsFor) {
@@ -57,25 +56,22 @@ export default function Dashboard({ settings, isPremium, onToggleModule, onUpdat
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {modules.map(mod => {
-                  const isLocked = mod.isPro && !isPremium;
-                  const isActive = !isLocked && settings.active_modules.includes(mod.id);
+                  const isActive = settings.active_modules.includes(mod.id);
 
                   return (
                     <div
                       key={mod.id}
                       className={`
                         rounded-lg border p-4 transition-colors
-                        ${isLocked
-                          ? 'border-gray-200 bg-gray-50 opacity-60'
-                          : isActive
-                            ? 'border-white bg-[#f6f6f6]'
-                            : 'border-gray-200 bg-white'}
+                        ${isActive
+                          ? 'border-white bg-[#f6f6f6]'
+                          : 'border-gray-200 bg-white'}
                       `}
                     >
                       <div className="flex items-center justify-between">
                         <div className="min-w-0 mr-3">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className={`font-medium text-[14px] ${isLocked ? 'text-gray-400' : 'text-gray-900'}`}>
+                            <span className="font-medium text-[14px] text-gray-900">
                               {mod.name}
                             </span>
                             {(mod.cssClass ?? '').trim().split(/\s+/).filter(Boolean).map((cls, i) => (
@@ -84,46 +80,14 @@ export default function Dashboard({ settings, isPremium, onToggleModule, onUpdat
                                 <CopyClassButton text={cls} label={`Copy ${cls}`} />
                               </span>
                             ))}
-                            {mod.isPro && (
-                              <span className={`
-                                rounded px-2 py-1 text-[10px] font-semibold uppercase
-                                ${isPremium
-                                  ? 'bg-[#ffeeb5] text-[#ad8700]'
-                                  : 'bg-gray-200 text-gray-500'}
-                              `}>
-                                Pro
-                              </span>
-                            )}
                           </div>
-                          <p className={`mt-1 text-[13px] ${isLocked ? 'text-gray-400' : 'text-gray-500'}`}>
+                          <p className="mt-1 text-[13px] text-gray-500">
                             {mod.description}
                           </p>
-                          {isLocked && (
-                            <p className="mt-1.5 text-xs text-black">
-                              Requires Pro license.{' '}
-                              <a
-                                href={window.animicroData.upgradeUrl}
-                                className="text-black underline hover:text-gray-700"
-                                {...(!window.animicroData.proPlugin ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                              >
-                                {window.animicroData.proPlugin ? 'Activate license' : 'Upgrade to Pro'}
-                              </a>
-                            </p>
-                          )}
                         </div>
 
                         <div className="flex items-center gap-2 shrink-0">
-                          {isLocked ? (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="w-5 h-5 text-gray-300"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                            </svg>
-                          ) : (
-                            <>
+                          <>
                               {isActive && (
                                 <button
                                   onClick={() => setSettingsFor(mod.id)}
@@ -140,8 +104,7 @@ export default function Dashboard({ settings, isPremium, onToggleModule, onUpdat
                                 onChange={() => onToggleModule(mod.id)}
                                 label={`Toggle ${mod.name}`}
                               />
-                            </>
-                          )}
+                          </>
                         </div>
                       </div>
                     </div>

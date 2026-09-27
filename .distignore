@@ -13,9 +13,6 @@ docs/
 free/
 build/
 release/
-includes/class-license-manager.php
-includes/class-updater.php
-includes/lib/
 *.md
 !README.md
 package.json

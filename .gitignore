@@ -7,4 +7,3 @@ release/
 .agents/
 .DS_Store
 *.log
-.env.build

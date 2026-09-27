@@ -5,6 +5,26 @@ All notable changes to Animicro are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-09-27
+
+Animicro is now a single, fully free plugin. The paid product moves out of the plugin to the Animicro Library (copy-paste Bricks layouts on animicro.com), so the plugin no longer has a Pro variant or any licensing.
+
+### Changed
+- **Every module is free.** `Animicro::PRO_MODULES`, `is_pro_module()` and `is_pro_plugin()` are gone; the admin no longer locks modules and the frontend no longer filters them. Smooth Scroll is available to everyone.
+- **Plugins screen**: the bold "Upgrade" action link is replaced by a plain "Bricks layouts" row-meta link (filterable via `animicro_library_url`). The `animicro_upgrade_url` filter is removed.
+- **Admin data**: `window.animicroData` no longer carries `isPremium`, `proPlugin` or `upgradeUrl`; the `isPro` field is removed from `MODULE_INFO` and the Pro badges, lock icons and "Requires Pro license" copy are gone from the Modules grid and the tab bar.
+- **Build**: `scripts/build.sh` produces a single `release/animicro-X.Y.Z.zip`; the pre-push hook and `.distignore` follow.
+- **Build**: the ZIP is recreated from scratch on every run (`zip -r` into an existing archive kept files that had been removed) and macOS `.DS_Store` files are stripped — WP.org's Plugin Check rejects hidden files.
+
+### Added
+- **Migration from the legacy "Animicro Pro" plugin** (`animicro-pro/`). `animicro.php` returns early when another copy is already loaded (Pro loads first alphabetically; a second copy would redeclare the classes and fatal). In that case activating 2.0 deactivates Animicro Pro and deletes the old license options; both plugins share the `animicro_settings` option, so modules and settings carry over. If both stay active, an admin notice explains what to do.
+
+### Removed
+- LicenSuite SDK copy (`includes/licensing/`), the GitHub Releases self-updater (`includes/class-updater.php`) and the vendored plugin-update-checker library (`includes/lib/`).
+- `ANIMICRO_PRO` constant, the "free deactivated by Pro" notice and its transient.
+- `.github/workflows/release-pro.yml` (Pro ZIPs on GitHub Releases), `scripts/build_release_zip.py` (duplicate of `build.sh`), `docs/licensing.md`, `docs/WORDPRESS_INTEGRATION.md` and the local `.env.build`.
+- `uninstall.php` no longer contacts any server; it still deletes the legacy license options for sites that switched from Pro.
+
 ## [1.27.0] - 2026-09-02
 
 Folds in the licensing work that was prepared as 1.26.0 but never published.

@@ -61,16 +61,10 @@ class Animicro_Frontend {
 		);
 	}
 
-	private function is_premium(): bool {
-		return Animicro::is_pro_plugin()
-			&& class_exists( 'Animicro_License_Manager' )
-			&& Animicro_License_Manager::is_premium();
-	}
-
 	public function enqueue_assets(): void {
 		$settings = Animicro::get_settings();
 
-		$smooth_enabled = ! empty( $settings['smooth_scroll']['enabled'] ) && $this->is_premium();
+		$smooth_enabled = ! empty( $settings['smooth_scroll']['enabled'] );
 
 		if ( empty( $settings['active_modules'] ) && ! $smooth_enabled ) {
 			return;
@@ -110,16 +104,7 @@ class Animicro_Frontend {
 		add_filter( 'script_loader_tag', [ $this, 'add_module_type' ], 10, 3 );
 
 		$module_settings = $settings['module_settings'] ?? [];
-		$is_premium      = $this->is_premium();
-
-		$active_modules = array_values(
-			array_filter(
-				$settings['active_modules'] ?? [],
-				function ( $m ) use ( $is_premium ) {
-					return $is_premium || ! Animicro::is_pro_module( $m );
-				}
-			)
-		);
+		$active_modules  = array_values( $settings['active_modules'] ?? [] );
 
 		$front_data = [
 			'modules'        => array_map( 'sanitize_text_field', $active_modules ),
@@ -127,7 +112,7 @@ class Animicro_Frontend {
 		];
 
 		$smooth_scroll = $settings['smooth_scroll'] ?? [];
-		if ( ! empty( $smooth_scroll['enabled'] ) && $is_premium ) {
+		if ( ! empty( $smooth_scroll['enabled'] ) ) {
 			$front_data['smoothScroll'] = [
 				'lerp'            => (float) ( $smooth_scroll['lerp'] ?? 0.1 ),
 				'duration'        => (float) ( $smooth_scroll['duration'] ?? 1.2 ),

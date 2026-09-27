@@ -8,7 +8,7 @@ import AdvancedSettings from './components/AdvancedSettings';
 import PageTransitions from './components/PageTransitions';
 
 export default function App() {
-  const { version, isPremium } = window.animicroData;
+  const { version } = window.animicroData;
   const { settings, updateModuleSettings, updateSmoothScroll, updateAdvanced, toggleModule, save, isDirty, isSaving, saveMessage } = useSettings();
   const [activeTab, setActiveTab] = useState<TabId>('modules');
 
@@ -17,14 +17,7 @@ export default function App() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Animicro</h1>
-          <p className="text-sm text-gray-500">
-            v{version}
-            {isPremium && (
-              <span className="ml-2 rounded bg-[#ffeeb5] px-2 py-1 text-[10px] font-semibold uppercase text-[#ad8700]">
-                Pro
-              </span>
-            )}
-          </p>
+          <p className="text-sm text-gray-500">v{version}</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -48,13 +41,12 @@ export default function App() {
         </div>
       </div>
 
-      <TabNav activeTab={activeTab} onTabChange={setActiveTab} isPremium={isPremium} />
+      <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
 
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         {activeTab === 'modules' && (
           <Dashboard
             settings={settings}
-            isPremium={isPremium}
             onToggleModule={toggleModule}
             onUpdateModuleSettings={updateModuleSettings}
           />
@@ -66,7 +58,7 @@ export default function App() {
             onUpdateModuleSettings={updateModuleSettings}
           />
         )}
-        {activeTab === 'smooth-scroll' && isPremium && (
+        {activeTab === 'smooth-scroll' && (
           <SmoothScroll config={settings.smooth_scroll} onChange={updateSmoothScroll} />
         )}
         {activeTab === 'advanced' && (

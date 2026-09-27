@@ -3,56 +3,37 @@ export type TabId = 'modules' | 'page-transitions' | 'smooth-scroll' | 'advanced
 interface Tab {
   id: TabId;
   label: string;
-  isPro?: boolean;
 }
 
 const TABS: Tab[] = [
   { id: 'modules',          label: 'Modules' },
   { id: 'page-transitions', label: 'Page Transitions' },
-  { id: 'smooth-scroll',    label: 'Smooth Scroll', isPro: true },
+  { id: 'smooth-scroll',    label: 'Smooth Scroll' },
   { id: 'advanced',         label: 'Advanced' },
 ];
 
 interface TabNavProps {
   activeTab: TabId;
   onTabChange: (tab: TabId) => void;
-  isPremium: boolean;
 }
 
-export default function TabNav({ activeTab, onTabChange, isPremium }: TabNavProps) {
+export default function TabNav({ activeTab, onTabChange }: TabNavProps) {
   return (
     <nav className="flex border-b border-gray-200 mb-6">
-      {TABS.map(tab => {
-        const locked = tab.isPro && !isPremium;
-        const handleClick = () => {
-          if (locked && !window.animicroData.proPlugin) {
-            window.open(window.animicroData.upgradeUrl, '_blank', 'noopener');
-          } else if (!locked) {
-            onTabChange(tab.id);
-          }
-        };
-        return (
-          <button
-            key={tab.id}
-            onClick={handleClick}
-            className={`
-              px-4 py-2.5 text-sm font-medium -mb-px border-b-2 transition-colors flex items-center gap-1.5
-              ${locked
-                ? 'border-transparent text-gray-300 cursor-not-allowed'
-                : activeTab === tab.id
-                  ? 'border-brand-500 text-brand-500'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
-            `}
-          >
-            {tab.label}
-            {tab.isPro && (
-              <span className="rounded bg-[#ffeeb5] px-1.5 py-1 text-[10px] font-semibold uppercase text-[#ad8700] leading-none">
-                Pro
-              </span>
-            )}
-          </button>
-        );
-      })}
+      {TABS.map(tab => (
+        <button
+          key={tab.id}
+          onClick={() => onTabChange(tab.id)}
+          className={`
+            px-4 py-2.5 text-sm font-medium -mb-px border-b-2 transition-colors flex items-center gap-1.5
+            ${activeTab === tab.id
+              ? 'border-brand-500 text-brand-500'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
+          `}
+        >
+          {tab.label}
+        </button>
+      ))}
     </nav>
   );
 }

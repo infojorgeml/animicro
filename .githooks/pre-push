@@ -1,21 +1,17 @@
 #!/usr/bin/env bash
-# Animicro pre-push hook: rebuild both free + pro release ZIPs before push.
+# Animicro pre-push hook: rebuild the release ZIP before push.
 # Configure once with: git config core.hooksPath .githooks  (handled by pnpm postinstall)
 
 set -e
 
 ROOT="$(git rev-parse --show-toplevel)"
 
-# LicenSuite v3 Connect flow no longer needs a build-time anon key, so
-# .env.build is optional. Kept around in case other future build secrets
-# need it.
-
-echo "==> pre-push: rebuilding Animicro release ZIPs..."
+echo "==> pre-push: rebuilding Animicro release ZIP..."
 bash "$ROOT/scripts/build.sh"
 
 if ! git diff --quiet release/ 2>/dev/null; then
     echo ""
-    echo "⚠  release/ changed during build. Commit or stash the new ZIPs if you want them tracked."
+    echo "⚠  release/ changed during build. Commit or stash the new ZIP if you want it tracked."
 fi
 
 exit 0

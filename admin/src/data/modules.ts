@@ -319,7 +319,6 @@ export interface ModuleInfo {
   name: string;
   description: string;
   cssClass: string;
-  isPro: boolean;
   category: ModuleCategory;
 }
 
@@ -335,55 +334,55 @@ export const MODULE_CATEGORIES: { id: ModuleCategory; label: string; description
 
 export const MODULE_INFO: ModuleInfo[] = [
   // Entry Animations
-  { id: 'fade',        name: 'Fade',        description: 'Smooth appearance with opacity',            cssClass: '.am-fade',        isPro: false, category: 'entry' },
-  { id: 'scale',       name: 'Scale',       description: 'Scales from small to full size',            cssClass: '.am-scale',       isPro: false, category: 'entry' },
-  { id: 'slide-up',    name: 'Slide Up',    description: 'Slides up when appearing',                  cssClass: '.am-slide-up',    isPro: false, category: 'entry' },
-  { id: 'slide-down',  name: 'Slide Down',  description: 'Slides down when appearing',                cssClass: '.am-slide-down',  isPro: false, category: 'entry' },
-  { id: 'slide-right', name: 'Slide Right', description: 'Slides in toward the right (from the left edge)',  cssClass: '.am-slide-right', isPro: false, category: 'entry' },
-  { id: 'slide-left',  name: 'Slide Left',  description: 'Slides in toward the left (from the right edge)',  cssClass: '.am-slide-left',  isPro: false, category: 'entry' },
-  { id: 'skew-up',     name: 'Skew Up',     description: 'Slides up with a slight skew that straightens as it stops', cssClass: '.am-skew-up', isPro: false, category: 'entry' },
-  { id: 'flip-x',      name: 'Flip X',      description: '3D card flip on the X axis (vertical rotation — like opening a book top-to-bottom)',     cssClass: '.am-flip-x', isPro: false,  category: 'entry' },
-  { id: 'flip-y',      name: 'Flip Y',      description: '3D card flip on the Y axis (horizontal rotation — like turning a page left-to-right)',   cssClass: '.am-flip-y', isPro: false,  category: 'entry' },
-  { id: 'blur',        name: 'Blur',        description: 'Blur that clears as it appears',            cssClass: '.am-blur',        isPro: false,  category: 'entry' },
+  { id: 'fade',        name: 'Fade',        description: 'Smooth appearance with opacity',            cssClass: '.am-fade',        category: 'entry' },
+  { id: 'scale',       name: 'Scale',       description: 'Scales from small to full size',            cssClass: '.am-scale',       category: 'entry' },
+  { id: 'slide-up',    name: 'Slide Up',    description: 'Slides up when appearing',                  cssClass: '.am-slide-up',    category: 'entry' },
+  { id: 'slide-down',  name: 'Slide Down',  description: 'Slides down when appearing',                cssClass: '.am-slide-down',  category: 'entry' },
+  { id: 'slide-right', name: 'Slide Right', description: 'Slides in toward the right (from the left edge)',  cssClass: '.am-slide-right', category: 'entry' },
+  { id: 'slide-left',  name: 'Slide Left',  description: 'Slides in toward the left (from the right edge)',  cssClass: '.am-slide-left',  category: 'entry' },
+  { id: 'skew-up',     name: 'Skew Up',     description: 'Slides up with a slight skew that straightens as it stops', cssClass: '.am-skew-up', category: 'entry' },
+  { id: 'flip-x',      name: 'Flip X',      description: '3D card flip on the X axis (vertical rotation — like opening a book top-to-bottom)',     cssClass: '.am-flip-x', category: 'entry' },
+  { id: 'flip-y',      name: 'Flip Y',      description: '3D card flip on the Y axis (horizontal rotation — like turning a page left-to-right)',   cssClass: '.am-flip-y', category: 'entry' },
+  { id: 'blur',        name: 'Blur',        description: 'Blur that clears as it appears',            cssClass: '.am-blur',        category: 'entry' },
 
   // Continuous (Infinite)
-  { id: 'float',       name: 'Float',       description: 'Infinite soft up/down floating motion',     cssClass: '.am-float',       isPro: false, category: 'continuous' },
-  { id: 'pulse',       name: 'Pulse',       description: 'Infinite gentle scale pulse — breathing-like', cssClass: '.am-pulse',    isPro: false, category: 'continuous' },
-  { id: 'spin',        name: 'Spin',        description: 'Continuous rotation that speeds up momentarily with scroll', cssClass: '.am-spin',   isPro: true,  category: 'continuous' },
+  { id: 'float',       name: 'Float',       description: 'Infinite soft up/down floating motion',     cssClass: '.am-float',       category: 'continuous' },
+  { id: 'pulse',       name: 'Pulse',       description: 'Infinite gentle scale pulse — breathing-like', cssClass: '.am-pulse',    category: 'continuous' },
+  { id: 'spin',        name: 'Spin',        description: 'Continuous rotation that speeds up momentarily with scroll', cssClass: '.am-spin',   category: 'continuous' },
 
   // Mouse Interactions
-  { id: 'magnet',      name: 'Magnet',      description: 'Element drifts smoothly toward the mouse with inertia (viewport-wide effect)', cssClass: '.am-magnet',   isPro: true, category: 'mouse' },
-  { id: 'magnetic',    name: 'Magnetic',    description: 'Buttons and icons are pulled toward the cursor when it gets close (local effect)', cssClass: '.am-magnetic', isPro: true, category: 'mouse' },
-  { id: 'cursor',      name: 'Custom Cursor', description: 'Replaces the system cursor with a custom circle that grows on hover targets', cssClass: '.am-cursor-expand', isPro: true, category: 'mouse' },
+  { id: 'magnet',      name: 'Magnet',      description: 'Element drifts smoothly toward the mouse with inertia (viewport-wide effect)', cssClass: '.am-magnet',   category: 'mouse' },
+  { id: 'magnetic',    name: 'Magnetic',    description: 'Buttons and icons are pulled toward the cursor when it gets close (local effect)', cssClass: '.am-magnetic', category: 'mouse' },
+  { id: 'cursor',      name: 'Custom Cursor', description: 'Replaces the system cursor with a custom circle that grows on hover targets', cssClass: '.am-cursor-expand', category: 'mouse' },
 
   // Text
-  { id: 'split',        name: 'Split Text',   description: 'Splits and animates text by letters/words', cssClass: '.am-split-chars .am-split-words', isPro: true, category: 'text' },
-  { id: 'scatter',      name: 'Scatter Text', description: 'Characters or words fly in from random positions and converge', cssClass: '.am-scatter-chars .am-scatter-words', isPro: true, category: 'text' },
-  { id: 'scramble',     name: 'Scramble Text',description: 'Text decodes character by character with a left-to-right glitch wave',  cssClass: '.am-scramble',                       isPro: true, category: 'text' },
-  { id: 'text-reveal',  name: 'Text Reveal',  description: 'Reveals text line by line with a sliding mask', cssClass: '.am-text-reveal',  isPro: true, category: 'text' },
-  { id: 'highlight',    name: 'Highlight',    description: 'Animated marker highlight behind text',                    cssClass: '.am-highlight',  isPro: false, category: 'text' },
-  { id: 'typewriter',   name: 'Typewriter',   description: 'Types text character by character with a blinking cursor', cssClass: '.am-typewriter', isPro: false, category: 'text' },
+  { id: 'split',        name: 'Split Text',   description: 'Splits and animates text by letters/words', cssClass: '.am-split-chars .am-split-words', category: 'text' },
+  { id: 'scatter',      name: 'Scatter Text', description: 'Characters or words fly in from random positions and converge', cssClass: '.am-scatter-chars .am-scatter-words', category: 'text' },
+  { id: 'scramble',     name: 'Scramble Text',description: 'Text decodes character by character with a left-to-right glitch wave',  cssClass: '.am-scramble',                       category: 'text' },
+  { id: 'text-reveal',  name: 'Text Reveal',  description: 'Reveals text line by line with a sliding mask', cssClass: '.am-text-reveal',  category: 'text' },
+  { id: 'highlight',    name: 'Highlight',    description: 'Animated marker highlight behind text',                    cssClass: '.am-highlight',  category: 'text' },
+  { id: 'typewriter',   name: 'Typewriter',   description: 'Types text character by character with a blinking cursor', cssClass: '.am-typewriter', category: 'text' },
 
   // Groups & Layouts
-  { id: 'stagger',      name: 'Stagger',      description: 'Animates container children in sequence',   cssClass: '.am-stagger',      isPro: false, category: 'group' },
-  { id: 'grid-reveal',  name: 'Grid Reveal',  description: 'Spatial animation that reveals grid items from a focal point', cssClass: '.am-grid-reveal', isPro: true, category: 'group' },
+  { id: 'stagger',      name: 'Stagger',      description: 'Animates container children in sequence',   cssClass: '.am-stagger',      category: 'group' },
+  { id: 'grid-reveal',  name: 'Grid Reveal',  description: 'Spatial animation that reveals grid items from a focal point', cssClass: '.am-grid-reveal', category: 'group' },
 
   // Scroll & Continuous
-  { id: 'text-fill-scroll', name: 'Text Fill on Scroll', description: 'Fills text word by word as user scrolls', cssClass: '.am-text-fill-scroll', isPro: true, category: 'scroll' },
-  { id: 'parallax',         name: 'Parallax',            description: 'Scroll-linked parallax movement',         cssClass: '.am-parallax',         isPro: false,  category: 'scroll' },
-  { id: 'scroll-slide-left',  name: 'Scroll Slide Left',  description: 'As you scroll down, the element drifts horizontally across the viewport (right → left)', cssClass: '.am-scroll-slide-left',  isPro: false, category: 'scroll' },
-  { id: 'scroll-slide-right', name: 'Scroll Slide Right', description: 'As you scroll down, the element drifts horizontally across the viewport (left → right)', cssClass: '.am-scroll-slide-right', isPro: false, category: 'scroll' },
+  { id: 'text-fill-scroll', name: 'Text Fill on Scroll', description: 'Fills text word by word as user scrolls', cssClass: '.am-text-fill-scroll', category: 'scroll' },
+  { id: 'parallax',         name: 'Parallax',            description: 'Scroll-linked parallax movement',         cssClass: '.am-parallax',         category: 'scroll' },
+  { id: 'scroll-slide-left',  name: 'Scroll Slide Left',  description: 'As you scroll down, the element drifts horizontally across the viewport (right → left)', cssClass: '.am-scroll-slide-left',  category: 'scroll' },
+  { id: 'scroll-slide-right', name: 'Scroll Slide Right', description: 'As you scroll down, the element drifts horizontally across the viewport (left → right)', cssClass: '.am-scroll-slide-right', category: 'scroll' },
 
   // Media & Images
-  { id: 'hover-zoom',   name: 'Zoom Hover',     description: 'Image scales up on hover within an overflow:hidden parent', cssClass: '.am-hover-zoom',   isPro: false, category: 'media' },
-  { id: 'img-parallax', name: 'Image Parallax', description: 'Window effect — inner image translates on scroll inside an overflow:hidden frame', cssClass: '.am-img-parallax', isPro: true,  category: 'media' },
-  { id: 'clip-reveal',  name: 'Clip Reveal',    description: 'Premium image reveal via clip-path: curtains, center split, expanding circle', cssClass: '.am-clip-reveal', isPro: true, category: 'media' },
-  { id: 'ken-burns',    name: 'Ken Burns',      description: 'Slow infinite zoom for hero images — gives static backgrounds a cinematic feel', cssClass: '.am-ken-burns',   isPro: false, category: 'media' },
+  { id: 'hover-zoom',   name: 'Zoom Hover',     description: 'Image scales up on hover within an overflow:hidden parent', cssClass: '.am-hover-zoom',   category: 'media' },
+  { id: 'img-parallax', name: 'Image Parallax', description: 'Window effect — inner image translates on scroll inside an overflow:hidden frame', cssClass: '.am-img-parallax', category: 'media' },
+  { id: 'clip-reveal',  name: 'Clip Reveal',    description: 'Image reveal via clip-path: curtains, center split, expanding circle', cssClass: '.am-clip-reveal', category: 'media' },
+  { id: 'ken-burns',    name: 'Ken Burns',      description: 'Slow infinite zoom for hero images — gives static backgrounds a cinematic feel', cssClass: '.am-ken-burns',   category: 'media' },
 
   // Page Transitions (rendered in their own tab, not on the Modules dashboard).
   // Single module that intercepts navigation clicks to animate an overlay IN
   // before changing pages and OUT after the next page loads.
-  { id: 'page-curtain', name: 'Page Curtain', description: 'Click → cortina cubre → cambia de página → cortina se va. Symmetric overlay transition between internal pages.', cssClass: '', isPro: false, category: 'page' },
+  { id: 'page-curtain', name: 'Page Curtain', description: 'Click → cortina cubre → cambia de página → cortina se va. Symmetric overlay transition between internal pages.', cssClass: '', category: 'page' },
 ];
 
 export interface DataAttribute {

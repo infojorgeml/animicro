@@ -3,8 +3,8 @@
 **Contributors:** jorgemml
 **Tags:** animation, motion, css, performance, page-builder
 **Requires at least:** 6.0
-**Tested up to:** 7.0
-**Stable tag:** 1.27.0
+**Tested up to:** 7.1
+**Stable tag:** 2.0.0
 **Requires PHP:** 7.4
 **License:** GPLv2 or later
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
@@ -39,28 +39,39 @@ Under **Animicro → Advanced** you can enable **Respect Reduced Motion** (skips
 | Scale | `.am-scale` | Scales from small to full size |
 | Slide Up | `.am-slide-up` | Slides up when appearing |
 | Slide Down | `.am-slide-down` | Slides down when appearing |
-| Slide Left | `.am-slide-left` | Slides in toward the left (from the right edge) |
 | Slide Right | `.am-slide-right` | Slides in toward the right (from the left edge) |
+| Slide Left | `.am-slide-left` | Slides in toward the left (from the right edge) |
 | Skew Up | `.am-skew-up` | Slides up with a slight skew that straightens as it stops |
-| Flip X (Pro) | `.am-flip-x` | 3D card flip on the X axis — vertical rotation entry |
-| Flip Y (Pro) | `.am-flip-y` | 3D card flip on the Y axis — horizontal rotation entry |
-| Float | `.am-float` | Infinite soft up/down floating motion (continuous) |
-| Pulse | `.am-pulse` | Infinite gentle scale pulse — breathing-like (continuous) |
-| Ken Burns | `.am-ken-burns` | Slow infinite zoom for hero images — cinematic documentary feel |
-| Scroll Slide Left | `.am-scroll-slide-left` | Element drifts horizontally right → left as you scroll down |
-| Scroll Slide Right | `.am-scroll-slide-right` | Element drifts horizontally left → right as you scroll down |
-| Highlight | `.am-highlight` | Marker-style highlight behind text on entry |
-| Typewriter | `.am-typewriter` | Types text character by character with blinking cursor |
-| Zoom Hover | `.am-hover-zoom` | Image scales up on hover (parent needs `overflow: hidden`) |
-| Magnet (Pro) | `.am-magnet` | Element drifts smoothly toward the mouse with LERP inertia |
-| Scatter Text (Pro) | `.am-scatter-chars` / `.am-scatter-words` | Characters or words fly in from random positions and converge |
-| Scramble Text (Pro) | `.am-scramble` | Text decodes character by character with a glitch wave |
-| Spin (Pro) | `.am-spin` | Continuous rotation that speeds up momentarily with scroll |
-| Clip Reveal (Pro) | `.am-clip-reveal` | Premium image reveal via clip-path: curtains, center split, expanding circle |
-| Magnetic (Pro) | `.am-magnetic` | Buttons and icons are pulled toward the cursor when it gets close (local effect) |
-| Custom Cursor (Pro) | `.am-cursor-expand` | Replaces the system cursor with a custom circle that grows on hover targets |
+| Flip X | `.am-flip-x` | 3D card flip on the X axis (vertical rotation — like opening a book top-to-bottom) |
+| Flip Y | `.am-flip-y` | 3D card flip on the Y axis (horizontal rotation — like turning a page left-to-right) |
+| Blur | `.am-blur` | Blur that clears as it appears |
+| Float | `.am-float` | Infinite soft up/down floating motion |
+| Pulse | `.am-pulse` | Infinite gentle scale pulse — breathing-like |
+| Spin | `.am-spin` | Continuous rotation that speeds up momentarily with scroll |
+| Magnet | `.am-magnet` | Element drifts smoothly toward the mouse with inertia (viewport-wide effect) |
+| Magnetic | `.am-magnetic` | Buttons and icons are pulled toward the cursor when it gets close (local effect) |
+| Custom Cursor | `.am-cursor-expand` | Replaces the system cursor with a custom circle that grows on hover targets |
+| Split Text | `.am-split-chars` / `.am-split-words` | Splits and animates text by letters/words |
+| Scatter Text | `.am-scatter-chars` / `.am-scatter-words` | Characters or words fly in from random positions and converge |
+| Scramble Text | `.am-scramble` | Text decodes character by character with a left-to-right glitch wave |
+| Text Reveal | `.am-text-reveal` | Reveals text line by line with a sliding mask |
+| Highlight | `.am-highlight` | Animated marker highlight behind text |
+| Typewriter | `.am-typewriter` | Types text character by character with a blinking cursor |
+| Stagger | `.am-stagger` | Animates container children in sequence |
+| Grid Reveal | `.am-grid-reveal` | Spatial animation that reveals grid items from a focal point |
+| Text Fill on Scroll | `.am-text-fill-scroll` | Fills text word by word as user scrolls |
+| Parallax | `.am-parallax` | Scroll-linked parallax movement |
+| Scroll Slide Left | `.am-scroll-slide-left` | As you scroll down, the element drifts horizontally across the viewport (right → left) |
+| Scroll Slide Right | `.am-scroll-slide-right` | As you scroll down, the element drifts horizontally across the viewport (left → right) |
+| Zoom Hover | `.am-hover-zoom` | Image scales up on hover within an overflow:hidden parent |
+| Image Parallax | `.am-img-parallax` | Window effect — inner image translates on scroll inside an overflow:hidden frame |
+| Clip Reveal | `.am-clip-reveal` | Image reveal via clip-path: curtains, center split, expanding circle |
+| Ken Burns | `.am-ken-burns` | Slow infinite zoom for hero images — gives static backgrounds a cinematic feel |
+| Page Curtain | — | Click → cortina cubre → cambia de página → cortina se va. Symmetric overlay transition between internal pages. |
 
-Additional modules are available with [Animicro Pro](https://animicro.com).
+Every module is included — Animicro is 100% free. Plus **Smooth Scroll** (Lenis) and **Page Transitions**.
+
+Looking for ready-made sections? The [Animicro Library](https://animicro.com/library/) has copy-paste Bricks layouts built with these modules.
 
 ## Basic usage
 

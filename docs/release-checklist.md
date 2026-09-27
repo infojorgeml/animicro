@@ -1,6 +1,6 @@
-# Animicro — Release checklist (1.3.0+)
+# Animicro — Release checklist (2.0.0+)
 
-**Estructura del código:** el núcleo compartido vive en `includes/`, `admin/src/` y `frontend/src/`. La variante Pro no usa carpetas `src/pro` en este repo: el build Pro añade `class-license-manager.php` y ajusta el header del plugin vía `scripts/build.sh` (ver comentarios en el script).
+**Estructura del código:** todo vive en `includes/`, `admin/src/` y `frontend/src/`. Desde la 2.0 hay un único plugin gratuito (sin variante Pro ni licencias).
 
 **Build:** `bash scripts/build.sh` (desde la raíz del plugin).
 
@@ -25,15 +25,13 @@
 
 5. **Commit y push** a GitHub
 
-6. **Generar ZIPs**
+6. **Generar el ZIP**
    ```bash
    bash scripts/build.sh
    ```
-   Salida en `release/`:
-   - `release/animicro-X.Y.Z.zip` (free, WordPress.org / SVN)
-   - `release/animicro-pro-X.Y.Z.zip` (Pro, distribución propia)
+   Salida: `release/animicro-X.Y.Z.zip` (el mismo paquete que va a WordPress.org).
 
-   **Opcional:** copiar los ZIP al escritorio u otra carpeta:
+   **Opcional:** copiar el ZIP al escritorio u otra carpeta:
    ```bash
    cp release/animicro-*.zip ~/Desktop/
    ```
@@ -44,11 +42,9 @@
 
 ## Información extra
 
-- **Pro en local:** si el flujo Pro vuelve a usar `ANIMICRO_PRO` en `animicro.php`, puedes poner temporalmente `define( 'ANIMICRO_PRO', true );` para pruebas (sin commit). En la rama actual el free no define esa constante; ajusta según el estado del script de build.
-
 - **`pnpm run build`:** `scripts/build.sh` ejecuta `pnpm run build` automáticamente si faltan `admin/dist/.vite/manifest.json` o `frontend/dist/.vite/manifest.json`. Si ya compilaste, reutiliza los `dist` existentes. El proyecto usa **pnpm exclusivamente** (no usar `npm`/`npx`).
 
-- **ZIPs en `release/`:** en `.gitignore`. Distribución manual: SVN de WordPress.org (free), tu web (Pro).
+- **ZIP en `release/`:** en `.gitignore`. Distribución: SVN de WordPress.org con `pnpm run release:wp`.
 
 - **`.distignore`:** si empaquetas con otra herramienta, respeta exclusiones (fuentes TS, etc.).
 
@@ -64,5 +60,5 @@ Release Animicro vX.Y.Z
 3. Actualiza README.md y free/readme.txt si cambian features o compatibilidad.
 4. Actualiza docs/ según corresponda.
 5. Commit y push.
-6. Ejecuta bash scripts/build.sh y confirma release/animicro-X.Y.Z.zip y release/animicro-pro-X.Y.Z.zip.
+6. Ejecuta bash scripts/build.sh y confirma release/animicro-X.Y.Z.zip.
 ```

@@ -3,40 +3,36 @@
  * Animicro Uninstall
  *
  * Fires when the plugin is DELETED from WP admin (not on deactivation).
- * Frees the activated seat on the LicenSuite server (best-effort) and removes
- * all plugin data from the database.
+ * Removes all plugin data from the database.
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-// Best-effort: release this site's seat on the server before wiping the stored
-// key. The license-key flow CAN self-deactivate (unlike the old Connect flow),
-// so this frees the seat for another site automatically. Any failure is safe
-// to ignore — the user can also remove the site from their dashboard. The free
-// build ships without this file's dependency, so the readable check guards it.
-$animicro_license_manager = __DIR__ . '/includes/licensing/class-license-manager.php';
-if ( is_readable( $animicro_license_manager ) ) {
-	require_once $animicro_license_manager;
-	if ( class_exists( 'Animicro_License_Manager' ) ) {
-		Animicro_License_Manager::release_seat_for_uninstall();
-	}
+delete_option( 'animicro_settings' );
+
+// Leftovers from the licensing system used by Animicro Pro (≤ 1.x), for sites
+// that switched from Pro to the free 2.0.
+$animicro_legacy_options = [
+	'animicro_license_key',
+	'animicro_license_data',
+	'animicro_premium_active',
+	'animicro_connection_id',
+	'animicro_connection_secret',
+	'animicro_pending_reconnect',
+];
+foreach ( $animicro_legacy_options as $animicro_option ) {
+	delete_option( $animicro_option );
 }
 
-// License-key storage
-delete_option( 'animicro_license_key' );
-
-// Legacy v3 Connect storage (cleaned for installs upgrading from older versions)
-delete_option( 'animicro_connection_id' );
-delete_option( 'animicro_connection_secret' );
-delete_option( 'animicro_pending_reconnect' );
-
-// Shared state
-delete_option( 'animicro_settings' );
-delete_option( 'animicro_license_data' );
-delete_option( 'animicro_premium_active' );
-delete_transient( 'animicro_license_check' );
-delete_transient( 'animicro_license_last_check' );
-delete_transient( 'animicro_connect_error' );
-delete_transient( 'animicro_show_revoke_notice' );
+$animicro_legacy_transients = [
+	'animicro_license_check',
+	'animicro_license_last_check',
+	'animicro_connect_error',
+	'animicro_show_revoke_notice',
+	'animicro_pro_deactivated_free',
+];
+foreach ( $animicro_legacy_transients as $animicro_transient ) {
+	delete_transient( $animicro_transient );
+}

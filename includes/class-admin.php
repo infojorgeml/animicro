@@ -13,11 +13,11 @@ class Animicro_Admin {
 	public function __construct() {
 		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
 		add_filter( 'plugin_action_links_' . ANIMICRO_BASENAME, [ $this, 'plugin_action_links' ], 10, 2 );
+		add_filter( 'plugin_row_meta', [ $this, 'plugin_row_meta' ], 10, 2 );
 
 		if ( is_admin() ) {
 			add_action( 'admin_menu', [ $this, 'register_menu' ] );
 			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
-			add_action( 'admin_notices', [ $this, 'notice_free_deactivated' ] );
 			// Run before any plugin renders its admin notice. Priority 1 so
 			// we strip the action queue before WP starts firing it.
 			add_action( 'in_admin_header', [ $this, 'suppress_admin_notices' ], 1 );
@@ -60,23 +60,7 @@ class Animicro_Admin {
 	}
 
 	/**
-	 * Show a one-time success notice when Pro auto-deactivated the free version.
-	 */
-	public function notice_free_deactivated(): void {
-		if ( ! Animicro::is_pro_plugin() ) {
-			return;
-		}
-		if ( ! get_transient( 'animicro_pro_deactivated_free' ) ) {
-			return;
-		}
-		delete_transient( 'animicro_pro_deactivated_free' );
-		echo '<div class="notice notice-success is-dismissible"><p>'
-			. esc_html__( 'Animicro (free) has been deactivated automatically. Animicro Pro is now active.', 'animicro' )
-			. '</p></div>';
-	}
-
-	/**
-	 * Add Settings and Upgrade links to the plugin row.
+	 * Add the Settings link to the plugin row.
 	 */
 	public function plugin_action_links( array $links, string $plugin_file ): array {
 		if ( ANIMICRO_BASENAME !== $plugin_file ) {
@@ -91,19 +75,24 @@ class Animicro_Admin {
 			esc_html__( 'Settings', 'animicro' )
 		);
 
-		$merged = array_merge( [ $settings_link ], $links );
+		return array_merge( [ $settings_link ], $links );
+	}
 
-		if ( ! Animicro::is_pro_plugin() ) {
-			$upgrade_url = apply_filters( 'animicro_upgrade_url', 'https://animicro.com/' );
-
-			$merged[] = sprintf(
-				'<a href="%s" target="_blank" rel="noopener noreferrer" style="font-weight: 700; color: #8DDF0A;">%s</a>',
-				esc_url( $upgrade_url ),
-				esc_html__( 'Upgrade', 'animicro' )
-			);
+	/**
+	 * Link to the ready-made Bricks layout library, next to "View details".
+	 */
+	public function plugin_row_meta( array $meta, string $plugin_file ): array {
+		if ( ANIMICRO_BASENAME !== $plugin_file ) {
+			return $meta;
 		}
 
-		return $merged;
+		$meta[] = sprintf(
+			'<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+			esc_url( apply_filters( 'animicro_library_url', 'https://animicro.com/library/' ) ),
+			esc_html__( 'Bricks layouts', 'animicro' )
+		);
+
+		return $meta;
 	}
 
 	private const MENU_ICON_BASE64 = 'PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4IiBmaWxsPSJub25lIj48cGF0aCBkPSJNOTUuMzkyOSA2NEwxMDUuMjEgNzUuNzg1N0MxMDYuMjQxIDc2Ljk4NTEgMTA3LjAxMyA3OC4zNzUzIDEwNy40NzkgNzkuODcyOUMxMDcuOTQ1IDgxLjM3MDQgMTA4LjA5NSA4Mi45NDQzIDEwNy45MjEgODQuNUMxMDcuODA2IDg2LjA2NjEgMTA3LjM1OSA4Ny41OTE5IDEwNi42MDkgODguOTgxMkMxMDUuODU5IDkwLjM3MDQgMTA0LjgyMSA5MS41OTI5IDEwMy41NjIgOTIuNTcxNEwxMDAuNTU4IDk1LjAzNTdMOTAuNTU3NSA4Mi45Mjg2Qzg4LjczNTggODAuNjUwOSA4Ni4wOSA3OS4xMzgxIDgzLjE2MTggNzguNjk5OUM4MC4yMzM1IDc4LjI2MTcgNzcuMjQ0MiA3OC45MzEyIDc0LjgwNTcgODAuNTcxNEwyNC4xODAyIDExNEwyMS45ODIzIDExMC43MTRDMjAuMjQ4MyAxMDguMDgyIDE5LjYyNyAxMDQuODk3IDIwLjI0ODQgMTAxLjgyOEMyMC44Njk5IDk4Ljc1ODQgMjIuNjg1OSA5Ni4wNDI3IDI1LjMxNTggOTQuMjVMNzEuMjg5IDY0TDI1LjMxNTggMzMuNzVDMjIuNjc4NCAzMS45NjMxIDIwLjg1NjQgMjkuMjQ2OSAyMC4yMzQ0IDI2LjE3NUMxOS42MTI1IDIzLjEwMyAyMC4yMzkyIDE5LjkxNTcgMjEuOTgyMyAxNy4yODU3TDI0LjE4MDIgMTRMNzQuOTUyMiA0Ny40Mjg2Qzc3LjM5MDcgNDkuMDY4OCA4MC4zODAxIDQ5LjczODMgODMuMzA4MyA0OS4zMDAxQzg2LjIzNjYgNDguODYxOSA4OC44ODIzIDQ3LjM0OTEgOTAuNzA0IDQ1LjA3MTRMMTAwLjU5NSAzMy4wMzU3TDEwMy41OTkgMzUuNUMxMDQuODQyIDM2LjQ3MzggMTA1Ljg2OCAzNy42ODY0IDEwNi42MTIgMzkuMDYyNUMxMDcuMzU1IDQwLjQzODYgMTA3LjgwMSA0MS45NDkgMTA3LjkyMSA0My41QzEwOC4xMDUgNDUuMDUwOCAxMDcuOTY2IDQ2LjYyMTkgMTA3LjUxMyA0OC4xMTkyQzEwNy4wNiA0OS42MTY1IDEwNi4zMDIgNTEuMDA5MyAxMDUuMjg0IDUyLjIxNDNMOTUuMzkyOSA2NFoiIGZpbGw9ImJsYWNrIi8+PC9zdmc+';
@@ -120,9 +109,6 @@ class Animicro_Admin {
 			$icon_url,
 			80
 		);
-
-		// The License screen (animicro-license) is the shared LicenSuite SDK
-		// page, registered by Animicro_License_Page — not a React screen.
 	}
 
 	public function render_page(): void {
@@ -183,23 +169,11 @@ class Animicro_Admin {
 			wp_enqueue_media();
 		}
 
-		$is_pro_plugin = Animicro::is_pro_plugin();
-		$is_premium    = false;
-
-		if ( $is_pro_plugin && class_exists( 'Animicro_License_Manager' ) ) {
-			$is_premium = Animicro_License_Manager::is_premium();
-		}
-
 		$data = wp_json_encode( [
-			'restUrl'    => esc_url_raw( rest_url( 'animicro/v1/' ) ),
-			'nonce'      => wp_create_nonce( 'wp_rest' ),
-			'settings'   => Animicro::get_settings(),
-			'version'    => ANIMICRO_VERSION,
-			'isPremium'  => $is_premium,
-			'proPlugin'  => $is_pro_plugin,
-			'upgradeUrl' => $is_pro_plugin
-				? admin_url( 'admin.php?page=animicro-license' )
-				: apply_filters( 'animicro_upgrade_url', 'https://animicro.com/' ),
+			'restUrl'  => esc_url_raw( rest_url( 'animicro/v1/' ) ),
+			'nonce'    => wp_create_nonce( 'wp_rest' ),
+			'settings' => Animicro::get_settings(),
+			'version'  => ANIMICRO_VERSION,
 		] );
 
 		wp_add_inline_script( 'animicro-admin', "window.animicroData = {$data};", 'before' );
@@ -248,9 +222,6 @@ class Animicro_Admin {
 				'permission_callback' => [ $this, 'check_permission' ],
 			],
 		] );
-
-		// License activation/removal is handled by the shared LicenSuite SDK
-		// page (Animicro_License_Page) via admin-post.php — no REST routes.
 	}
 
 	public function check_permission( ?\WP_REST_Request $request = null ): bool {
@@ -275,21 +246,6 @@ class Animicro_Admin {
 		$clean['active_modules'] = isset( $raw['active_modules'] ) && is_array( $raw['active_modules'] )
 			? array_map( 'sanitize_text_field', $raw['active_modules'] )
 			: $defaults['active_modules'];
-
-		$is_premium = Animicro::is_pro_plugin()
-			&& class_exists( 'Animicro_License_Manager' )
-			&& Animicro_License_Manager::is_premium();
-
-		if ( ! $is_premium ) {
-			$clean['active_modules'] = array_values(
-				array_filter(
-					$clean['active_modules'],
-					function ( $m ) {
-						return ! Animicro::is_pro_module( $m );
-					}
-				)
-			);
-		}
 
 		$raw_module_settings     = isset( $raw['module_settings'] ) && is_array( $raw['module_settings'] )
 			? $raw['module_settings']
